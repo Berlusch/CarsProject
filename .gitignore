@@ -1,0 +1,15 @@
+.vs
+CarsProject/bin
+CarsProject/obj
+CarsProject.DAL/bin
+CarsProject.DAL/obj
+CarsProject.Common/bin
+CarsProject.Common/obj
+CarsProject.Model/bin
+CarsProject.Model/obj
+CarsProject.Model.Common/bin
+CarsProject.Model.Common/obj
+CarsProject.Repository/bin
+CarsProject.Repository/obj
+CarsProject.Repository.Common/bin
+CarsProject.Repository.Common/obj
