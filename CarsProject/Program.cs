@@ -1,5 +1,6 @@
 using CarsProject.DAL;
 using Microsoft.EntityFrameworkCore;
+using CarsProject.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
 
 builder.Services.AddDbContext<CarsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
