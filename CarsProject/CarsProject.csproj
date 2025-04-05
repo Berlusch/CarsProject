@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -24,10 +24,6 @@
     <ProjectReference Include="..\CarsProject.Model\CarsProject.Model.csproj" />
     <ProjectReference Include="..\CarsProject.Repository.Common\CarsProject.Repository.Common.csproj" />
     <ProjectReference Include="..\CarsProject.Repository\CarsProject.Repository.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
