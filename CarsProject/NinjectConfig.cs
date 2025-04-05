@@ -16,6 +16,7 @@ namespace CarsProject
             kernel.Bind<ICarOwnerRepository>().To<CarOwnerRepository>();
             kernel.Bind<ICarRegistrationRepository>().To<CarRegistrationRepository>();
             kernel.Bind<ICarEngineTypeRepository>().To<CarEngineTypeRepository>();
+            kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
 
             return kernel;
         }
