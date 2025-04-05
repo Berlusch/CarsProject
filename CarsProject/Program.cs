@@ -6,14 +6,15 @@ using CarsProject.Repository.Common;
 using Microsoft.EntityFrameworkCore;
 using Ninject;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-//NINJECT
 var kernel = NinjectConfig.CreateKernel();
 
 builder.Services.AddSingleton<IKernel>(kernel);
 
+// Ostale registracije servisa
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICarMakeRepository, CarMakeRepository>();
 builder.Services.AddScoped<ICarModelRepository, CarModelRepository>();
 builder.Services.AddScoped<ICarOwnerRepository, CarOwnerRepository>();
@@ -21,18 +22,19 @@ builder.Services.AddScoped<ICarRegistrationRepository, CarRegistrationRepository
 builder.Services.AddScoped<ICarEngineTypeRepository, CarEngineTypeRepository>();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger konfiguracija
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
 
+// Dodavanje DbContext za povezivanje s bazom podataka
 builder.Services.AddDbContext<CarsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("CarsProject.DAL"))); 
+        b => b.MigrationsAssembly("CarsProject.DAL")));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger middleware za razvojnu okolinu
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
