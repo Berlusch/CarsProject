@@ -9,11 +9,11 @@ using Ninject;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Ninject configuration
 var kernel = NinjectConfig.CreateKernel();
 
 builder.Services.AddSingleton<IKernel>(kernel);
 
-// Ostale registracije servisa
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICarMakeRepository, CarMakeRepository>();
 builder.Services.AddScoped<ICarModelRepository, CarModelRepository>();
@@ -21,11 +21,14 @@ builder.Services.AddScoped<ICarOwnerRepository, CarOwnerRepository>();
 builder.Services.AddScoped<ICarRegistrationRepository, CarRegistrationRepository>();
 builder.Services.AddScoped<ICarEngineTypeRepository, CarEngineTypeRepository>();
 
+//Automapper configuration
+builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
+
 builder.Services.AddControllers();
 // Swagger konfiguracija
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
+
 
 // Dodavanje DbContext za povezivanje s bazom podataka
 builder.Services.AddDbContext<CarsDbContext>(options =>
