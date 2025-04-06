@@ -1,12 +1,10 @@
 ﻿namespace CarsProject.Model.Common
 {
-    public interface ICarModel
-    {
-        int Id { get; set; }
+    public interface ICarModel:IEntityBase
+    {        
         string Name { get; set; }
-        string Abrv { get; set; }
-        ICarMake CarMake { get; set; }  
+
+        int CarEngineTypeId { get; set; }
         ICarEngineType CarEngineType { get; set; }
     }
-
 }

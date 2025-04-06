@@ -1,9 +1,8 @@
 ﻿namespace CarsProject.Model.Common
 {
-    public interface ICarEngineType
+    public interface ICarEngineType:IEntityBase
     
-    {
-        int Id { get; set; }
+    {       
         string Type { get; set; }
         string Abrv { get; set; }
 

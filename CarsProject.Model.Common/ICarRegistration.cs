@@ -1,11 +1,16 @@
 ﻿namespace CarsProject.Model.Common
 {
-    public interface ICarRegistration
+    public interface ICarRegistration : IEntityBase
     {
-        int Id { get; set; }
         string RegistrationNumber { get; set; }
-        ICarOwner CarOwner { get; set; }  
-        ICarModel CarModel { get; set; }  
+
+        int CarOwnerId { get; set; }
+        int CarModelId { get; set; }
+
+        ICarOwner CarOwner { get; set; }
+        ICarModel CarModel { get; set; }
     }
 }
+
+
 
