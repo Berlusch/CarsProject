@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using CarsProject.Model;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.DAL
 {
@@ -17,5 +11,21 @@ namespace CarsProject.DAL
         public DbSet<CarsProject.Model.CarEngineType> CarEngineTypes { get; set; }
 
         public CarsDbContext(DbContextOptions<CarsDbContext> options) : base(options) { }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // 1:n relationships
+
+            modelBuilder.Entity<CarModel>().HasOne(g => g.CarMake);           
+            //modelBuilder.Entity<CarModel>().HasOne(g => g.CarEngineType)
+            //.WithMany();  
+            modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarOwner);
+            modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarModel);
+
+        }
     }
-}
+
+    
+
+    }
