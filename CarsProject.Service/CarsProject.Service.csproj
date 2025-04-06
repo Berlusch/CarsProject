@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarsProject.Model\CarsProject.Model.csproj" />
+    <ProjectReference Include="..\CarsProject.Repository.Common\CarsProject.Repository.Common.csproj" />
+    <ProjectReference Include="..\CarsProject.Repository\CarsProject.Repository.csproj" />
+    <ProjectReference Include="..\CarsProject.Service.Common\CarsProject.Service.Common.csproj" />
+  </ItemGroup>
+
+</Project>
