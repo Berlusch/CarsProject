@@ -1,19 +1,22 @@
-﻿using CarsProject.Model.Common;
-using System.ComponentModel.DataAnnotations.Schema;
-
+﻿using CarsProject.Model;
+using CarsProject.Model.Common;
 
 namespace CarsProject.Model
 {
-    public class CarModel : EntityBase, ICarModel
-    {        
+    public class CarModel : ICarModel
+    {
+        public int Id { get; set; }
         public string Name { get; set; } = "";
-        public string Abrv { get; set; } = "";
 
-        [ForeignKey("carMake")]
-        public required ICarMake CarMake { get; set; }
+        public int CarEngineTypeId { get; set; }
 
-        [ForeignKey("carEngineType")]
-        public required ICarEngineType CarEngineType { get; set; }
-                
+        public required CarEngineType CarEngineType { get; set; }
+
+        ICarEngineType ICarModel.CarEngineType
+        {
+            get => CarEngineType;
+            set => CarEngineType = (CarEngineType)value;
+        }
     }
 }
+

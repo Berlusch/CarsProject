@@ -1,19 +1,30 @@
 ﻿using CarsProject.Model.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarsProject.Model
 {
     public class CarRegistration : EntityBase, ICarRegistration
-    {       
+    {
         public string RegistrationNumber { get; set; } = "";
 
-        [ForeignKey("carOwner")]
-        public required ICarOwner CarOwner { get; set; }
-        [ForeignKey("carModel")]
-        public required ICarModel CarModel { get; set; }
+        public int CarOwnerId { get; set; }
+        public int CarModelId { get; set; }
+        
+        public CarOwner CarOwner { get; set; } = null!;
+        public CarModel CarModel { get; set; } = null!;
 
         
-        
+        ICarOwner ICarRegistration.CarOwner
+        {
+            get => CarOwner;
+            set => CarOwner = (CarOwner)value;
+        }
+
+        ICarModel ICarRegistration.CarModel
+        {
+            get => CarModel;
+            set => CarModel = (CarModel)value;
+        }
     }
 }
+
 

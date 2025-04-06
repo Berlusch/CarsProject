@@ -42,6 +42,7 @@ namespace CarsProject.Controllers
                 return BadRequest(ModelState);
 
             await _unitOfWork.CarMakeRepository.AddAsync(carMake);
+            await _unitOfWork.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new { id = carMake.Id }, carMake);
         }
 
@@ -52,6 +53,7 @@ namespace CarsProject.Controllers
                 return BadRequest("ID mismatch");
 
             await _unitOfWork.CarMakeRepository.UpdateAsync(carMake);
+            await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
 
@@ -59,6 +61,7 @@ namespace CarsProject.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _unitOfWork.CarMakeRepository.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
     }
