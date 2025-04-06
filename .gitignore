@@ -13,4 +13,8 @@ CarsProject.Repository/bin
 CarsProject.Repository/obj
 CarsProject.Repository.Common/bin
 CarsProject.Repository.Common/obj
+CarsProject.Service.Common/bin
+CarsProject.Service.Common/obj
+CarsProject.Service/bin
+CarsProject.Service/obj
 
