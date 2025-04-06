@@ -1,7 +1,5 @@
-﻿using CarsProject.Model;  
-using CarsProject.Repository.Common;  
-using CarsProject.DAL;  
-using Microsoft.EntityFrameworkCore;  
+﻿using CarsProject.DAL;
+using CarsProject.Repository.Common;
 
 namespace CarsProject.Repository
 {

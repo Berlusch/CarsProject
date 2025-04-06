@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace CarsProject.Repository.Common
+﻿namespace CarsProject.Repository.Common
 {
     public interface IUnitOfWork : IDisposable
     {

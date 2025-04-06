@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CarsProject.DAL;
+﻿using CarsProject.DAL;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Repository.Common
 {
