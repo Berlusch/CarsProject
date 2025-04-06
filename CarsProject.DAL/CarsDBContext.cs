@@ -18,8 +18,8 @@ namespace CarsProject.DAL
             // 1:n relationships
 
             modelBuilder.Entity<CarModel>().HasOne(g => g.CarMake);           
-            //modelBuilder.Entity<CarModel>().HasOne(g => g.CarEngineType)
-            //.WithMany();  
+            modelBuilder.Entity<CarModel>().HasOne(g => g.CarEngineType)
+            .WithMany();  
             modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarOwner);
             modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarModel);
 
