@@ -1,6 +1,7 @@
-﻿using Ninject;
-using CarsProject.Repository;
+﻿using CarsProject.Repository;
 using CarsProject.Repository.Common;
+using CarsProject.Service;
+using Ninject;
 
 namespace CarsProject
 {
@@ -11,6 +12,7 @@ namespace CarsProject
             var kernel = new StandardKernel();
 
             // Repository bindings
+            kernel.Bind<ICarMakeService>().To<CarMakeService>();
             kernel.Bind<ICarMakeRepository>().To<CarMakeRepository>();
             kernel.Bind<ICarModelRepository>().To<CarModelRepository>();
             kernel.Bind<ICarOwnerRepository>().To<CarOwnerRepository>();
