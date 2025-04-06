@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CarsProject.Model.DTO
 {
@@ -14,9 +9,9 @@ namespace CarsProject.Model.DTO
         [Required(ErrorMessage = "Abbreviation is required.")]
     string Abrv,
         [Required(ErrorMessage = "Car make ID is required.")]
-    int CarMakeId,
-        [Required(ErrorMessage = "Car engine type ID is required.")]
-    int CarEngineTypeId
+    int CarMakeId
+
+    //CarEngineTypeId is not required because it is not used in the insert/update operation (only lookup is used)
 
     );
 }
