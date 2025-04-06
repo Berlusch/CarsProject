@@ -1,8 +1,7 @@
 ﻿namespace CarsProject.DAL
 {
-    public class CarMake
+    public class CarMake:EntityBase
     {
-        public int Id { get; set; }
         public string Name { get; set; } = "";
         public string Abrv { get; set; } = "";
 

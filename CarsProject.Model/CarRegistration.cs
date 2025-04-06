@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CarsProject.Model.Common;
+﻿using CarsProject.Model.Common;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarsProject.Model
 {
-    public class CarRegistration : ICarRegistration
-    {
-        public int Id { get; set; }
+    public class CarRegistration : EntityBase, ICarRegistration
+    {       
         public string RegistrationNumber { get; set; } = "";
-        public ICarOwner CarOwner { get; set; }
-        public ICarModel CarModel { get; set; }
 
-        //Constructor to initialize the non-nullable properties
-        public CarRegistration(ICarOwner carOwner, ICarModel carModel)
-        {
-            CarOwner = carOwner ?? throw new ArgumentNullException(nameof(carOwner));
-            CarModel = carModel ?? throw new ArgumentNullException(nameof(carModel));
-        }
+        [ForeignKey("carOwner")]
+        public required ICarOwner CarOwner { get; set; }
+        [ForeignKey("carModel")]
+        public required ICarModel CarModel { get; set; }
 
+        
+        
     }
 }
+
