@@ -1,69 +1,72 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using CarsProject.Model.DTO;
+using CarsProject.Service;
+using Microsoft.AspNetCore.Mvc;
 using CarsProject.Model;
-using CarsProject.Repository.Common;
 
 namespace CarsProject.Controllers
-{    
-        [ApiController]
-        [Route("api/[controller]")]
-        public class CarMakeController : ControllerBase
-        {
-        private readonly IUnitOfWork _unitOfWork;
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CarMakeController : ControllerBase
+    {
+        private readonly ICarMakeService _carMakeService;
+        private readonly IMapper _mapper;
 
-        public CarMakeController(IUnitOfWork unitOfWork)
+        public CarMakeController(ICarMakeService carMakeService, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _carMakeService = carMakeService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CarMake>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CarMakeDTORead>>> GetAll()
         {
-            var carMakes = await _unitOfWork.CarMakeRepository.GetAllAsync();
+            var carMakes = await _carMakeService.GetAllCarMakesAsync();
             return Ok(carMakes);
         }
 
-
         [HttpGet("{id}")]
-        public async Task<ActionResult<CarMake>> GetById(int id)
+        public async Task<ActionResult<CarMakeDTORead>> GetById(int id)
         {
-            var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(id);
-
+            var carMake = await _carMakeService.GetCarMakeByIdAsync(id);
             if (carMake == null)
                 return NotFound();
-
             return Ok(carMake);
         }
 
-
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarMake carMake)
+        public async Task<ActionResult> Create([FromBody] CarMakeDTOInsertUpdate carMakeDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _unitOfWork.CarMakeRepository.AddAsync(carMake);
-            await _unitOfWork.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetById), new { id = carMake.Id }, carMake);
+            var createdCarMake = await _carMakeService.AddCarMakeAsync(carMakeDto);
+            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, createdCarMake);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarMake carMake)
+        public async Task<IActionResult> Update(int id, [FromBody] CarMakeDTOInsertUpdate carMakeDto)
         {
-            if (id != carMake.Id)
-                return BadRequest("ID mismatch");
+            var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMakeDto);
 
-            await _unitOfWork.CarMakeRepository.UpdateAsync(carMake);
-            await _unitOfWork.SaveChangesAsync();
-            return NoContent();
+            if (updatedCarMake == null)
+            {
+                return NotFound();  // Ako je ažuriranje propalo jer CarMake nije pronađen
+            }
+
+            return Ok(updatedCarMake);  // Vraćamo ažurirani CarMakeDTORead
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _unitOfWork.CarMakeRepository.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync();
+            var success = await _carMakeService.DeleteCarMakeAsync(id);
+            if (!success)
+                return NotFound();
+
             return NoContent();
         }
     }
-    
 }

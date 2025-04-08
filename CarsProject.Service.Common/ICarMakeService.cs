@@ -1,16 +1,14 @@
-﻿using CarsProject.Model;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using CarsProject.Model.DTO;
 
 namespace CarsProject.Service
 {
+
     public interface ICarMakeService
     {
-        Task<IEnumerable<CarMake>> GetAllCarMakesAsync();
-        Task<CarMake> GetCarMakeByIdAsync(int id);
-        Task<CarMake> AddCarMakeAsync(CarMake carMake);
-        Task<CarMake> UpdateCarMakeAsync(CarMake carMake);
+        Task<IEnumerable<CarMakeDTORead>> GetAllCarMakesAsync();
+        Task<CarMakeDTORead> GetCarMakeByIdAsync(int id);
+        Task<CarMakeDTORead> AddCarMakeAsync(CarMakeDTOInsertUpdate carMakeDto);
+        Task<CarMakeDTORead> UpdateCarMakeAsync(int id, CarMakeDTOInsertUpdate carMakeDto);
         Task<bool> DeleteCarMakeAsync(int id);
     }
 }
-

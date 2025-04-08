@@ -1,3 +1,4 @@
+using AutoMapper;
 using CarsProject;
 using CarsProject.DAL;
 using CarsProject.Mapping;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<ICarEngineTypeRepository, CarEngineTypeRepository>();
 //Automapper configuration
 builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
 
+
 builder.Services.AddControllers();
 // Swagger konfiguracija
 builder.Services.AddEndpointsApiExplorer();
@@ -53,3 +55,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+

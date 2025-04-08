@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CarsProject.Model.DTO;
+using CarsProject.Model;
 
 
 namespace CarsProject.Mapping
@@ -8,30 +10,30 @@ namespace CarsProject.Mapping
         public CarsProjectMappingProfile()
         {
             // CarEngineType Mapping
-            CreateMap<CarsProject.DAL.CarEngineType, CarsProject.Model.DTO.CarEngineTypeDTORead>();
+            CreateMap<CarEngineType, CarEngineTypeDTORead>();
             
             // CarOwner Mapping
-            CreateMap<CarsProject.DAL.CarOwner, CarsProject.Model.DTO.CarOwnerDTORead>();
-            CreateMap<CarsProject.Model.DTO.CarOwnerDTOInsertUpdate, CarsProject.DAL.CarOwner>();
+            CreateMap<CarOwner, CarOwnerDTORead>();
+            CreateMap<CarOwnerDTOInsertUpdate, CarOwner>();
 
             // CarMake Mapping
-            CreateMap<CarsProject.DAL.CarMake, CarsProject.Model.DTO.CarMakeDTORead>();
-            CreateMap<CarsProject.Model.DTO.CarMakeDTOInsertUpdate, CarsProject.DAL.CarMake>();
+            CreateMap<CarMake, CarMakeDTORead>();
+            CreateMap<CarMakeDTOInsertUpdate, CarMake>();
 
             // CarModel Mapping
             CreateMap<CarsProject.DAL.CarModel, CarsProject.Model.DTO.CarModelDTORead>()
                 .ForCtorParam("CarMakeName", opt => opt.MapFrom(src => src.CarMake.Name))
                 .ForCtorParam("CarEngineTypeType", opt => opt.MapFrom(src => src.CarEngineType.Type));
 
-            CreateMap<CarsProject.Model.DTO.CarModelDTOInsertUpdate, CarsProject.DAL.CarModel>()
+            CreateMap<CarModelDTOInsertUpdate, CarsProject.DAL.CarModel>()
                 .ForMember(dest => dest.CarMake, opt => opt.MapFrom(src => src.CarMakeId));
                 
             // CarRegistration Mapping
-            CreateMap<CarsProject.DAL.CarRegistration, CarsProject.Model.DTO.CarRegistrationDTORead>()
+            CreateMap<CarRegistration, CarRegistrationDTORead>()
                 .ForCtorParam("CarModelName", opt => opt.MapFrom(src => src.CarModel.Name))
                 .ForCtorParam("CarOwnerFirstNameLastName", opt => opt.MapFrom(src => $"{src.CarOwner.FirstName} {src.CarOwner.LastName}"));
 
-            CreateMap<CarsProject.Model.DTO.CarRegistrationDTOInsertUpdate, CarsProject.DAL.CarRegistration>()
+            CreateMap<CarRegistrationDTOInsertUpdate, CarRegistration>()
                 .ForMember(dest => dest.CarModel, opt => opt.MapFrom(src => src.CarModelId))
                 .ForMember(dest => dest.CarOwner, opt => opt.MapFrom(src => src.CarOwnerId));
         }

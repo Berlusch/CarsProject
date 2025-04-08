@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CarsProject.Model\CarsProject.Model.csproj" />
     <ProjectReference Include="..\CarsProject.Repository.Common\CarsProject.Repository.Common.csproj" />
     <ProjectReference Include="..\CarsProject.Repository\CarsProject.Repository.csproj" />
