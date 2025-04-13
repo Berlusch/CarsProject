@@ -7,22 +7,26 @@ using CarsProject.Repository.Common;
 using CarsProject.Service;
 using Microsoft.EntityFrameworkCore;
 using Ninject;
+using Ninject.Extensions.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Ninject configuration
-var kernel = NinjectConfig.CreateKernel();
+//Ninject
+builder.Host.UseServiceProviderFactory(new NinjectServiceProviderFactory());
 
-builder.Services.AddSingleton<IKernel>(kernel);
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ICarMakeService,CarMakeService>();
-builder.Services.AddScoped<ICarMakeRepository, CarMakeRepository>();
-builder.Services.AddScoped<ICarModelRepository, CarModelRepository>();
-builder.Services.AddScoped<ICarOwnerRepository, CarOwnerRepository>();
-builder.Services.AddScoped<ICarRegistrationRepository, CarRegistrationRepository>();
-builder.Services.AddScoped<ICarEngineTypeRepository, CarEngineTypeRepository>();
+builder.Host.ConfigureContainer<IKernel>(kernel =>
+{
+    kernel.Bind<ICarMakeService>().To<CarMakeService>();
+    kernel.Bind<ICarMakeRepository>().To<CarMakeRepository>();
+    kernel.Bind<ICarModelRepository>().To<CarModelRepository>();
+    kernel.Bind<ICarOwnerRepository>().To<CarOwnerRepository>();
+    kernel.Bind<ICarRegistrationRepository>().To<CarRegistrationRepository>();
+    kernel.Bind<ICarEngineTypeRepository>().To<CarEngineTypeRepository>();
+    kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
+    
+});
 
 //Automapper configuration
 builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
