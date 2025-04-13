@@ -12,20 +12,25 @@ namespace CarsProject.DAL
 
         public CarsDbContext(DbContextOptions<CarsDbContext> options) : base(options) { }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // 1:n relationships
+            
+            modelBuilder.Entity<CarMake>();
+            modelBuilder.Entity<CarModel>();
+            modelBuilder.Entity<CarOwner>();
+            modelBuilder.Entity<CarRegistration>();
+            modelBuilder.Entity<CarEngineType>();
 
-            modelBuilder.Entity<CarModel>().HasOne(g => g.CarMake);           
+            // 1:n relationships
+            modelBuilder.Entity<CarModel>().HasOne(g => g.CarMake);
             modelBuilder.Entity<CarModel>().HasOne(g => g.CarEngineType)
-            .WithMany();  
+                .WithMany();
             modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarOwner);
             modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarModel);
-
         }
     }
+}
 
     
 
-    }
+    

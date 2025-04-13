@@ -33,7 +33,7 @@ builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
 
 
 builder.Services.AddControllers();
-// Swagger konfiguracija
+// Swagger configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

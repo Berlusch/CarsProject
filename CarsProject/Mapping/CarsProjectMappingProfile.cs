@@ -18,7 +18,7 @@ namespace CarsProject.Mapping
 
             // CarMake Mapping
             CreateMap<CarMake, CarMakeDTORead>();
-            CreateMap<CarMakeDTOInsertUpdate, CarMake>();
+            CreateMap<CarMakeDTOInsertUpdate, CarMake>();            
 
             // CarModel Mapping
             CreateMap<CarModel, CarsProject.Model.DTO.CarModelDTORead>()

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarsProject.DAL.Migrations
 {
     [DbContext(typeof(CarsDbContext))]
-    [Migration("20250413095814_NewMigration")]
-    partial class NewMigration
+    [Migration("20250413112152_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
