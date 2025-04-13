@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using CarsProject.Model;
 using CarsProject.Model.DTO;
 using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
-using CarsProject.Model;
 
 namespace CarsProject.Controllers
 {
@@ -19,11 +19,16 @@ namespace CarsProject.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CarMakeDTORead>>> GetAll()
+        [HttpGet("getPfs")]
+        public async Task<ActionResult<IEnumerable<CarMakeDTORead>>> GetPFS(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 5,
+            [FromQuery] string sortBy = "name",
+            [FromQuery] string filter = "")
         {
-            var carMakes = await _carMakeService.GetAllCarMakesAsync();
-            return Ok(carMakes);
+            var carMakes = await _carMakeService.GetCarMakesPagedAsync(pageNumber, pageSize, sortBy, filter);
+            var carMakeDtos = _mapper.Map<IEnumerable<CarMakeDTORead>>(carMakes);
+            return Ok(carMakeDtos);
         }
 
         [HttpGet("{id}")]
@@ -32,7 +37,8 @@ namespace CarsProject.Controllers
             var carMake = await _carMakeService.GetCarMakeByIdAsync(id);
             if (carMake == null)
                 return NotFound();
-            return Ok(carMake);
+
+            return Ok(_mapper.Map<CarMakeDTORead>(carMake)); 
         }
 
         [HttpPost]
@@ -41,23 +47,23 @@ namespace CarsProject.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdCarMake = await _carMakeService.AddCarMakeAsync(carMakeDto);
-            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, createdCarMake);
+            var carMake = _mapper.Map<CarMake>(carMakeDto); // Mapiraj DTO u domain model
+            var createdCarMake = await _carMakeService.AddCarMakeAsync(carMake);
+
+            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeDTORead>(createdCarMake)); // Mapiraj domain model u DTO
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CarMakeDTOInsertUpdate carMakeDto)
         {
-            var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMakeDto);
+            var carMake = _mapper.Map<CarMake>(carMakeDto); // Mapiraj DTO u domain model
+            var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMake);
 
             if (updatedCarMake == null)
-            {
-                return NotFound();  // Ako je ažuriranje propalo jer CarMake nije pronađen
-            }
+                return NotFound();
 
-            return Ok(updatedCarMake);  // Vraćamo ažurirani CarMakeDTORead
+            return Ok(_mapper.Map<CarMakeDTORead>(updatedCarMake)); 
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

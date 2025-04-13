@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CarsProject.Model.DTO;
 using CarsProject.Model;
+using CarsProject.Model.DTO;
 
 
 namespace CarsProject.Mapping
@@ -21,11 +21,12 @@ namespace CarsProject.Mapping
             CreateMap<CarMakeDTOInsertUpdate, CarMake>();
 
             // CarModel Mapping
-            CreateMap<CarsProject.DAL.CarModel, CarsProject.Model.DTO.CarModelDTORead>()
-                .ForCtorParam("CarMakeName", opt => opt.MapFrom(src => src.CarMake.Name))
-                .ForCtorParam("CarEngineTypeType", opt => opt.MapFrom(src => src.CarEngineType.Type));
+            CreateMap<CarModel, CarsProject.Model.DTO.CarModelDTORead>()
+                .ForMember(dest => dest.CarMakeName, opt => opt.MapFrom(src => src.CarMake.Name))
+                .ForMember(dest => dest.CarEngineTypeType, opt => opt.MapFrom(src => src.CarEngineType.Type));
 
-            CreateMap<CarModelDTOInsertUpdate, CarsProject.DAL.CarModel>()
+
+            CreateMap<CarModelDTOInsertUpdate, CarModel>()
                 .ForMember(dest => dest.CarMake, opt => opt.MapFrom(src => src.CarMakeId));
                 
             // CarRegistration Mapping

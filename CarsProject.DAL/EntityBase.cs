@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CarsProject.DAL
 {
-    public class EntityBase
+    internal class EntityBase
     {
         public int Id { get; set; }
     }

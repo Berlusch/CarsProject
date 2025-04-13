@@ -6,6 +6,6 @@ namespace CarsProject.Repository.Common
     public interface ICarMakeRepository: ICRUDRepository<CarMake>
        
     {
-        //other specific methods will be added here later
+        Task<IEnumerable<CarMake>> GetAllCarMakesAsync();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using CarsProject.Model;
-using CarsProject.Model.DTO;
 using CarsProject.Repository.Common;
 
 namespace CarsProject.Service
@@ -16,13 +15,41 @@ namespace CarsProject.Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CarMakeDTORead>> GetAllCarMakesAsync()
+        
+        public async Task<IEnumerable<CarMake>> GetCarMakesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
         {
-            var carMakes = await _unitOfWork.CarMakeRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<CarMakeDTORead>>(carMakes);
+            var carMakesQuery = await _unitOfWork.CarMakeRepository.GetAllCarMakesAsync(); 
+
+            // Filtering
+            if (!string.IsNullOrEmpty(filter))
+            {
+                carMakesQuery = carMakesQuery.Where(c => c.Name.Contains(filter)); // Filtering by name
+            }
+
+            // Sorting
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                if (sortBy.ToLower() == "name")
+                {
+                    carMakesQuery = carMakesQuery.OrderBy(c => c.Name);
+                } // Sorting by name
+                else
+                {
+                    carMakesQuery = carMakesQuery.OrderBy(c => c.Id); // Otherwise, sorting by ID
+                }
+            }
+
+            // Pagination
+            var carMakesPaged = carMakesQuery
+                .Skip((pageNumber - 1) * pageSize) 
+                .Take(pageSize) 
+                .ToList(); 
+
+            return carMakesPaged; 
         }
 
-        public async Task<CarMakeDTORead> GetCarMakeByIdAsync(int id)
+        
+        public async Task<CarMake> GetCarMakeByIdAsync(int id)
         {
             var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(id);
 
@@ -31,39 +58,36 @@ namespace CarsProject.Service
                 throw new Exception($"CarMake with ID {id} not found.");
             }
 
-            return _mapper.Map<CarMakeDTORead>(carMake);
+            return carMake; 
         }
 
-        public async Task<CarMakeDTORead> AddCarMakeAsync(CarMakeDTOInsertUpdate carMakeDto)
+        
+        public async Task<CarMake> AddCarMakeAsync(CarMake carMake)
         {
-            var carMake = _mapper.Map<CarMake>(carMakeDto);
-            var added = await _unitOfWork.CarMakeRepository.AddAsync(carMake);
+            var addedCarMake = await _unitOfWork.CarMakeRepository.AddAsync(carMake);
             await _unitOfWork.SaveChangesAsync();
-            return _mapper.Map<CarMakeDTORead>(added);
+            return addedCarMake; 
         }
 
-        public async Task<CarMakeDTORead> UpdateCarMakeAsync(int id, CarMakeDTOInsertUpdate carMakeDto)
+        
+        public async Task<CarMake> UpdateCarMakeAsync(int id, CarMake carMake)
         {
             var existingCarMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(id);
 
             if (existingCarMake == null)
             {
-                
                 throw new KeyNotFoundException($"CarMake with ID {id} not found.");
             }
 
-            
-            var carMakeToUpdate = _mapper.Map<CarMake>(carMakeDto);
-            carMakeToUpdate.Id = id; // Postavljamo ID kako bi se ažurirao pravi entitet
+            carMake.Id = id; 
 
-            
-            var updatedCarMake = await _unitOfWork.CarMakeRepository.UpdateAsync(carMakeToUpdate);
+            var updatedCarMake = await _unitOfWork.CarMakeRepository.UpdateAsync(carMake);
             await _unitOfWork.SaveChangesAsync();
 
-            
-            return _mapper.Map<CarMakeDTORead>(updatedCarMake);
+            return updatedCarMake; 
         }
 
+        
         public async Task<bool> DeleteCarMakeAsync(int id)
         {
             var deleted = await _unitOfWork.CarMakeRepository.DeleteAsync(id);

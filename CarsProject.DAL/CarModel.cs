@@ -1,6 +1,6 @@
 ﻿namespace CarsProject.DAL
 {
-    public class CarModel : EntityBase
+    internal class CarModel : EntityBase
     {             
         public string Name { get; set; } = "";
         public string Abrv { get; set; } = "";

@@ -1,12 +1,23 @@
-﻿namespace CarsProject.Repository.Common
+﻿using CarsProject.Model;
+using System.Linq.Expressions;
+
+namespace CarsProject.Repository.Common
 {
     public interface ICRUDRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync();
+        
+        Task<PagedResult<T>> GetPagedAsync(
+            int pageNumber,
+            int pageSize,
+            Func<IQueryable<T>, IQueryable<T>>? filter = null, 
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null); 
+
         Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity);
-        Task<bool> DeleteAsync(int id);  
+        Task<bool> DeleteAsync(int id);
     }
 }
+
+
 

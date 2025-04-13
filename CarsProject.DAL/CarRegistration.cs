@@ -1,6 +1,6 @@
 ﻿namespace CarsProject.DAL
 {
-    public class CarRegistration : EntityBase
+    internal class CarRegistration : EntityBase
     {        
         public string RegistrationNumber { get; set; } = "";
         public required CarOwner CarOwner { get; set; } 

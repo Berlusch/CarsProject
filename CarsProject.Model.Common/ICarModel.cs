@@ -6,5 +6,8 @@
 
         int CarEngineTypeId { get; set; }
         ICarEngineType CarEngineType { get; set; }
+
+        int CarMakeId { get; set; }
+        ICarMake CarMake { get; set; }
     }
 }

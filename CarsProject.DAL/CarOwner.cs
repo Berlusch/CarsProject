@@ -1,6 +1,6 @@
 ﻿namespace CarsProject.DAL
 {
-    public class CarOwner:EntityBase
+    internal class CarOwner:EntityBase
     {        
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
