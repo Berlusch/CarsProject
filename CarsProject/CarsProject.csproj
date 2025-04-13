@@ -1,31 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Ninject" Version="3.3.6" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Ninject" Version="3.3.6" />
+		<PackageReference Include="Ninject.Extensions.DependencyInjection" Version="1.0.2" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CarsProject.Common\CarsProject.Common.csproj" />
-    <ProjectReference Include="..\CarsProject.DAL\CarsProject.DAL.csproj" />
-    <ProjectReference Include="..\CarsProject.Model.Common\CarsProject.Model.Common.csproj" />
-    <ProjectReference Include="..\CarsProject.Model\CarsProject.Model.csproj" />
-    <ProjectReference Include="..\CarsProject.Repository.Common\CarsProject.Repository.Common.csproj" />
-    <ProjectReference Include="..\CarsProject.Repository\CarsProject.Repository.csproj" />
-    <ProjectReference Include="..\CarsProject.Service.Common\CarsProject.Service.Common.csproj" />
-    <ProjectReference Include="..\CarsProject.Service\CarsProject.Service.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CarsProject.Common\CarsProject.Common.csproj" />
+		<ProjectReference Include="..\CarsProject.DAL\CarsProject.DAL.csproj" />
+		<ProjectReference Include="..\CarsProject.Model.Common\CarsProject.Model.Common.csproj" />
+		<ProjectReference Include="..\CarsProject.Model\CarsProject.Model.csproj" />
+		<ProjectReference Include="..\CarsProject.Repository.Common\CarsProject.Repository.Common.csproj" />
+		<ProjectReference Include="..\CarsProject.Repository\CarsProject.Repository.csproj" />
+		<ProjectReference Include="..\CarsProject.Service.Common\CarsProject.Service.Common.csproj" />
+		<ProjectReference Include="..\CarsProject.Service\CarsProject.Service.csproj" />
+	</ItemGroup>
+
+	<!-- Add the InternalsVisibleTo element to allow AutoMapper to access internal classes -->
+	<ItemGroup>
+		<InternalsVisibleTo Include="CarsProject" />
+	</ItemGroup>
 
 </Project>
