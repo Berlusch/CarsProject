@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CarsProject.Model;
+using CarsProject.Model.Common;
 using CarsProject.Model.DTO;
+using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -82,7 +84,7 @@ namespace CarsProject.Service
         }
 
 
-        public async Task<CarMake> UpdateCarMakeAsync(int id, CarMake carMake)
+        public async Task<CarMakeDTORead> UpdateCarMakeAsync(int id, CarMakeDTOInsertUpdate carMakeDto)
         {
             var existingCarMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(id);
 
@@ -90,14 +92,15 @@ namespace CarsProject.Service
             {
                 throw new KeyNotFoundException($"CarMake with ID {id} not found.");
             }
-      
-            var updatedCarMake= await _unitOfWork.CarMakeRepository.UpdateAsync(existingCarMake);
-            
+
+            // Ovo ažurira existingCarMake pomoću podataka iz DTO-a
+            _mapper.Map(carMakeDto, existingCarMake);
+
+            var updatedCarMake = await _unitOfWork.CarMakeRepository.UpdateAsync(existingCarMake);
             await _unitOfWork.SaveChangesAsync();
 
-            return updatedCarMake;
+            return _mapper.Map<CarMakeDTORead>(updatedCarMake);
         }
-
 
 
 

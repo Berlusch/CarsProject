@@ -56,13 +56,12 @@ namespace CarsProject.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CarMakeDTOInsertUpdate carMakeDto)
         {
-            var carMake = _mapper.Map<CarMake>(carMakeDto); // Mapiraj DTO u domain model
-            var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMake);
+            var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMakeDto);
 
             if (updatedCarMake == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CarMakeDTORead>(updatedCarMake)); 
+            return Ok(updatedCarMake); // Već je DTORead iz servisa
         }
 
         [HttpDelete("{id}")]
