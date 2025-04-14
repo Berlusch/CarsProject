@@ -48,7 +48,7 @@ namespace CarsProject.Controllers
                 return BadRequest(ModelState);
 
             var carMake = _mapper.Map<CarMake>(carMakeDto); // Mapiraj DTO u domain model
-            var createdCarMake = await _carMakeService.AddCarMakeAsync(carMake);
+            var createdCarMake = await _carMakeService.AddCarMakeAsync(carMakeDto);
 
             return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeDTORead>(createdCarMake)); // Mapiraj domain model u DTO
         }
