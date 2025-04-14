@@ -2,12 +2,9 @@
 {
     public interface ICarModel:IEntityBase
     {        
-        string Name { get; set; }
-
-        int CarEngineTypeId { get; set; }
-        ICarEngineType CarEngineType { get; set; }
-
-        int CarMakeId { get; set; }
+        string Name { get; set; }   
+        string Abrv { get; set; }
+        ICarEngineType CarEngineType { get; set; }        
         ICarMake CarMake { get; set; }
     }
 }
