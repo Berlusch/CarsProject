@@ -1,0 +1,156 @@
+﻿using AutoMapper;
+using CarsProject.Model;
+using CarsProject.Model.DTO;
+using CarsProject.Repository.Common;
+using CarsProject.Service;
+
+public class CarModelService : ICarModelService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public CarModelService(IUnitOfWork unitOfWork, IMapper mapper)
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
+
+    // PFS (pagination, filtering, sorting)
+    public async Task<IEnumerable<CarModelDTORead>> GetCarModelsPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
+    {
+        var carModelsQuery = await _unitOfWork.CarModelRepository.GetAllCarModelsAsync();
+
+        // Filtering
+        if (!string.IsNullOrEmpty(filter))
+        {
+            string lowerFilter = filter.ToLower();
+            carModelsQuery = carModelsQuery.Where(c => c.Name.ToLower().Contains(lowerFilter));
+        }
+
+        // Sorting
+        if (!string.IsNullOrEmpty(sortBy))
+        {
+            if (sortBy.ToLower() == "name")
+            {
+                carModelsQuery = carModelsQuery.OrderBy(c => c.Name);
+            }
+            else
+            {
+                carModelsQuery = carModelsQuery.OrderBy(c => c.Id);
+            }
+        }
+
+        // Pagination
+        var carModelsPaged = carModelsQuery
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();  // Pretvori u List<CarModel>
+
+        // Mapiraj List<CarModel> u List<CarModelDTORead>
+        var result = _mapper.Map<List<CarModelDTORead>>(carModelsPaged);  
+
+        return result;
+    }
+
+
+    public async Task<CarModelDTORead> GetCarModelByIdAsync(int id)
+    {
+        var carModel = await _unitOfWork.CarModelRepository.GetByIdAsync(id);        
+
+        if (carModel == null)
+        {
+            throw new Exception($"CarModel with ID {id} not found.");
+        }
+
+        return _mapper.Map<CarModelDTORead>(carModel);
+    }
+
+    public async Task<CarModelDTORead> AddCarModelAsync(CarModelDTOInsertUpdate carModelDto)
+    {
+        // Provjera postoji li CarMake s navedenim ID-em
+        var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(carModelDto.CarMakeId);
+        if (carMake == null)
+        {
+            throw new Exception($"CarMake with ID {carModelDto.CarMakeId} not found.");
+        }
+
+        // Check if CarEngineType with the specified ID exists
+        var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(carModelDto.CarEngineTypeId);
+        if (carEngineType == null)
+        {
+            throw new Exception($"CarEngineType with ID {carModelDto.CarEngineTypeId} not found.");
+        }
+
+        // Check if a CarModel with the same name already exists
+        var carModels = await _unitOfWork.CarModelRepository.GetAllCarModelsAsync();        
+        var existingCarModel = carModels.FirstOrDefault(c => c.Name.Equals(carModelDto.Name, StringComparison.OrdinalIgnoreCase));
+
+
+        if (existingCarModel != null)
+        {
+            throw new Exception($"CarModel with the name {carModelDto.Name} already exists.");
+        }
+
+       
+        var carModel = _mapper.Map<CarModel>(carModelDto);
+        carModel.CarMake = carMake;  
+        carModel.CarEngineType = carEngineType;  
+
+        
+        var addedCarModel = await _unitOfWork.CarModelRepository.AddAsync(carModel);
+        await _unitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<CarModelDTORead>(addedCarModel);
+    }
+
+    public async Task<CarModelDTORead> UpdateCarModelAsync(int id, CarModelDTOInsertUpdate carModelDto)
+    {
+        var existingCarModel = await _unitOfWork.CarModelRepository.GetByIdAsync(id);
+
+        if (existingCarModel == null)
+        {
+            throw new KeyNotFoundException($"CarModel with ID {id} not found.");
+        }
+
+        // Provjera postoji li CarMake s navedenim ID-em za ažuriranje
+        var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(carModelDto.CarMakeId);
+        if (carMake == null)
+        {
+            throw new Exception($"CarMake with ID {carModelDto.CarMakeId} not found.");
+        }
+
+        // Provjera postoji li CarEngineType s navedenim ID-em za ažuriranje
+        var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(carModelDto.CarEngineTypeId);
+        if (carEngineType == null)
+        {
+            throw new Exception($"CarEngineType with ID {carModelDto.CarEngineTypeId} not found.");
+        }
+
+        // Mapiranje novog DTO-a u postojeći entitet
+        _mapper.Map(carModelDto, existingCarModel);
+        existingCarModel.CarMake = carMake;  // Ažuriranje CarMake
+        existingCarModel.CarEngineType = carEngineType;  // Ažuriranje CarEngineType
+
+        // Ažuriranje modela u bazi
+        var updatedCarModel = await _unitOfWork.CarModelRepository.UpdateAsync(existingCarModel);
+        await _unitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<CarModelDTORead>(updatedCarModel);
+    }
+
+    public async Task<bool> DeleteCarModelAsync(int id)
+    {
+        var existingCarModel = await _unitOfWork.CarModelRepository.GetByIdAsync(id);
+        if (existingCarModel == null)
+        {
+            return false;
+        }
+
+        var deleted = await _unitOfWork.CarModelRepository.DeleteAsync(id);
+        if (!deleted)
+            return false;
+
+        await _unitOfWork.SaveChangesAsync();
+        return true;
+    }
+}

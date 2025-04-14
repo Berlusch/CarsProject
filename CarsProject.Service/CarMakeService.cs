@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
 using CarsProject.Model;
-using CarsProject.Model.Common;
 using CarsProject.Model.DTO;
-using CarsProject.Repository;
 using CarsProject.Repository.Common;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace CarsProject.Service
 {
@@ -20,18 +16,19 @@ namespace CarsProject.Service
             _mapper = mapper;
         }
 
-        // Paginacija, filtriranje i sortiranje
-        public async Task<IEnumerable<CarMake>> GetCarMakesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
+        // PFS (pagination, filtering, sorting)
+        public async Task<IEnumerable<CarMakeDTORead>> GetCarMakesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
         {
             var carMakesQuery = await _unitOfWork.CarMakeRepository.GetAllCarMakesAsync();
 
-            // Filtriranje
+            // Filtering
             if (!string.IsNullOrEmpty(filter))
             {
-                carMakesQuery = carMakesQuery.Where(c => c.Name.Contains(filter));
+                string lowerFilter = filter.ToLower();
+                carMakesQuery = carMakesQuery.Where(c => c.Name.ToLower().Contains(lowerFilter));
             }
 
-            // Sortiranje
+            // Sorting
             if (!string.IsNullOrEmpty(sortBy))
             {
                 if (sortBy.ToLower() == "name")
@@ -44,17 +41,19 @@ namespace CarsProject.Service
                 }
             }
 
-            // Paginacija
+            // Pagination
             var carMakesPaged = carMakesQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            return carMakesPaged;
+            
+            var result = _mapper.Map<IEnumerable<CarMakeDTORead>>(carMakesPaged);
+
+            return result;
         }
 
-      
-        public async Task<CarMake> GetCarMakeByIdAsync(int id)
+        public async Task<CarMakeDTORead> GetCarMakeByIdAsync(int id)
         {
             var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(id);
 
@@ -63,26 +62,32 @@ namespace CarsProject.Service
                 throw new Exception($"CarMake with ID {id} not found.");
             }
 
-            return carMake;
+            return _mapper.Map<CarMakeDTORead>(carMake);
         }
 
-        public async Task<CarMake> AddCarMakeAsync(CarMake carMake)
+        public async Task<CarMakeDTORead> AddCarMakeAsync(CarMakeDTOInsertUpdate carMakeDto)
         {
-            // Dohvati sve car makes iz baze i provjeri postoji li već entitet s istim nazivom
-            var carMakes = await _unitOfWork.CarMakeRepository.GetAllCarMakesAsync(); // Ovo je IEnumerable<CarMake>
+            
 
-            var existingCarMake = carMakes.FirstOrDefault(c => c.Name.Equals(carMake.Name, StringComparison.OrdinalIgnoreCase));
+            var carMakes = await _unitOfWork.CarMakeRepository.GetAllCarMakesAsync(); 
+
+
+            var existingCarMake = carMakes.FirstOrDefault(c => c.Name.Equals(carMakeDto.Name, StringComparison.OrdinalIgnoreCase));
 
             if (existingCarMake != null)
             {
-                throw new Exception($"CarMake with the name {carMake.Name} already exists.");
+                throw new Exception($"CarMake with the name {carMakeDto.Name} already exists.");
             }
+
+            
+
+            var carMake = _mapper.Map<CarMake>(carMakeDto);
 
             var addedCarMake = await _unitOfWork.CarMakeRepository.AddAsync(carMake);
             await _unitOfWork.SaveChangesAsync();
-            return addedCarMake;
-        }
 
+            return _mapper.Map<CarMakeDTORead>(addedCarMake);
+        }
 
         public async Task<CarMakeDTORead> UpdateCarMakeAsync(int id, CarMakeDTOInsertUpdate carMakeDto)
         {
@@ -93,7 +98,8 @@ namespace CarsProject.Service
                 throw new KeyNotFoundException($"CarMake with ID {id} not found.");
             }
 
-            // Ovo ažurira existingCarMake pomoću podataka iz DTO-a
+            
+
             _mapper.Map(carMakeDto, existingCarMake);
 
             var updatedCarMake = await _unitOfWork.CarMakeRepository.UpdateAsync(existingCarMake);
@@ -102,14 +108,13 @@ namespace CarsProject.Service
             return _mapper.Map<CarMakeDTORead>(updatedCarMake);
         }
 
-
-
         public async Task<bool> DeleteCarMakeAsync(int id)
         {
             var existingCarMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(id);
             if (existingCarMake == null)
             {
-                return false; // Nema što za brisati
+                return false; 
+
             }
 
             var deleted = await _unitOfWork.CarMakeRepository.DeleteAsync(id);
