@@ -18,6 +18,9 @@ builder.Host.UseServiceProviderFactory(new NinjectServiceProviderFactory());
 
 builder.Host.ConfigureContainer<IKernel>(kernel =>
 {
+    kernel.Bind<ICarModelService>().To<CarModelService>();
+    kernel.Bind<ICarEngineTypeService>().To<CarEngineTypeService>();
+    kernel.Bind<ICarOwnerService>().To<CarOwnerService>();
     kernel.Bind<ICarMakeService>().To<CarMakeService>();
     kernel.Bind<ICarMakeRepository>().To<CarMakeRepository>();
     kernel.Bind<ICarModelRepository>().To<CarModelRepository>();
