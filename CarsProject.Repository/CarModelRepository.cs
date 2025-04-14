@@ -15,13 +15,34 @@ namespace CarsProject.Repository
             _context = context;
         }
 
-        // Implementacija metode za preuzimanje svih CarModels podataka
+        
         public async Task<IEnumerable<CarModel>> GetAllCarModelsAsync()
         {
-            return await _context.CarModels.ToListAsync(); // Dohvati sve CarModels iz baze
+            
+            return await _context.CarModels
+                .Include(cm => cm.CarMake)       
+                .Include(cm => cm.CarEngineType) 
+                .ToListAsync();
+        }
+
+        public override async Task<CarModel> GetByIdAsync(int id)
+        {
+            
+            var carModel = await _context.CarModels
+                .Include(cm => cm.CarMake)       
+                .Include(cm => cm.CarEngineType) 
+                .FirstOrDefaultAsync(cm => cm.Id == id);  
+
+            if (carModel == null)
+            {
+                throw new KeyNotFoundException($"CarModel with ID {id} not found.");
+            }
+
+            return carModel;
         }
     }
 }
+
 
 
 

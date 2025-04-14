@@ -53,7 +53,7 @@ namespace CarsProject.Repository
         }
 
         
-        public async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
