@@ -12,6 +12,7 @@ namespace CarsProject
             var kernel = new StandardKernel();
 
             // Repository bindings
+            kernel.Bind<ICarRegistrationService>().To<CarRegistrationService>();
             kernel.Bind<ICarModelService>().To<CarModelService>();
             kernel.Bind<ICarEngineTypeService>().To<CarEngineTypeService>();
             kernel.Bind<ICarOwnerService>().To<CarOwnerService>();
