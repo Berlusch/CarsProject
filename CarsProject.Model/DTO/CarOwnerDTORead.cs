@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CarsProject.Model.DTO
+﻿namespace CarsProject.Model.DTO
 {
     public record CarOwnerDTORead
     (
@@ -14,4 +8,5 @@ namespace CarsProject.Model.DTO
         DateOnly DateOfBirth
 
     );
+    
 }
