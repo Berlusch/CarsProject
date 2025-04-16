@@ -59,17 +59,17 @@
   align-items: center;
   justify-content: space-between;
   width: 180px;
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   margin: 10px 0;
   background-color: #19a5a5; /* Tirkizna boja */
   color: white;
   border: none;
   border-radius: 0; /* Ovdje nema zaobljenja jer je šiljak */
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: normal;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(211, 208, 208, 0.1);
   transition: background-color 0.3s ease;
   text-decoration: none;
   clip-path: polygon(
@@ -87,12 +87,6 @@
 
 
 
-.button-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
+
 
 
