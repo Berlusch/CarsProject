@@ -5,11 +5,11 @@ function Home() {
   return (
     <div className="home">
       <div className="main">
-        <SignpostButton text="Car Makes" link="./carmakes" />
-        <SignpostButton text="Car Models" link="./carmodels" />
-        <SignpostButton text="Car Owners" link="./carowners" />
-        <SignpostButton text="Car Registrations" link="./carregistrations" />
-        <SignpostButton text="Car Engine Types" link="./carenginetypes" />
+        <SignpostButton text="Car Makes" link="./car-makes" />
+        <SignpostButton text="Car Models" link="./car-models" />
+        <SignpostButton text="Car Owners" link="./car-owners" />
+        <SignpostButton text="Car Registrations" link="./car-registrations" />
+        <SignpostButton text="Car Engine Types" link="./car-engine-types" />
       </div>
     </div>
   );
