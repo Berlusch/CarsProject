@@ -1,30 +1,25 @@
 export const RouteNames={
     HOME: '/',
 
-    CARMAKE_LIST: '/carmakes',
-    CARMAKE_ADD: '/carmakes/add',
-    CARMAKE_EDIT: '/carmakes/:id',
-    CARMAKE_DELETE: '/carmakes/delete/:id',
+    CAR_MAKE_LIST: '/car-makes',
+    CAR_MAKE_ADD: '/car-makes/add',
+    CAR_MAKE_EDIT: '/car-makes/:id',
+    
+    CAR_MODEL_LIST: '/car-models',
+    CAR_MODEL_ADD: '/car-models/dodaj',
+    CAR_MODEL_EDIT: '/car-models/:sifra',
+    
 
-    CARMODEL_LIST: '/carmodels',
-    CARMODEL_ADD: '/carmodels/dodaj',
-    CARMODEL_EDIT: '/carmodels/:sifra',
-    CARMODEL_DELETE: '/carmodels/obrisi/:sifra',
+    CAR_OWNER_LIST: '/car-owners',
+    CAR_OWNER_ADD: '/car-owners/add',
+    CAR_OWNER_EDIT: '/car-owners/:id',
+    
 
-    CAROWNER_LIST: '/carowners',
-    CAROWNER_ADD: '/carowners/add',
-    CAROWNER_EDIT: '/carowners/:id',
-    CAROWNER_DELETE: '/carowners/delete/:id',
-
-    CARREGISTRATION_LIST: '/carregistrations',
-    CARREGISTRATION_ADD: '/carregistrations/add',
-    CARREGISTRATION_EDIT: '/carregistrations/:id',
-    CARREGISTRATION_DELETE: '/carregistrations/delete/:id',
-
-    CARENGINETYPE_LIST: '/carenginetypes',
-    CARENGINETYPE_ADD: '/carenginetypes/add',
-    CARENGINETYPE_EDIT: '/carenginetypes/:id',
-    CARENGINETYPE_DELETE: '/carenginetypes/delete/:id'    
+    CAR_REGISTRATION_LIST: '/car-registrations',
+    CAR_REGISTRATION_ADD: '/car-registrations/add',
+    CAR_REGISTRATION_EDIT: '/car-registrations/:id',
+    
+    CAR_ENGINE_TYPE_LIST: '/car-engine-types'   
     
 }
 

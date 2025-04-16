@@ -22,8 +22,7 @@ function App() {
       <main className="main">
         <Routes>
           {}
-          <Route path="/" element={<Home />} /> 
-                                        
+          <Route path="/" element={<Home />} />                                         
         </Routes>
         <div style={{ textAlign: 'center', paddingTop: '40px', paddingRight: '30px', fontSize: '12px' }}>
   &copy; Bernarda Lusch 2025
