@@ -1,42 +1,39 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.signpost-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 250px; /* Smanjio sam širinu za bolji izgled */
+  padding: 12px 20px;
+  margin: 10px 0;
+  background-color: #128080; /* Tirkizna boja */
+  color: white;
+  border: none;
+  border-radius: 6px 0 0 6px; /* Zaobljeni lijevi kut */
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.signpost-button:hover {
+  background-color: #0f6c6a; /* Tirkizna tamnija boja */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.signpost-button .label {
+  flex-grow: 1; /* Ovo osigurava da labela zauzme sav prostor */
+  text-align: left;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.signpost-button .arrow {
+  position: absolute;
+  right: -15px; /* Zašiljeni kraj se povuče izvan gumba */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 15px solid #128080; /* Tirkizna boja */
 }
