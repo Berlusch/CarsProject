@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const SignpostButton = ({ label }) => {
+function SignpostButton({ text, link }) {
   return (
-    <button className="signpost-button">
-      <span className="label">{label}</span>
-      <span className="arrow"></span>
-    </button>
+    <Link to={link} className="signpost-button">
+      {text}
+    </Link>
   );
-};
+}
 
 export default SignpostButton;

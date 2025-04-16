@@ -1,39 +1,96 @@
+/* Glavni kontejner */
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 2;
+  margin-top: 40px; /* Ovdje ostavi marginu za razmak s vrha */
+  border-bottom: 2px solid #69c1d1; 
+  padding-bottom: 10px; 
+}
+
+/* Logo */
+.logo {
+  height: 160px;
+  object-fit: contain;
+  margin-top: 20px;
+  border-bottom: 2px solid #69c1d1; 
+}
+
+/* Glavni sadržaj */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+
+
+.button-container {
+  display: flex;
+  flex-direction: column; /* Postavljamo gumbe u vertikalni red */
+  align-items: center; /* Poravnavanje gumba po horizontalnoj osi */
+  justify-content: center; /* Poravnavanje gumba po vertikalnoj osi */
+  height: 100vh; /* Koristimo cijeli visinu ekrana */
+  margin: 0; /* Uklonimo marginu */
+}
+
 .signpost-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 250px; /* Smanjio sam širinu za bolji izgled */
-  padding: 12px 20px;
+  width: 200px;
+  padding: 1rem 2rem;
   margin: 10px 0;
-  background-color: #128080; /* Tirkizna boja */
+  background-color: #19a5a5; /* Tirkizna boja */
   color: white;
   border: none;
-  border-radius: 6px 0 0 6px; /* Zaobljeni lijevi kut */
+  border-radius: 0; /* Ovdje nema zaobljenja jer je šiljak */
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   position: relative;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
+  text-decoration: none;
+  clip-path: polygon(
+    0 0, 
+    calc(100% - 20px) 0, 
+    100% 50%, 
+    calc(100% - 20px) 100%, 
+    0 100%);
 }
 
 .signpost-button:hover {
-  background-color: #0f6c6a; /* Tirkizna tamnija boja */
+  background-color: #148a8a; /* Tamnija tirkizna boja */
+  color: white;
 }
 
-.signpost-button .label {
-  flex-grow: 1; /* Ovo osigurava da labela zauzme sav prostor */
-  text-align: left;
-}
 
-.signpost-button .arrow {
-  position: absolute;
-  right: -15px; /* Zašiljeni kraj se povuče izvan gumba */
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-top: 15px solid transparent;
-  border-bottom: 15px solid transparent;
-  border-left: 15px solid #128080; /* Tirkizna boja */
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
 }
