@@ -1,0 +1,26 @@
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .custom-table th,
+  .custom-table td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  
+  .custom-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+  
+  .custom-table tbody tr:nth-child(odd) {
+    background-color: #ffffff; /* bijelo */
+  }
+  
+  .custom-table tbody tr:nth-child(even) {
+    background-color: #e6f5f7; /* svijetlotirkizno */
+  }
+  
