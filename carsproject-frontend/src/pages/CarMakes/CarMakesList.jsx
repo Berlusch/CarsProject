@@ -1,28 +1,51 @@
-import React from 'react';
-import Table from '../../components/Table.jsx';
+import React, { useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
+import Table from '../../components/Table';
+import CarMakeStore from '../../stores/CarMakeStore';
+import { RouteNames } from '../../common/constants';
 
+const CarMakesList = () => {
+  const {
+    carMakes,
+    fetchCarMakes,
+    removeCarMake,
+    isLoading,
+    error
+  } = CarMakeStore;
 
-const columns = [
-  { header: 'ID', accessor: 'id' },
-  { header: 'Marka', accessor: 'make' },
-  { header: 'Model', accessor: 'model' },
-  { header: 'Godina', accessor: 'year' }
-];
+  useEffect(() => {
+    fetchCarMakes();
+  }, []);
 
-const data = [
-  { id: 1, make: 'Toyota', model: 'Corolla', year: 2020 },
-  { id: 2, make: 'Volkswagen', model: 'Golf', year: 2019 },
-  { id: 3, make: 'Ford', model: 'Focus', year: 2021 },
-  { id: 4, make: 'BMW', model: 'X5', year: 2022 }
-];
+  const columns = [
+    { header: 'Name', accessor: 'Name' },
+    { header: 'Abrv', accessor: 'Abrv' },
+    { header: 'Edit', accessor: 'Edit' },
+    { header: 'Remove', accessor: 'Remove' }
+  ];
 
-const Cars = () => {
+  const handleEdit = (id) => {
+    console.log("Edit car make", id);
+    // Dodaj navigaciju ili logiku za uređivanje
+  };
+
+  const handleRemove = async (id) => {
+    await removeCarMake(id);
+  };
+
+  if (isLoading) return <p>Učitavanje podataka...</p>;
+  if (error) return <p>Greška pri dohvaćanju: {error}</p>;
+
   return (
-    <div>
-      <h2>Cars List</h2>
-      <Table columns={columns} data={data} />
-    </div>
+    <Table
+      columns={columns}
+      data={carMakes}
+      onEdit={handleEdit}
+      onRemove={handleRemove}
+      onAdd={() => console.log('Add new car make')}
+      routeNames={RouteNames.CARMAKE_ADD}
+    />
   );
 };
 
-export default Cars;
+export default observer(CarMakesList);
