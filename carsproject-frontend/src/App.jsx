@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import MainLayout from './layouts/MainLayout';
 import CarMakesList from './pages/CarMakes/CarMakesList';
-import { RouteNames } from './common/constants'
+import { RouteNames } from './common/constants';
+
 
 function App() {
   return (

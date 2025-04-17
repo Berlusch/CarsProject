@@ -59,13 +59,14 @@
   align-items: center;
   justify-content: space-between;
   width: 180px;
-  padding: 1rem 1rem;
+  padding: 10px 10px;
   margin: 10px 0;
   background-color: #19a5a5; /* Tirkizna boja */
   color: white;
   border: none;
   border-radius: 0; /* Ovdje nema zaobljenja jer je šiljak */
-  font-size: 18px;
+  font-family: 'Helvetica', serif;
+  font-size: 20px;
   font-weight: normal;
   cursor: pointer;
   position: relative;

@@ -24,4 +24,4 @@ export const RouteNames={
 }
 
 
-export const Backend_URL ='https://localhost:7023/swagger/index.html';
+export const Backend_URL ='https://localhost:7023/api/v1';
