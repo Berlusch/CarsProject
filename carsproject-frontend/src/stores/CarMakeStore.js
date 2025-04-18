@@ -31,10 +31,7 @@ class CarMakeStore {
       pageSize: this.pageSize,       // Broj stavki po stranici      
     };
   }
-
-  get totalPages() {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
+  
 }
 
 export default new CarMakeStore();

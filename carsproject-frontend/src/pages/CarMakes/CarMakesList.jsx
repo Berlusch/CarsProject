@@ -15,7 +15,7 @@ const CarMakesList = observer(() => {
 
     const response = await CarMakeService.getCarMakesPFS(currentPage, pageSize, "name", searchTerm);
     setCarMakes(response);  // Spremi dohvaćene podatke
-    CarMakeStore.totalCount = response.data.totalCount;
+    
   };
 
   useEffect(() => {
@@ -78,8 +78,9 @@ const CarMakesList = observer(() => {
   return (
     <div>
       <SearchBox
-        value={CarMakeStore.searchTerm}
-        onChange={(e) => handleSearch(e.target.value)}
+      value={CarMakeStore.searchTerm}  // Poveži vrijednost sa store-om
+         onChange={(value) => CarMakeStore.setSearchTerm(value)}  // Ažurira searchTerm
+         onSearch={handleSearch}  // Pokreće pretragu
       />
       <Table
         columns={columns}
