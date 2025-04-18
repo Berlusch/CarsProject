@@ -5,7 +5,7 @@ class CarMakeStore {
   currentPage = 1;  // Trenutna stranica
   pageSize = 5;     // Broj stavki po stranici
   sortDirection = "asc";  // Smjer sortiranja ('asc' ili 'desc')
-  totalCount = 0;
+  hasNextPage = false; 
 
   constructor() {
     makeAutoObservable(this);
@@ -21,14 +21,14 @@ class CarMakeStore {
   setPage(page) {
     this.currentPage = page;
   }
-
-  
+    
   // Getter za filtere
   get filters() {
     return {
-      searchTerm: this.searchTerm,   // Trenutni pojam za pretragu
-      currentPage: this.currentPage, // Trenutna stranica
-      pageSize: this.pageSize,       // Broj stavki po stranici      
+      searchTerm: this.searchTerm,   
+      currentPage: this.currentPage, 
+      pageSize: this.pageSize,       
+      hasNextPage: this.hasNextPage   
     };
   }
   

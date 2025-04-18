@@ -1,36 +1,38 @@
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-  }
-  
-  .pagination-btn {
-    background-color: #f0f0f0;    
-    border: 1px solid #ccc;
-    padding: 4px 8px;         
-    margin: 0 3px;            
-    cursor: pointer;
-    font-size: 12px;          
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-  
-  .pagination-btn:hover:not(:disabled) {
-    background-color: #9fc8ce;
-  }
-  
-  .pagination-btn:disabled {
-    background-color: #e0e0e0;
-    cursor: not-allowed;
-    color: #999;
-  }
-  
-  .pagination-info {
-    font-size: 14px;
-    margin: 0 10px;
-    color: #333;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-btn {
+  background-color: #81d1ca; /* tirkizna */
+  color: white;
+  border: none;
+  padding: 4px 10px; /* manji padding */
+  margin: 0 4px;
+  border-radius: 4px; /* blago zaobljeno */
+  font-size: 14px; /* manji font */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #5bbeb6;
+}
+
+.pagination-btn:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  margin: 0 8px;
+  font-size: 14px;
+}
+
+ 
   .pagination-btn:first-child {
     border-radius: 4px 0 0 4px;
   }

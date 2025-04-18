@@ -8,28 +8,45 @@ import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
 
 const CarMakesList = observer(() => {
-  const [carMakes, setCarMakes] = useState([]);
+const [carMakes, setCarMakes] = useState([]);
+const [currentPageSize, setCurrentPageSize] = useState(0); 
+const {currentPage, pageSize, searchTerm } = CarMakeStore.filters;
 
-  const fetchCarMakes = async () => {
-    const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
+const fetchCarMakes = async () => {
+const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
+
 
     const response = await CarMakeService.getCarMakesPFS(currentPage, pageSize, "name", searchTerm);
-    setCarMakes(response);  // Spremi dohvaćene podatke
+    setCarMakes(response);  
+    setCurrentPageSize(response.length);
     
   };
 
   useEffect(() => {
     fetchCarMakes();
-  }, [CarMakeStore.filters]); // Pretraga, stranica izazivaju ponovno dohvaćanje podataka
+  }, [CarMakeStore.filters]); 
 
   const handleSearch = (term) => {
-    CarMakeStore.setSearchTerm(term); // Postavi pretragu i resetiraj stranicu
+    CarMakeStore.setSearchTerm(term); 
   };
 
   const handlePageChange = (page) => {
-    CarMakeStore.setPage(page); // Promjena stranice
+    CarMakeStore.setPage(page); 
   };
 
+  useEffect(() => {
+    fetchCarMakes();  
+  }, [currentPage, pageSize, searchTerm]);
+
+  const hasNextPage = currentPageSize === pageSize;
+
+  // Funkcija za promjenu stranice
+  const onPageChange = (newPage) => {
+    CarMakeStore.setPage(newPage);
+    fetchCarMakes();  
+  };
+
+    
   const columns = [
     { header: 'Name', accessor: 'name' },
     { header: 'Abrv', accessor: 'abrv' },
@@ -74,6 +91,7 @@ const CarMakesList = observer(() => {
 
     fetchCarMakes();  // Ponovno dohvati podatke nakon brisanja
   };
+  
 
   return (
     <div>
@@ -95,6 +113,7 @@ const CarMakesList = observer(() => {
         currentPage={CarMakeStore.currentPage}
         totalPages={Math.ceil(CarMakeStore.totalCount / CarMakeStore.pageSize)}
         onPageChange={handlePageChange}
+        hasNextPage={hasNextPage}
       />
     </div>
   );
