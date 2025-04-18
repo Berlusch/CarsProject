@@ -5,6 +5,7 @@ class CarMakeStore {
   currentPage = 1;  // Trenutna stranica
   pageSize = 5;     // Broj stavki po stranici
   sortDirection = "asc";  // Smjer sortiranja ('asc' ili 'desc')
+  totalCount = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -30,7 +31,10 @@ class CarMakeStore {
       pageSize: this.pageSize,       // Broj stavki po stranici      
     };
   }
+
+  get totalPages() {
+    return Math.ceil(this.totalCount / this.pageSize);
+  }
 }
 
-// Default export store-a
 export default new CarMakeStore();

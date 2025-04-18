@@ -5,25 +5,29 @@ import CarMakeService from '../../common/Services/CarMakeService';
 import Table from '../../components/Table';
 import { RouteNames } from '../../common/constants';
 import SearchBox from '../../components/SearchBox';
+import Pagination from '../../components/Pagination';
 
 const CarMakesList = observer(() => {
   const [carMakes, setCarMakes] = useState([]);
 
-  // Dohvati podatke uzimajući MobX filtere
   const fetchCarMakes = async () => {
-    const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
+    const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
 
     const response = await CarMakeService.getCarMakesPFS(currentPage, pageSize, "name", searchTerm);
     setCarMakes(response);  // Spremi dohvaćene podatke
+    CarMakeStore.totalCount = response.data.totalCount;
   };
 
-  // Kada se filteri promijene, ponovno dohvati podatke
   useEffect(() => {
     fetchCarMakes();
-  }, [CarMakeStore.filters]);  // Provjeravamo sve filtere (searchTerm, currentPage, itd.)
+  }, [CarMakeStore.filters]); // Pretraga, stranica izazivaju ponovno dohvaćanje podataka
 
   const handleSearch = (term) => {
-    CarMakeStore.setSearchTerm(term);  // Ažurira searchTerm u store-u
+    CarMakeStore.setSearchTerm(term); // Postavi pretragu i resetiraj stranicu
+  };
+
+  const handlePageChange = (page) => {
+    CarMakeStore.setPage(page); // Promjena stranice
   };
 
   const columns = [
@@ -74,9 +78,8 @@ const CarMakesList = observer(() => {
   return (
     <div>
       <SearchBox
-        value={CarMakeStore.searchTerm}  // Poveži vrijednost sa store-om
-        onChange={(value) => CarMakeStore.setSearchTerm(value)}  // Ažurira searchTerm
-        onSearch={handleSearch}  // Pokreće pretragu
+        value={CarMakeStore.searchTerm}
+        onChange={(e) => handleSearch(e.target.value)}
       />
       <Table
         columns={columns}
@@ -86,6 +89,11 @@ const CarMakesList = observer(() => {
         onAdd={() => console.log('Add new car make')}
         routeNames={RouteNames.CAR_MAKE_ADD}
         entityName="Car Make"
+      />
+      <Pagination
+        currentPage={CarMakeStore.currentPage}
+        totalPages={Math.ceil(CarMakeStore.totalCount / CarMakeStore.pageSize)}
+        onPageChange={handlePageChange}
       />
     </div>
   );
