@@ -1,28 +1,60 @@
 import React, { useEffect, useState } from 'react';
+import { observer } from 'mobx-react';
+import CarMakeStore from '../../stores/CarMakeStore';
+import CarMakeService from '../../common/Services/CarMakeService';
 import Table from '../../components/Table';
 import { RouteNames } from '../../common/constants';
-import CarMakeService from '../../common/Services/CarMakeService';
-import { observer } from 'mobx-react';
-import { carMakeStore } from '../../stores/CarMakeStore';
+import SearchBox from '../../components/SearchBox';
 
+const CarMakesList = observer(() => {
+  const [carMakes, setCarMakes] = useState([]);
 
+  // Dohvati podatke uzimajući MobX filtere
+  const fetchCarMakes = async () => {
+    const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
 
-export default function CarMakesList() {
-  const [carMakes, setCarMakes] = useState([]);  
-  
+    const response = await CarMakeService.getCarMakesPFS(currentPage, pageSize, "name", searchTerm);
+    setCarMakes(response);  // Spremi dohvaćene podatke
+  };
 
-  async function fetchCarMakes() {
-    const response = await CarMakeService.getCarMakesPFS(1, 5, "name", "");
-    setCarMakes(response);    
-  }
+  // Kada se filteri promijene, ponovno dohvati podatke
+  useEffect(() => {
+    fetchCarMakes();
+  }, [CarMakeStore.filters]);  // Provjeravamo sve filtere (searchTerm, currentPage, itd.)
 
-  function handleEdit(id) {
+  const handleSearch = (term) => {
+    CarMakeStore.setSearchTerm(term);  // Ažurira searchTerm u store-u
+  };
+
+  const columns = [
+    { header: 'Name', accessor: 'name' },
+    { header: 'Abrv', accessor: 'abrv' },
+    { header: 'Edit', accessor: 'edit' },
+    { header: 'Remove', accessor: 'remove' }
+  ];
+
+  const data = carMakes && carMakes.map(carMake => ({
+    id: carMake.id,
+    name: carMake.name,
+    abrv: carMake.abrv,
+    edit: (
+      <button className="edit-button" onClick={() => handleEdit(carMake.id)}>
+        <i className="fas fa-edit"></i>
+      </button>
+    ),
+    remove: (
+      <button className="delete-button" onClick={() => handleRemove(carMake.id)}>
+        <i className="fas fa-trash"></i>
+      </button>
+    ),
+  }));
+
+  const handleEdit = (id) => {
     console.log("Edit car make", id);
-    
-  }
+  };
 
-  async function handleRemove(id) {
-    const carMake = carMakes.items.find(c => c.id === id);
+  const handleRemove = async (id) => {
+    const carMake = carMakes.find(c => c.id === id);
     const carMakeName = carMake.name;
 
     if (!confirm(`Are you sure you want to remove ${carMakeName}?`)) {
@@ -36,48 +68,27 @@ export default function CarMakesList() {
       return;
     }
 
-    fetchCarMakes();
-  }
-
-  useEffect(() => {
-    fetchCarMakes();
-  }, []);
-
-  const columns = [
-    { header: 'Name', accessor: 'name' },
-    { header: 'Abrv', accessor: 'abrv' },
-    { header: 'Edit', accessor: 'edit' },
-    { header: 'Remove', accessor: 'remove' }
-    
-  ];
-
-  const data = carMakes && carMakes.map(carMake => ({
-    id: carMake.id, // Čuvamo id za kasniju upotrebu u akcijama
-    name: carMake.name,
-    abrv: carMake.abrv,
-    edit: ( // Dodavanje kolone za edit
-      <button className="edit-button" onClick={() => handleEdit(carMake.id)}>
-        <i className="fas fa-edit"></i> {/* Ikona za Edit */}
-      </button>
-    ),
-    remove: ( // Dodavanje kolone za remove
-      <button className="delete-button" onClick={() => handleRemove(carMake.id)}>
-        <i className="fas fa-trash"></i> {/* Ikona za Delete */}
-      </button>
-    ),
-    
-  })); []
-  
+    fetchCarMakes();  // Ponovno dohvati podatke nakon brisanja
+  };
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      onEdit={handleEdit}
-      onRemove={handleRemove}
-      onAdd={() => console.log('Add new car make')}
-      routeNames={RouteNames.CAR_MAKE_ADD}
-      entityName="Car Make"
-    />
+    <div>
+      <SearchBox
+        value={CarMakeStore.searchTerm}  // Poveži vrijednost sa store-om
+        onChange={(value) => CarMakeStore.setSearchTerm(value)}  // Ažurira searchTerm
+        onSearch={handleSearch}  // Pokreće pretragu
+      />
+      <Table
+        columns={columns}
+        data={data}
+        onEdit={handleEdit}
+        onRemove={handleRemove}
+        onAdd={() => console.log('Add new car make')}
+        routeNames={RouteNames.CAR_MAKE_ADD}
+        entityName="Car Make"
+      />
+    </div>
   );
-}
+});
+
+export default CarMakesList;

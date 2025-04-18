@@ -1,36 +1,36 @@
 import { makeAutoObservable } from "mobx";
 
 class CarMakeStore {
-  searchTerm = '';
-  currentPage = 1;
-  pageSize = 5;
-  sortDirection = "asc"; // 'asc' | 'desc'
+  searchTerm = '';  // Pretraga
+  currentPage = 1;  // Trenutna stranica
+  pageSize = 5;     // Broj stavki po stranici
+  sortDirection = "asc";  // Smjer sortiranja ('asc' ili 'desc')
 
   constructor() {
     makeAutoObservable(this);
   }
 
+  // Postavljanje termina za pretragu
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1;
+    this.currentPage = 1;  // Resetiranje stranice na 1 pri novoj pretrazi
   }
 
+  // Postavljanje trenutne stranice
   setPage(page) {
     this.currentPage = page;
   }
 
-  setSortDirection(direction) {
-    this.sortDirection = direction;
-  }
   
-  get filteredCarMakes() {
+  // Getter za filtere
+  get filters() {
     return {
-      searchTerm: this.searchTerm,
-      currentPage: this.currentPage,
-      pageSize: this.pageSize,
-      sortDirection: this.sortDirection,
+      searchTerm: this.searchTerm,   // Trenutni pojam za pretragu
+      currentPage: this.currentPage, // Trenutna stranica
+      pageSize: this.pageSize,       // Broj stavki po stranici      
     };
   }
 }
 
+// Default export store-a
 export default new CarMakeStore();
