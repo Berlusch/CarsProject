@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CarsProject.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class CarOwnerController : ControllerBase
     {
         private readonly ICarOwnerService _carOwnerService;
@@ -20,7 +20,7 @@ namespace CarsProject.Controllers
         }
 
         [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarOwnerDTORead>>> GetPFS(
+        public async Task<ActionResult<IEnumerable<CarOwnerDTORead>>> GetPfs(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string sortBy = "last name",
