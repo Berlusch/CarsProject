@@ -1,8 +1,8 @@
 import { HttpService } from "./HttpService"; 
 
-async function getPSF(page = 1, pageSize = 5, sort = "name", filter = "") {
+async function getCarMakesPFS(page = 1, pageSize = 5, sort = "name", filter = "") {
   try {
-    const response = await HttpService.get("/CarMake/getPfs", {
+    const response = await HttpService.getPFS("/car-makes", {
       params: { pageNumber: page, pageSize, sortBy: sort, filter },
     });
     return response.data;
@@ -41,7 +41,7 @@ async function remove(id,CarMake){
 
   
   export default{
-    getPSF,
+    getCarMakesPFS,
     getById,
     add,
     edit,
