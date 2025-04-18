@@ -2,9 +2,10 @@ import { HttpService } from "./HttpService";
 
 async function getCarMakesPFS(page = 1, pageSize = 5, sort = "name", filter = "") {
   try {
-    const response = await HttpService.getPFS("/car-makes", {
-      params: { pageNumber: page, pageSize, sortBy: sort, filter },
+    const response = await HttpService.get('/CarMake/getPfs', {
+      params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Fetching data error:", error);

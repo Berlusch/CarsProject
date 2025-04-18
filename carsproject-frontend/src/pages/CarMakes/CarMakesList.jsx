@@ -3,22 +3,25 @@ import Table from '../../components/Table';
 import { RouteNames } from '../../common/constants';
 import CarMakeService from '../../common/Services/CarMakeService';
 
+
+
 export default function CarMakesList() {
-  const [carMakes, setCarMakes] = useState({ items: [] });
+  const [carMakes, setCarMakes] = useState([]);  
+  
 
   async function fetchCarMakes() {
     const response = await CarMakeService.getCarMakesPFS(1, 5, "name", "");
-    setCarMakes(response);
+    setCarMakes(response);    
   }
 
   function handleEdit(id) {
     console.log("Edit car make", id);
-    // Dodaj logiku za uređivanje ako želiš
+    
   }
 
   async function handleRemove(id) {
     const carMake = carMakes.items.find(c => c.id === id);
-    const carMakeName = carMake?.name;
+    const carMakeName = carMake.name;
 
     if (!confirm(`Are you sure you want to remove ${carMakeName}?`)) {
       return;
@@ -39,19 +42,30 @@ export default function CarMakesList() {
   }, []);
 
   const columns = [
-    { header: 'Name', accessor: 'Name' },
-    { header: 'Abrv', accessor: 'Abrv' },
-    { header: 'Edit', accessor: 'Edit' },
-    { header: 'Remove', accessor: 'Remove' }
+    { header: 'Name', accessor: 'name' },
+    { header: 'Abrv', accessor: 'abrv' },
+    { header: 'Edit', accessor: 'edit' },
+    { header: 'Remove', accessor: 'remove' }
+    
   ];
 
-  const data = carMakes.items?.map(carMake => ({
-    id: carMake.id,
-    Name: carMake.name,
-    Abrv: carMake.abrv,
-    Edit: carMake.id,
-    Remove: carMake.id
-  })) || [];
+  const data = carMakes && carMakes.map(carMake => ({
+    id: carMake.id, // Čuvamo id za kasniju upotrebu u akcijama
+    name: carMake.name,
+    abrv: carMake.abrv,
+    edit: ( // Dodavanje kolone za edit
+      <button className="edit-button" onClick={() => handleEdit(carMake.id)}>
+        <i className="fas fa-edit"></i> {/* Ikona za Edit */}
+      </button>
+    ),
+    remove: ( // Dodavanje kolone za remove
+      <button className="delete-button" onClick={() => handleRemove(carMake.id)}>
+        <i className="fas fa-trash"></i> {/* Ikona za Delete */}
+      </button>
+    ),
+    
+  })); []
+  
 
   return (
     <Table
@@ -61,6 +75,7 @@ export default function CarMakesList() {
       onRemove={handleRemove}
       onAdd={() => console.log('Add new car make')}
       routeNames={RouteNames.CAR_MAKE_ADD}
+      entityName="Car Make"
     />
   );
 }

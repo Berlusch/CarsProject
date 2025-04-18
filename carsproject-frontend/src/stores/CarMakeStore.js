@@ -1,137 +1,59 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import CarMakeService from "../common/Services/CarMakeService";
+import httpService from "../common/Services/HttpService";
 
 class CarMakeStore {
   carMakes = [];
-  isLoading = false;
-  error = null;
-  pageNumber = 1;
+  totalCount = 0;
+
+  // Stanja za pretragu, paginaciju i sortiranje
+  searchTerm = "";
+  currentPage = 1;
   pageSize = 5;
-  sortBy = 'name'; 
-  filter = '';
+  sortDirection = "asc"; // 'asc' | 'desc'
 
   constructor() {
     makeAutoObservable(this);
   }
-  
-  setPageNumber(page) {
-    this.pageNumber = page;
+
+  get totalPages() {
+    return Math.ceil(this.totalCount / this.pageSize);
   }
 
-  setPageSize(size) {
-    this.pageSize = size;
-  }
-
-  setSortBy(sort) {
-    this.sortBy = sort;
-  }
-
-  setFilter(filter) {
-    this.filter = filter;
-  }
-
-  async fetchCarMakes() {
-    this.isLoading = true;
-    this.error = null;
-  
-    try {
-      
-      const data = await CarMakeService.getPSF(        
-        this.pageNumber,
-        this.pageSize,
-        this.sortBy,
-        this.filter
-      );
-  
-      runInAction(() => {
-        this.carMakes = data;
-      });
-    } catch (err) {
-      runInAction(() => {
-        this.error = err.message;
-      });
-    } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
-    }
-  }
-
-  async getCarMakeById(id) {
-    this.isLoading = true;
-    this.error = null;
-
-    try {
-      const carMake = await CarMakeService.getById(id);
-      return carMake;
-    } catch (error) {
-      runInAction(() => {
-        this.error = `Failed to load car make: ${error.message || "Unknown error"}`;
-      });
-      console.error(error);
-      return null;
-    } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
-    }
-  }
-
-  async addCarMake(carMake) {
-    try {
-      const response = await CarMakeService.add(carMake);
-      if (!response.ok) {
-        throw new Error('Failed to add car make');
-      }
-      await this.fetchCarMakes();
-      return { error: false, message: "Added!" };
-    } catch (e) {
-      console.error(e);
-      return { error: true, message: "Adding error" };
-    }
-  }
-
-  async editCarMake(id, updatedCarMake) {
-    try {
-      const response = await CarMakeService.edit(id, updatedCarMake);
-      if (!response.ok) {
-        throw new Error('Failed to edit car make');
-      }
-      await this.fetchCarMakes();
-      return { error: false, message: "Edited!" };
-    } catch (e) {
-      console.error(e);
-      return { error: true, message: "Editing problem" };
-    }
-  }
-
-  async removeCarMake(id) {
-    try {
-      const response = await CarMakeService.remove(id);
-      if (!response.ok) {
-        throw new Error('Failed to remove car make');
-      }
-      await this.fetchCarMakes();
-      return { error: false, message: "Removed!" };
-    } catch (e) {
-      console.error(e);
-      return { error: true, message: "Operation failed" };
-    }
-  }
-
-  setFilter(filter) {
-    this.filter = filter;
-    this.fetchCarMakes(this.page, this.pageSize, this.sort, filter);
+  setSearchTerm(term) {
+    this.searchTerm = term;
+    this.currentPage = 1;
+    this.fetchCarMakes();
   }
 
   setPage(page) {
-    this.page = page;
-    this.fetchCarMakes(page, this.pageSize, this.sort, this.filter);
+    this.currentPage = page;
+    this.fetchCarMakes();
   }
 
-  setPageSize(pageSize) {
-    this.pageSize = pageSize;
-    this.fetchCarMakes(this.page, pageSize, this.sort, this.filter);
+  setSortDirection(direction) {
+    this.sortDirection = direction;
+    this.fetchCarMakes();
+  }
+
+  async fetchCarMakes() {
+    try {
+      const response = await httpService.get("/carmake", {
+        params: {
+          name: this.searchTerm,
+          page: this.currentPage,
+          pageSize: this.pageSize,
+          sortBy: "name",
+          sortDirection: this.sortDirection,
+        },
+      });
+
+      runInAction(() => {
+        this.carMakes = response.data.items; // ili kako već vraća tvoj backend
+        this.totalCount = response.data.totalCount;
+      });
+    } catch (error) {
+      console.error("Failed to fetch car makes:", error);
+    }
   }
 }
 

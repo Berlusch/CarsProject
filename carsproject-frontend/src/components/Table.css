@@ -15,7 +15,7 @@
 }
 
 .add-button:hover {
-  background-color: #2a9ead;
+  background-color: #198a99;
 }
 
 .custom-table {
@@ -32,7 +32,7 @@
 }
 
 .custom-table thead {
-  background-color: #e0f7f5;
+  background-color: #c7ece9;
 }
 
 .row-light {
@@ -70,7 +70,7 @@
 }
 
 .delete-button:hover {
-  background-color: #ccdad9;
+  background-color: #bee6e4;
 }
 
 .no-data {
