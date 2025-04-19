@@ -11,6 +11,9 @@ import CarEngineTypesList from './pages/CarEngineTypes/CarEngineTypesList';
 import CarRegistrationsList from './pages/CarRegistrations/CarRegistrationsList';
 import CarRegistrationsAdd from './pages/CarRegistrations/CarRegistrationsAdd';
 import CarRegistrationsEdit from './pages/CarRegistrations/CarRegistrationsEdit';
+import CarOwnersList from './pages/CarOwners/CarOwnersList';
+import CarOwnersAdd from './pages/CarOwners/CarOwnersAdd';
+import CarOwnersEdit from './pages/CarOwners/CarOwnersEdit';
 
 
 function App() {
@@ -28,6 +31,10 @@ function App() {
           <Route path={RouteNames.CAR_REGISTRATION_LIST} element={<CarRegistrationsList />} />
           <Route path={RouteNames.CAR_REGISTRATION_ADD} element={<CarRegistrationsAdd />} />
           <Route path={RouteNames.CAR_REGISTRATION_EDIT} element={<CarRegistrationsEdit/>} />
+
+          <Route path={RouteNames.CAR_OWNER_LIST} element={<CarOwnersList />} />
+          <Route path={RouteNames.CAR_OWNER_ADD} element={<CarOwnersAdd />} />
+          <Route path={RouteNames.CAR_OWNER_EDIT} element={<CarOwnersEdit/>} />
 
           <Route path={RouteNames.CAR_ENGINE_TYPE_LIST} element={<CarEngineTypesList/>} />
           

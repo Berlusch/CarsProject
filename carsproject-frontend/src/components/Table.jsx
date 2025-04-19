@@ -1,7 +1,6 @@
 import React from 'react';
 import './Table.css';
 import { Link } from 'react-router-dom';
-import { RouteNames } from '../common/constants';
 
 const Table = ({ columns, data, onEdit, onRemove, onAdd, routeNames,  }) => {
   console.log('Columns:', columns);
@@ -12,7 +11,7 @@ const Table = ({ columns, data, onEdit, onRemove, onAdd, routeNames,  }) => {
   return (
 
     <div className="table-container">
-      <Link to={RouteNames.CAR_MAKE_ADD}>
+      <Link to={routeNames}>
       <button className="add-button" onClick={onAdd}>
         Add New 
       </button>

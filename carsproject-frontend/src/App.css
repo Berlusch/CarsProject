@@ -1,4 +1,4 @@
-/* Glavni kontejner */
+
 .app {
   display: flex;
   flex-direction: column;
@@ -7,7 +7,7 @@
   min-height: 100vh;
 }
 
-/* Header */
+
 .header {
   display: flex;
   align-items: center;
@@ -47,11 +47,11 @@
 
 .button-container {
   display: flex;
-  flex-direction: column; /* Postavljamo gumbe u vertikalni red */
-  align-items: center; /* Poravnavanje gumba po horizontalnoj osi */
-  justify-content: center; /* Poravnavanje gumba po vertikalnoj osi */
-  height: 100vh; /* Koristimo cijeli visinu ekrana */
-  margin: 0; /* Uklonimo marginu */
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  height: 100vh; 
+  margin: 0; 
 }
 
 .signpost-button {
