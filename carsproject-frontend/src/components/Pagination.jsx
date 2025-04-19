@@ -1,7 +1,7 @@
 import React from 'react';
 import './Pagination.css'; 
 
-const Pagination = ({ currentPage, onPageChange, hasNextPage }) => {
+const Pagination = ({ currentPage, onPageChange, hasNextPage, currentPageSize }) => {
     const handlePrevPage = () => {
       if (currentPage > 1) {
         onPageChange(currentPage - 1);
@@ -10,7 +10,7 @@ const Pagination = ({ currentPage, onPageChange, hasNextPage }) => {
   
     const handleNextPage = () => {
       if (hasNextPage) {
-        onPageChange(currentPage + 1);
+        onPageChange(currentPage + 1);        
       }
     };
   

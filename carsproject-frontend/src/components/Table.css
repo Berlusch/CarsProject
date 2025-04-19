@@ -91,3 +91,9 @@
 .custom-table th {
   text-align: center;
 }
+
+.no-data-message {
+  font-style: italic;
+  color: #09686e;
+  font-size: 17px;
+}

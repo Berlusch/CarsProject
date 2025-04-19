@@ -6,6 +6,9 @@ async function getCarMakesPFS(page = 1, pageSize = 5, sort = "name", filter = ""
       params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
     });
     console.log(response.data);
+    if (response.data.items && response.data.items.length === 0) {
+      console.log("Sorry, no more data available, please go back!");
+    }
     return response.data;
   } catch (error) {
     console.error("Fetching data error:", error);
@@ -22,10 +25,14 @@ async function getById(id){
     .catch((e)=>{})
 }
 
-async function add(CarMake){
-    return await HttpService.post('/CarMake', CarMake)
-    .then(()=>{return{error:false, message: 'Added'}})
-    .catch(()=>{return{error:true, message:'Adding problem'}})
+async function add(CarMake) {
+  try {
+    await HttpService.post('/CarMake', CarMake);
+    return { error: false, message: 'Car make added successfully' };
+  } catch (error) {
+    console.error('Error adding car make:', error);
+    return { error: true, message: 'Problem adding car make' };
+  }
 }
 
 async function edit(id,CarMake){
