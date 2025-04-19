@@ -59,9 +59,7 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
   ];
 
   const data = carMakes && carMakes.map(carMake => {
-    // Log prije nego što vraćaš objekt
-    console.log('ID koji se šalje u URL:', carMake.id);
-  
+      
     return {
       id: carMake.id,
       name: carMake.name,
@@ -100,18 +98,23 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
 
     
 
-    fetchCarMakes();  // Ponovno dohvati podatke nakon brisanja
+    fetchCarMakes();  
   };
 
   const handleEdit = (id) => {navigate(RouteNames.CAR_MAKE_EDIT.replace(':id', id))};
   
 
   return (
-    <div>
+    <div> 
+      <header className="entityName">
+        Car Makes
+      </header>
+      
+    
       <SearchBox
-      value={CarMakeStore.searchTerm}  // Poveži vrijednost sa store-om
-         onChange={(value) => CarMakeStore.setSearchTerm(value)}  // Ažurira searchTerm
-         onSearch={handleSearch}  // Pokreće pretragu
+      value={CarMakeStore.searchTerm}  
+         onChange={(value) => CarMakeStore.setSearchTerm(value)}  
+         onSearch={handleSearch}  
       />
       <Table
         columns={columns}
