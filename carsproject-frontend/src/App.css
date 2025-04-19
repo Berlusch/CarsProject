@@ -162,6 +162,13 @@ input {
   flex:1;
 }
 
+.entityName{
+  font-size: x-large;
+  font-weight: bold;
+  color:#19a5a5
+  
+}
+
 
 
 
