@@ -17,6 +17,7 @@ const CarMakesAdd = () => {
     if (CarMakeStore.addStatus.error) {
       alert('Adding item failed.');
     } else {
+      CarMakeStore.currentPage = 1;
       navigate(RouteNames.CAR_MAKE_LIST);
     }
     
@@ -26,6 +27,7 @@ const CarMakesAdd = () => {
     // Funkcija za poništavanje (možeš dodati logiku za vraćanje na prethodnu stranicu)
     setName('');
     setAbrv('');
+    CarMakeStore.currentPage = 1;
     navigate(RouteNames.CAR_MAKE_LIST);
   };
 

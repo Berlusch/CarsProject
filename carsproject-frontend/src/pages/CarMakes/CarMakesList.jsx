@@ -6,8 +6,12 @@ import Table from '../../components/Table';
 import { RouteNames } from '../../common/constants';
 import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const CarMakesList = observer(() => {
+const navigate=useNavigate();
 const [carMakes, setCarMakes] = useState([]);
 const [currentPageSize, setCurrentPageSize] = useState(0); 
 const {currentPage, pageSize, searchTerm } = CarMakeStore.filters;
@@ -54,26 +58,31 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
     { header: 'Remove', accessor: 'remove' }
   ];
 
-  const data = carMakes && carMakes.map(carMake => ({
-    id: carMake.id,
-    name: carMake.name,
-    abrv: carMake.abrv,
-    edit: (
-      <button className="edit-button" onClick={() => handleEdit(carMake.id)}>
-        <i className="fas fa-edit"></i>
-      </button>
-    ),
-    remove: (
-      <button className="delete-button" onClick={() => handleRemove(carMake.id)}>
-        <i className="fas fa-trash"></i>
-      </button>
-    ),
-  }));
-
-  const handleEdit = (id) => {
-    console.log("Edit car make", id);
-  };
-
+  const data = carMakes && carMakes.map(carMake => {
+    // Log prije nego što vraćaš objekt
+    console.log('ID koji se šalje u URL:', carMake.id);
+  
+    return {
+      id: carMake.id,
+      name: carMake.name,
+      abrv: carMake.abrv,
+      edit: (      
+        
+          <button className="edit-button" 
+          onClick={() => handleEdit(carMake.id)}>
+            <i className="fas fa-edit"></i>
+          </button>
+       
+      ),
+      remove: (
+        <button className="delete-button" 
+        onClick={() => handleRemove(carMake.id)}>
+          <i className="fas fa-trash"></i>
+        </button>
+      ),
+    };
+  });
+  
   const handleRemove = async (id) => {
     const carMake = carMakes.find(c => c.id === id);
     const carMakeName = carMake.name;
@@ -89,8 +98,12 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
       return;
     }
 
+    
+
     fetchCarMakes();  // Ponovno dohvati podatke nakon brisanja
   };
+
+  const handleEdit = (id) => {navigate(RouteNames.CAR_MAKE_EDIT.replace(':id', id))};
   
 
   return (
@@ -110,8 +123,7 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
         entityName="Car Make"
       />
       <Pagination
-        currentPage={CarMakeStore.currentPage}
-        totalPages={Math.ceil(CarMakeStore.totalCount / CarMakeStore.pageSize)}
+        currentPage={CarMakeStore.currentPage}        
         onPageChange={handlePageChange}
         hasNextPage={hasNextPage}
       />

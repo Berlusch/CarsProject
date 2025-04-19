@@ -16,14 +16,14 @@ async function getCarMakesPFS(page = 1, pageSize = 5, sort = "name", filter = ""
   }
 }
 
-async function getById(id){
-    return await HttpService.get('/CarMake/'+id)
+async function getById(id) {
+  return await HttpService.get('/CarMake/' + id)
     .then((response)=>{
-        //console.table(response.data)
-        return {error:false, message: response.data};
+      return{error:false, message: response.data};
     })
     .catch((e)=>{})
 }
+
 
 async function add(CarMake) {
   try {
@@ -35,7 +35,7 @@ async function add(CarMake) {
   }
 }
 
-async function edit(id,CarMake){
+async function edit(id, CarMake){
     return await HttpService.put('/CarMake/'+id, CarMake)
     .then(()=>{return{error:false, message: 'Edited'}})
     .catch(()=>{return{error:true, message:'Editing problem'}})

@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import CarMakeService from "../common/Services/CarMakeService";
 
+
 class CarMakeStore {
   searchTerm = '';  // Pretraga
   currentPage = 1;  // Trenutna stranica
@@ -10,6 +11,9 @@ class CarMakeStore {
   addStatus = { error: false, message: '' }; 
   carMakes = [];
   addStatus = { error: false, message: '' };
+  selectedCarMake = null;
+  error = null;
+  
 
   constructor() {
     makeAutoObservable(this);
@@ -52,6 +56,27 @@ class CarMakeStore {
     } catch (error) {
       this.addStatus = { error: true, message: 'Problem adding car make' };  // Ako dođe do greške u komunikaciji, postavljamo status
       console.error('Error adding car make:', error);
+    }
+  }
+  
+  async getCarMakeById(id) {
+    try {      
+      const result = await CarMakeService.getById(id);  
+        if (result.error) {
+        return { error: true, message: "Car Make not found." };
+      }
+      return result;
+    } catch (error) {
+      return { error: true, message: "Error fetching Car Make." };
+    }
+  }
+
+  async editCarMake(id, carMake) {
+    try {
+      await CarMakeService.edit(id, carMake);
+      return { error: false, message: "Car Make edited successfully." };
+    } catch (error) {
+      return { error: true, message: "Error updating Car Make." };
     }
   }
   

@@ -11,7 +11,7 @@
   border: none;
   padding: 4px 10px; /* manji padding */
   margin: 0 4px;
-  border-radius: 4px; /* blago zaobljeno */
+  border-radius: 6px; /* blago zaobljeno */
   font-size: 14px; /* manji font */
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -22,8 +22,8 @@
 }
 
 .pagination-btn:disabled {
-  background-color: #cccccc;
-  color: #666666;
+  background-color: #bebfc0;
+  color: #ffffff;
   cursor: not-allowed;
 }
 
