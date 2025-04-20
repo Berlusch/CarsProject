@@ -1,0 +1,121 @@
+import React, { useEffect, useState } from 'react';
+import { observer } from 'mobx-react';
+import CarModelStore from '../../stores/CarModelStore';
+import CarModelService from '../../common/Services/CarModelService';
+import Table from '../../components/Table';
+import { RouteNames } from '../../common/constants';
+import SearchBox from '../../components/SearchBox';
+import Pagination from '../../components/Pagination';
+import { useNavigate } from 'react-router-dom';
+
+const CarModelsList = observer(() => {
+  const navigate = useNavigate();
+  const [carModels, setCarModels] = useState([]);
+  const [currentPageSize, setCurrentPageSize] = useState(0);
+  const { currentPage, pageSize, searchTerm } = CarModelStore.filters;
+  
+
+  const fetchCarModels = async () => {
+    const { currentPage, pageSize, searchTerm } = CarModelStore.filters;
+    const response = await CarModelService.getCarModelsPFS(currentPage, pageSize, "name", searchTerm);
+    setCarModels(response);
+    setCurrentPageSize(response.length);
+  };  
+
+  useEffect(() => {
+    fetchCarModels();    
+    
+  }, [CarModelStore.filters]);
+
+  const handleSearch = (term) => {
+    CarModelStore.setSearchTerm(term);
+  };
+
+  const handlePageChange = (page) => {
+    CarModelStore.setPage(page);
+  };
+
+  useEffect(() => {
+    fetchCarModels();
+  }, [currentPage, pageSize, searchTerm]);
+
+  const hasNextPage = currentPageSize === pageSize;
+
+  const onPageChange = (newPage) => {
+    CarModelStore.setPage(newPage);
+    fetchCarModels();
+  };
+
+  const columns = [
+    { header: 'Model Number', accessor: 'registrationNumber' },
+    { header: 'Car Owner', accessor: 'carOwner' },
+    { header: 'Car Model', accessor: 'carModel' },
+    { header: 'Edit', accessor: 'edit' },
+    { header: 'Remove', accessor: 'remove' }
+  ];
+
+  const data = carModels && carModels.map(carModel => {
+    return {
+      id: carModel.id,
+      registrationNumber: carModel.registrationNumber,
+      carOwner: carModel.carOwnerFirstNameLastName,  
+      carModel: carModel.carModelName,  
+      edit: (      
+        <button className="edit-button" onClick={() => handleEdit(carModel.id)}>
+          <i className="fas fa-edit"></i>
+        </button>
+      ),
+      remove: (
+        <button className="delete-button" onClick={() => handleRemove(carModel.id)}>
+          <i className="fas fa-trash"></i>
+        </button>
+      ),
+    };
+  });
+
+
+  const handleRemove = async (id) => {
+    const carModel = carModels.find(c => c.id === id);
+    const carModelNumber = carModel.registrationNumber;
+    if (!confirm(`Are you sure you want to remove ${carModelNumber}?`)) {
+      return;
+    }
+    const response = await CarModelService.remove(id);
+    if (response.error) {
+      alert(response.message);
+      return;
+    }
+    fetchCarModels();
+  };
+
+  const handleEdit = (id) => {
+    navigate(RouteNames.CAR_REGISTRATION_EDIT.replace(':id', id));
+  };
+
+  return (
+    <div>
+      <header className="entityName">Car Models</header>
+      <SearchBox
+        value={CarModelStore.searchTerm}
+        onChange={(value) => CarModelStore.setSearchTerm(value)}
+        onSearch={handleSearch}
+      />
+      <Table
+        columns={columns}
+        data={data}
+        onEdit={handleEdit}
+        onRemove={handleRemove}
+        onAdd={() => console.log('Add new car make')}
+        routeNames={RouteNames.CAR_REGISTRATION_ADD}
+        entityName="Car Model"
+      />
+      <Pagination
+        currentPage={CarModelStore.currentPage}
+        onPageChange={handlePageChange}
+        hasNextPage={hasNextPage}
+      />
+    </div>
+  );
+});
+
+export default CarModelsList;
