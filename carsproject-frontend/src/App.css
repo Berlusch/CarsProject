@@ -7,6 +7,18 @@
   min-height: 100vh;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: start; 
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-size: 17px; /* POVEĆANJE svega */
+}
+
 
 .header {
   display: flex;
@@ -19,7 +31,7 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   position: relative;
   z-index: 2;
-  margin-top: 40px; /* Ovdje ostavi marginu za razmak s vrha */
+  margin-top: 40px; 
   border-bottom: 2px solid #69c1d1; 
   padding-bottom: 10px; 
 }
@@ -39,19 +51,16 @@
   align-items: center;
   gap: 1rem;
   margin-top: 2rem;
-  position: relative;
+  position: center;
   z-index: 1;
 }
-
-
 
 .button-container {
   display: flex;
   flex-direction: column; 
   align-items: center; 
-  justify-content: center; 
-  height: 100vh; 
-  margin: 0; 
+  justify-content: flex-start; 
+  margin: 0;
 }
 
 .signpost-button {
@@ -90,7 +99,7 @@
   display: flex;
   flex-direction: column;
   width: 400px;
-  height: 300px;
+  height: 50%;
   margin: 0 auto;
   padding: 20px;
   background-color: #f0f7f6;
@@ -109,26 +118,29 @@ h2 {
 }
 
 label {
-  font-weight: bold;
+  font-weight: normal;
   margin-bottom: 5px;
   display: block;
+  margin-left:55px;
 }
 
-input {
+input, select {
   width: 70%;
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin: 0 auto; /* Centriranje */
+  display: block;  
 }
 
 .form-button-container {
-  width: 70%;  
+  width: 100%;  
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
-  margin-left:58px;
+  
 }
 
 .cancel-button {
@@ -144,19 +156,6 @@ input {
   background-color: #aaa;
 }
 
-.add-button {
-  background-color: #1abc9c; /* Tirkizna boja */
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-button:hover {
-  background-color: #16a085;
-}
-
 .cancel-button,  
 .add-button {  
   flex:1;
@@ -165,7 +164,8 @@ input {
 .entityName{
   font-size: x-large;
   font-weight: bold;
-  color:#19a5a5
+  color:#19a5a5;
+  text-align: center;
   
 }
 
