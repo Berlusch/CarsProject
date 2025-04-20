@@ -64,7 +64,7 @@ const CarMakesEdit = observer(() => {
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter name"
+          
         />
       </div>
 
@@ -75,7 +75,7 @@ const CarMakesEdit = observer(() => {
           id="abrv"
           value={abrv}
           onChange={(e) => setAbrv(e.target.value)}
-          placeholder="Enter abbreviation"
+          
         />
       </div>
 
