@@ -1,6 +1,6 @@
 import { HttpService } from "./HttpService"; 
 
-async function getCarRegistrationsPFS(page = 1, pageSize = 5, sort = "name", filter = "") {
+async function getCarRegistrationsPFS(page = 1, pageSize = 5, sort = "registrationNumber", filter = "") {
   try {
     const response = await HttpService.get('/CarRegistration/getPfs', {
       params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
