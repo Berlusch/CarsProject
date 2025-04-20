@@ -12,7 +12,7 @@ const MainLayout = () => {
 
       <main className="main">
         <Outlet />
-        <div style={{ textAlign: 'center', paddingTop: '40px', paddingRight: '30px', fontSize: '12px' }}>
+        <div style={{ textAlign: 'center', paddingTop: '30px', paddingRight: '30px', fontSize: '12px' }}>
           &copy; Bernarda Lusch 2025
         </div>
       </main>

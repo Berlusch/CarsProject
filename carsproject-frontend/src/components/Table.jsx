@@ -2,50 +2,45 @@ import React from 'react';
 import './Table.css';
 import { Link } from 'react-router-dom';
 
-const Table = ({ columns, data, onEdit, onRemove, onAdd, routeNames,  }) => {
-  console.log('Columns:', columns);
-  console.log('Data:', data);
-
+const Table = ({ columns, data, onEdit, onRemove, onAdd, routeNames }) => {
   const hasData = data && data.length > 0;
 
   return (
-
     <div className="table-container">
-      <Link to={routeNames}>
-      <button className="add-button" onClick={onAdd}>
-        Add New 
-      </button>
-      </Link>
-
       <table className="custom-table">
-        {hasData ? (
-          <>
-            <thead>
-              <tr>
-                {columns.map((col) => (
-                  <th key={col.accessor}>{col.header}</th>
+        <thead>
+          <tr>
+            <th colSpan={columns.length}className="add-button-container">
+              <Link to={routeNames} style={{ textDecoration: 'none' }}>
+                <button className="add-button-inside" onClick={onAdd}>
+                  Add New
+                </button>
+              </Link>
+            </th>
+          </tr>
+          <tr>
+            {columns.map((col) => (
+              <th key={col.accessor}>{col.header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {hasData ? (
+            data.map((item, index) => (
+              <tr key={index} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
+                {columns.map(col => (
+                  <td key={col.accessor}>{item[col.accessor]}</td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {data.map((item, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
-                  {columns.map(col => (
-                    <td key={col.accessor}>{item[col.accessor]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </>
-        ) : (
-          <tbody>
+            ))
+          ) : (
             <tr>
-              <td className="no-data-message" style={{ textAlign: "center", padding: "1rem" }}>
-              Oops! No more data to show. You can go back or add a new car make.
+              <td colSpan={columns.length} className="no-data-message">
+                Oops! No more data to show. You can go back or add a new car make.
               </td>
             </tr>
-          </tbody>
-        )}
+          )}
+        </tbody>
       </table>
     </div>
   );
