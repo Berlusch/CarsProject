@@ -47,9 +47,10 @@ const CarModelsList = observer(() => {
   };
 
   const columns = [
-    { header: 'Model Number', accessor: 'registrationNumber' },
-    { header: 'Car Owner', accessor: 'carOwner' },
-    { header: 'Car Model', accessor: 'carModel' },
+    { header: 'Model Name', accessor: 'name' },
+    { header: 'Model Abrv', accessor: 'abrv' },
+    { header: 'Car Make', accessor: 'carMake' },
+    { header: 'Car Engine Type', accessor: 'carEngineType' },
     { header: 'Edit', accessor: 'edit' },
     { header: 'Remove', accessor: 'remove' }
   ];
@@ -57,9 +58,10 @@ const CarModelsList = observer(() => {
   const data = carModels && carModels.map(carModel => {
     return {
       id: carModel.id,
-      registrationNumber: carModel.registrationNumber,
-      carOwner: carModel.carOwnerFirstNameLastName,  
-      carModel: carModel.carModelName,  
+      name: carModel.name,
+      abrv: carModel.abrv,  
+      carMake: carModel.carMakeName,  
+      carEngineType: carModel.carEngineTypeType,
       edit: (      
         <button className="edit-button" onClick={() => handleEdit(carModel.id)}>
           <i className="fas fa-edit"></i>
@@ -89,7 +91,7 @@ const CarModelsList = observer(() => {
   };
 
   const handleEdit = (id) => {
-    navigate(RouteNames.CAR_REGISTRATION_EDIT.replace(':id', id));
+    navigate(RouteNames.CAR_MODEL_EDIT.replace(':id', id));
   };
 
   return (
@@ -106,7 +108,7 @@ const CarModelsList = observer(() => {
         onEdit={handleEdit}
         onRemove={handleRemove}
         onAdd={() => console.log('Add new car make')}
-        routeNames={RouteNames.CAR_REGISTRATION_ADD}
+        routeNames={RouteNames.CAR_MODEL_ADD}
         entityName="Car Model"
       />
       <Pagination

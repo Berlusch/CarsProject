@@ -61,10 +61,12 @@ class CarModelStore {
   async getCarModelById(id) {
     try {      
       const result = await CarModelService.getById(id);  
+      console.log("Store vraća: ", result);
         if (result.error) {
         return { error: true, message: "Car Model not found." };
       }
       return result;
+      
     } catch (error) {
       return { error: true, message: "Error fetching car model." };
     }
