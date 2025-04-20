@@ -14,8 +14,7 @@ const CarRegistrationsEdit = observer(() => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
-
-  // Dohvati podatke za carRegistration prema id-u
+  
   useEffect(() => {
     const fetchCarRegistration = async () => {              
   
@@ -73,7 +72,7 @@ const CarRegistrationsEdit = observer(() => {
     navigate("/car-registrations");
   };
 
-  if (loading) return <p>Loading...</p>; // Prikazuje se "Loading..." dok se podaci ne učitaju
+  if (loading) return <p>Loading...</p>; 
 
   return (
     <div className="form-container">
