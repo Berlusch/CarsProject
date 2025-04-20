@@ -21,15 +21,14 @@ class CarOwnerStore {
   
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1;  // Resetiranje stranice na 1 pri novoj pretrazi
+    this.currentPage = 1;  
   }
 
   
   setPage(page) {
     this.currentPage = page;
   }
-    
-  // Getter za filtere
+      
   get filters() {
     return {
       searchTerm: this.searchTerm,   
@@ -38,14 +37,13 @@ class CarOwnerStore {
       hasNextPage: this.hasNextPage   
     };
   }
-  // Add Car Owner
+  
   async addCarOwner(firstName, lastName, dateOfBirth) {
-    this.addStatus = { error: false, message: 'Adding car make...' }; 
+    this.addStatus = { error: false, message: 'Adding car owner...' }; 
   
     try {
-      const result = await CarOwnerService.add({ firstName, lastName, dateOfBirth });  
-  
-      // Provjera ako result nije null ili undefined
+      const result = await CarOwnerService.add({ firstName, lastName, dateOfBirth });    
+      
       if (result && result.error) {
         this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };  
       } else {

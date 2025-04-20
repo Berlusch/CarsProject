@@ -5,25 +5,27 @@ import CarOwnerStore from "../../stores/CarOwnerStore";
 
 const CarOwnersEdit = observer(() => {  
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [abrv, setAbrv] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [dateOfBirth, setDateOfBirth]= useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
 
-  // Dohvati podatke za carOwner prema id-u
+  
   useEffect(() => {
     const fetchCarOwner = async () => {              
   
       const result = await CarOwnerStore.getCarOwnerById(id);       
   
       if (result.error) {
-        console.log('Error fetching Car Owner:', result.message);  // Ispis poruke o grešci
+        console.log('Error fetching Car Owner:', result.message);  
         setMessage("Car Owner not found.");
       } else {
-        console.log('Fetched Car Owner:', result.message);  // Ispis podataka ako su uspješno dohvaćeni
-        setName(result.message.name);
-        setAbrv(result.message.abrv);
+        console.log('Fetched Car Owner:', result.message);  
+        setFirstName(result.message.firstName);
+        setLastName(result.message.lastName);
+        setDateOfBirth(result.message.dateOfBirth)
       }
       setLoading(false);
     };
@@ -31,25 +33,25 @@ const CarOwnersEdit = observer(() => {
     if (id) {
       fetchCarOwner();
     } else {
-      console.log('No ID provided');  // Ako ID nije dostupan
+      console.log('No ID provided');  
     }
   }, [id]);
   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await CarOwnerStore.editCarOwner(id, { name, abrv });
+    const result = await CarOwnerStore.editCarOwner(id, { firstName, lastName, dateOfBirth });
     setMessage(result.message);
     if (!result.error) {
-      navigate("/car-makes");
+      navigate("/car-owners");
     }
   };
 
   const handleCancel = () => {
-    navigate("/car-makes");
+    navigate("/car-owners");
   };
 
-  if (loading) return <p>Loading...</p>; // Prikazuje se "Loading..." dok se podaci ne učitaju
+  if (loading) return <p>Loading...</p>; 
 
   return (
     <div className="form-container">
@@ -58,26 +60,37 @@ const CarOwnersEdit = observer(() => {
       {message && <p className="form-message">{message}</p>}
 
       <div className="form-group">
-        <label htmlFor="name">Name</label>
+        <label htmlFor="firstName">First Name</label>
         <input
           type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter name"
+          id="firstName"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="Enter first name"
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="abrv">Abbreviation</label>
+        <label htmlFor="lastName">Last Name</label>
         <input
           type="text"
-          id="abrv"
-          value={abrv}
-          onChange={(e) => setAbrv(e.target.value)}
-          placeholder="Enter abbreviation"
+          id="lastName"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          placeholder="Enter last name"
         />
       </div>
+
+      <div className="form-group">
+        <label htmlFor="dateOfBirth">Date of Birth</label>
+        <input
+          type="date"
+          id="dateOfBirth"
+          value={dateOfBirth}
+          onChange={(e) => setDateOfBirth(e.target.value)}
+          placeholder="Enter date of birth"
+        />
+        </div>
 
       <div className="form-button-container">
         <button className="cancel-button" onClick={handleCancel}>

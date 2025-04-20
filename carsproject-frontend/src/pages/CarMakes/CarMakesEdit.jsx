@@ -31,7 +31,7 @@ const CarMakesEdit = observer(() => {
     if (id) {
       fetchCarMake();
     } else {
-      console.log('No ID provided');  // Ako ID nije dostupan
+      console.log('No ID provided');  
     }
   }, [id]);
   

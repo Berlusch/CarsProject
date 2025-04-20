@@ -22,7 +22,7 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
 
     const response = await CarOwnerService.getCarOwnersPFS(currentPage, pageSize, "last name", searchTerm);
     setCarOwners(response);  
-    console.log("podatci:", response)
+    console.log("Data:", response)
     
     setCurrentPageSize(response.length);
     

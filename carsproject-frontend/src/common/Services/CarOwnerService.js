@@ -5,7 +5,7 @@ async function getCarOwnersPFS(page = 1, pageSize = 5, sort = "last name", filte
     const response = await HttpService.get('/CarOwner/getPfs', {
       params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
     });
-    console.log("Servis podatci", response.data);
+    console.log("Service data", response.data);
     if (response.data.items && response.data.items.length === 0) {
       console.log("Sorry, no more data available, please go back!");
     }
