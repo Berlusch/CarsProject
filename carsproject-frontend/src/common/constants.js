@@ -6,8 +6,8 @@ export const RouteNames={
     CAR_MAKE_EDIT: '/car-makes/:id',
     
     CAR_MODEL_LIST: '/car-models',
-    CAR_MODEL_ADD: '/car-models/dodaj',
-    CAR_MODEL_EDIT: '/car-models/:sifra',
+    CAR_MODEL_ADD: '/car-models/add',
+    CAR_MODEL_EDIT: '/car-models/:id',
     
 
     CAR_OWNER_LIST: '/car-owners',
