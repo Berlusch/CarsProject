@@ -17,7 +17,7 @@ const CarRegistrationsList = observer(() => {
 
   const fetchCarRegistrations = async () => {
     const { currentPage, pageSize, searchTerm } = CarRegistrationStore.filters;
-    const response = await CarRegistrationService.getCarRegistrationsPFS(currentPage, pageSize, "name", searchTerm);
+    const response = await CarRegistrationService.getCarRegistrationsPFS(currentPage, pageSize, "registrationNumber", searchTerm);
     setCarRegistrations(response);
     setCurrentPageSize(response.length);
   };  
@@ -58,8 +58,8 @@ const CarRegistrationsList = observer(() => {
     return {
       id: carRegistration.id,
       registrationNumber: carRegistration.registrationNumber,
-      carOwner: carRegistration.carOwnerFirstNameLastName,  // Koristi ovo polje umjesto traženja vlasnika
-      carModel: carRegistration.carModelName,  // Ako trebaš prikazati ime modela
+      carOwner: carRegistration.carOwnerFirstNameLastName,  
+      carModel: carRegistration.carModelName,  
       edit: (      
         <button className="edit-button" onClick={() => handleEdit(carRegistration.id)}>
           <i className="fas fa-edit"></i>
