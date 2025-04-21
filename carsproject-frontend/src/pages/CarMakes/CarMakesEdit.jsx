@@ -53,7 +53,8 @@ const CarMakesEdit = observer(() => {
 
   return (
     <div className="form-container">
-      <h2>Edit Car Make</h2>
+      
+    <h2>Add Car Make</h2>
 
       {message && <p className="form-message">{message}</p>}
 

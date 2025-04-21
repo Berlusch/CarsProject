@@ -39,25 +39,26 @@ class CarRegistrationStore {
       hasNextPage: this.hasNextPage   
     };
   }
-  // Add Car Registration
-  async addCarRegistration(name, abrv) {
-    this.addStatus = { error: false, message: 'Adding car make...' }; // Inicijaliziramo status
+  async addCarRegistration(registrationNumber, carOwnerId, carModelId) {
+    this.addStatus = { error: false, message: 'Adding car registration...' };
   
     try {
-      const result = await CarRegistrationService.add({ name, abrv });  // Pozivamo servis za dodavanje
+      const result = await CarRegistrationService.add({ registrationNumber, carOwnerId, carModelId });
+      console.log('Response from server:', result);
   
-      // Provjera ako result nije null ili undefined
       if (result && result.error) {
-        this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };  // Ako dođe do greške, postavljamo status
+        this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };
       } else {
-        this.carRegistrations.push({ name, abrv });  // Ako je uspješno, dodajemo novi car make u store
-        this.addStatus = { error: false, message: result.message || 'Car make added successfully!' };  // Ažuriramo status s uspješnim porukama
+        this.carRegistrations.push({ registrationNumber, carOwnerId, carModelId });
+        this.addStatus = { error: false, message: result.message || 'Car registration added successfully!' };
       }
     } catch (error) {
-      this.addStatus = { error: true, message: 'Problem adding car make' };  // Ako dođe do greške u komunikaciji, postavljamo status
-      console.error('Error adding car make:', error);
-    }
+      this.addStatus = { error: true, message: 'Problem adding car registration' };
+      console.error('Error adding car registration:', error);
+      
+    }  
   }
+
   
   async getCarRegistrationById(id) {
     try {      

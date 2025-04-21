@@ -2,33 +2,37 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import CarRegistrationStore from "../../stores/CarRegistrationStore";
-import { Form } from "react-bootstrap";
 import CarOwnerService from "../../common/Services/CarOwnerService";
-
+import CarModelService from "../../common/Services/CarModelService";
+import { Form } from "react-bootstrap";
 
 const CarRegistrationsEdit = observer(() => {  
   const navigate = useNavigate();
   const [registrationNumber, setRegistrationNumber] = useState("");
+  const [carOwner, setCarOwner] = useState("");
+  const [carOwners, setCarOwners] = useState("");
   const [carOwnerId, setCarOwnerId] = useState("");
-  const [carOwners, setCarOwners] = useState([])
+  const [carModel, setCarModel] = useState("");
+  const [carModels, setCarModels] = useState("");
+  const [carModelId, setCarModelId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
-  
+
+  // Dohvati podatke za carRegistration prema id-u
   useEffect(() => {
     const fetchCarRegistration = async () => {              
   
       const result = await CarRegistrationStore.getCarRegistrationById(id);       
   
       if (result.error) {
-        console.log('Error fetching Car Registration:', result.message);  
+        console.log('Error fetching Car Registration:', result.message);  // Ispis poruke o grešci
         setMessage("Car Registration not found.");
       } else {
-        console.log('Fetched Car Registration:', result.message);  
+        console.log('Fetched Car Registration:', result.message);  // Ispis podataka ako su uspješno dohvaćeni
         setRegistrationNumber(result.message.registrationNumber);
-        setCarOwnerId(result.message.carOwnerId);
-        setCarOwners(result.message.carOwners);
-        
+        setCarOwner(result.message.carOwner);
+        setCarModel(result.message.carModel);
       }
       setLoading(false);
     };
@@ -41,27 +45,41 @@ const CarRegistrationsEdit = observer(() => {
   }, [id]);
 
   async function fetchCarOwners() {
-        try {
-          const response = await CarOwnerService.getCarOwnersPFS(1, 5, "name", "");
-          if (Array.isArray(response) && response.length > 0) {
-            setCarOwners(response);            
-          } else {
-            console.error("Data not available");
+          try {
+            const response = await CarOwnerService.getCarOwnersPFS(1, 100, "last name", "");
+            if (Array.isArray(response) && response.length > 0) {
+              setCarOwners(response);            
+            } else {
+              console.error("Data not available");
+            }
+          } catch (error) {
+            console.error("Fetching error:", error);
           }
-        } catch (error) {
-          console.error("Fetching error:", error);
         }
-      }
   
-      useEffect(() => {
-        fetchCarOwners();  
-      }, []); 
+    async function fetchCarModels() {
+          try {
+            const response = await CarModelService.getCarModelsPFS(1, 100, "name", "");
+            if (Array.isArray(response) && response.length > 0) {
+              setCarModels (response);            
+            } else {
+              console.error("Data not available");
+            }
+          } catch (error) {
+            console.error("Fetching error:", error);
+          }
+        }
+    
+        useEffect(() => {
+          fetchCarOwners();
+          fetchCarModels();  
+        }, [id]); 
   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await CarRegistrationStore.editCarRegistration
-    (id, { registrationNumber, carOwnerId });
+    (id, { registrationNumber, carOwnerId, carModelId });
     setMessage(result.message);
     if (!result.error) {
       navigate("/car-registrations");
@@ -76,7 +94,8 @@ const CarRegistrationsEdit = observer(() => {
 
   return (
     <div className="form-container">
-      <h2>Edit Car Registration</h2>
+      
+    <h2>Edit Car Registration</h2>
 
       {message && <p className="form-message">{message}</p>}
 
@@ -95,14 +114,26 @@ const CarRegistrationsEdit = observer(() => {
         value={carOwnerId}
         onChange={(e) => setCarOwnerId(e.target.value)}
       >
-        <option value="">Select a car owner</option>
+        <option value=""></option>
         {carOwners && carOwners.map((s, index) => (
           <option key={index} value={s.id}>
           {s.firstName} {s.lastName}
             </option>
         ))}
       </Form.Select>
-           
+      <br/>
+
+      <Form.Select 
+        value={carModelId}
+        onChange={(e) => setCarModelId(e.target.value)}
+      >
+        <option value=""></option>
+        {carModels && carModels.map((s, index) => (
+          <option key={index} value={s.id}>
+          {s.name}
+            </option>
+        ))}
+      </Form.Select>
 
       <div className="form-button-container">
         <button className="cancel-button" onClick={handleCancel}>

@@ -40,16 +40,16 @@ class CarModelStore {
     };
   }
   // Add Car Model
-  async addCarModel(name, abrv) {
+  async addCarModel(name, abrv, carMakeId, carEngineTypeId) {
     this.addStatus = { error: false, message: 'Adding car model...' }; 
   
     try {
-      const result = await CarModelService.add({ name, abrv, carMake, carEngineType });    
+      const result = await CarModelService.add({ name, abrv, carMakeId, carEngineTypeId });    
       
       if (result && result.error) {
         this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };  
       } else {
-        this.carModels.push({ name, abrv });  
+        this.carModels.push({ name, abrv, carMakeId, carEngineTypeId });  
         this.addStatus = { error: false, message: result.message || 'Car model added successfully!' }; 
       }
     } catch (error) {

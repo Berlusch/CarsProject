@@ -27,11 +27,11 @@ async function getById(id) {
 
 async function add(CarRegistration) {
   try {
-    await HttpService.post('/CarRegistration', CarRegistration);
-    return { error: false, message: 'Car make added successfully' };
+    const response = await HttpService.post('/CarRegistration', CarRegistration);
+    return { error: false, message: 'Car registration added successfully' };
   } catch (error) {
-    console.error('Error adding car make:', error);
-    return { error: true, message: 'Problem adding car make' };
+    console.error('Error adding car registration:', error);
+    return { error: true, message: 'Problem adding car registration' };
   }
 }
 

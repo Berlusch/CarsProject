@@ -2,21 +2,20 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import CarModelStore from "../../stores/CarModelStore";
-import { Form } from "react-bootstrap";
 import CarMakeService from "../../common/Services/CarMakeService";
 import CarEngineTypeService from "../../common/Services/CarEngineTypeService";
-
+import { Form } from "react-bootstrap";
 
 const CarModelsEdit = observer(() => {  
   const navigate = useNavigate();
-  const [modelName, setModelName] = useState("");
-  const [modelAbrv, setModelAbrv] = useState("");
+  const [name, setName] = useState("");
+  const [abrv, setAbrv] = useState("");
+  const [carMake, setCarMake] = useState("");
+  const [carMakes, setCarMakes] = useState("");
   const [carMakeId, setCarMakeId] = useState("");
-  const [carMake, setCarMake] = useState("")
-  const [carMakes, setCarMakes] = useState([])
+  const [carEngineType, setCarEngineType] = useState("");
+  const [carEngineTypes, setCarEngineTypes] = useState("");
   const [carEngineTypeId, setCarEngineTypeId] = useState("");
-  const [carEngineType, setCarEngineType] = useState("")
-  const [carEngineTypes, setCarEngineTypes] = useState([])
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
@@ -25,22 +24,17 @@ const CarModelsEdit = observer(() => {
   useEffect(() => {
     const fetchCarModel = async () => {              
   
-      const result = await CarModelStore.getCarModelById(id);     
-      console.log("ID iz URL-a:", id); 
+      const result = await CarModelStore.getCarModelById(id);       
   
       if (result.error) {
         console.log('Error fetching Car Model:', result.message);  
         setMessage("Car Model not found.");
       } else {
-        console.log('Fetched Car Model:', result.message); 
-        
-        setModelName(result.message.name);
-        setModelAbrv(result.message.abrv);
+        console.log('Fetched Car Model:', result.message);  
+        setName(result.message.name);
+        setAbrv(result.message.abrv);
         setCarMake(result.message.carMake);
-        setCarMakeId(result.message.parseInt(carMake.id));  
         setCarEngineType(result.message.carEngineType);
-        setCarEngineTypeId(result.message.parseInt(carEngineType.id));             
-        
       }
       setLoading(false);
     };
@@ -53,42 +47,41 @@ const CarModelsEdit = observer(() => {
   }, [id]);
 
   async function fetchCarMakes() {
-        try {
-          const response = await CarMakeService.getCarMakesPFS(1, 5, "name", "");
-          if (Array.isArray(response) && response.length > 0) {
-            setCarMakes(response);            
-          } else {
-            console.error("Data not available");
+          try {
+            const response = await CarMakeService.getCarMakesPFS(1, 100, "name", "");
+            if (Array.isArray(response) && response.length > 0) {
+              setCarMakes(response);            
+            } else {
+              console.error("Data not available");
+            }
+          } catch (error) {
+            console.error("Fetching error:", error);
           }
-        } catch (error) {
-          console.error("Fetching error:", error);
         }
-      }
-
-  async function fetchCarEngineTypes() {
-        try {
-          const response = await CarEngineTypeService.getCarEngineTypesListOnly();
-          if (Array.isArray(response) && response.length > 0) {
-            setCarEngineTypes (response);            
-          } else {
-            console.error("Data not available");
-          }
-        } catch (error) {
-          console.error("Fetching error:", error);
-        }
-      }
   
-      useEffect(() => {
-        fetchCarMakes();
-        fetchCarEngineTypes();  
-      }, [id]); 
+    async function fetchCarEngineTypes() {
+          try {
+            const response = await CarEngineTypeService.getCarEngineTypesListOnly();
+            if (Array.isArray(response) && response.length > 0) {
+              setCarEngineTypes (response);            
+            } else {
+              console.error("Data not available");
+            }
+          } catch (error) {
+            console.error("Fetching error:", error);
+          }
+        }
+    
+        useEffect(() => {
+          fetchCarMakes();
+          fetchCarEngineTypes();  
+        }, [id]); 
   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await CarModelStore.editCarModel
-    (modelName, modelAbrv, carMakeId,
-        carEngineTypeId);
+    (id, { name, abrv, carMakeId, carEngineTypeId});
     setMessage(result.message);
     if (!result.error) {
       navigate("/car-models");
@@ -103,28 +96,29 @@ const CarModelsEdit = observer(() => {
 
   return (
     <div className="form-container">
-      <h2>Edit Car Model</h2>
+      
+    <h2>Edit Car Model</h2>
 
       {message && <p className="form-message">{message}</p>}
 
       <div className="form-group">
-        <label htmlFor="modelName">Model Name</label>
+        <label htmlFor="name">Car Model</label>
         <input
           type="text"
-          id="modelName"
-          value={modelName}
-          onChange={(e) => setModelName(e.target.value)}
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="modelAbrv">Model Abrv</label>
+        <label htmlFor="abrv">Car Model Abrv</label>
         <input
           type="text"
-          id="modelAbrv"
-          value={modelAbrv}
-          onChange={(e) => setModelAbrv(e.target.value)}
+          id="abrv"
+          value={abrv}
+          onChange={(e) => setAbrv(e.target.value)}
           
         />
       </div>
@@ -133,7 +127,7 @@ const CarModelsEdit = observer(() => {
         value={carMakeId}
         onChange={(e) => setCarMakeId(e.target.value)}
       >
-        <option value="">{carMake}</option>
+        <option value=""></option>
         {carMakes && carMakes.map((s, index) => (
           <option key={index} value={s.id}>
           {s.name}
@@ -153,7 +147,6 @@ const CarModelsEdit = observer(() => {
             </option>
         ))}
       </Form.Select>
-           
 
       <div className="form-button-container">
         <button className="cancel-button" onClick={handleCancel}>

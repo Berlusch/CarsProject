@@ -4,38 +4,41 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 import { RouteNames } from '../../common/constants';
-import CarOwnerService from '../../common/Services/CarOwnerService';
-//import CarModelService from '../../common/Services/CarModelService'
+import CarMakeService from '../../common/Services/CarMakeService';
+import CarEngineTypeService from '../../common/Services/CarEngineTypeService';
 
 
 const CarModelsAdd = () => {
-  const [registrationNumber, setModelNumber] = useState('');
-  const [carOwners, setCarOwners] = useState([]);    
-  //const [carModels, setCarModels] = useState([]);
-  const [carOwnerId, setCarOwnerId] = useState("Select a car owner");    
-  //const [carModelId, setCarModelId] = useState([]);
+  
+  const [name, setName] = useState('');
+  const [abrv, setAbrv] = useState('');
+  const [carMakes, setCarMakes] = useState([]);    
+  const [carEngineTypes, setCarEngineTypes] = useState([]);
+  const [carMakeId, setCarMakeId] = useState('');    
+  const [carEngineTypeId, setCarEngineTypeId] = useState('');  
   const navigate = useNavigate();
 
-  /*async function fetchCarModels() {
-      try {
-        const response = await CarModelService.getCarModelsPFS(1, 5, "name", "");
-        if (Array.isArray(response) && response.length > 0) {
-          setCarModels(response);
-          setCarModelId(response.id)
-        } else {
-          console.error("Data not available");
-        }
-      } catch (error) {
-        console.error("Fetching error:", error);
+  async function fetchCarEngineTypes() {
+    try {
+      const response = await CarEngineTypeService.getCarEngineTypesListOnly();
+      if (Array.isArray(response) && response.length > 0) {
+        setCarEngineTypes(response);
+        setCarEngineTypeId(response[0].id); 
+      } else {
+        console.error("Data not available");
       }
-    }*/
+    } catch (error) {
+      console.error("Fetching error:", error);
+    }
+  }
+  
 
-    async function fetchCarOwners() {
+    async function fetchCarMakes() {
       try {
-        const response = await CarOwnerService.getCarOwnersPFS(1, 5, "name", "");
-        if (Array.isArray(response) && response.length > 0) {
-          setCarOwners(response);
-          setCarOwnerId(response.id)
+        const response = await CarMakeService.getCarMakesPFS(1, 100, "name", "");
+          if (Array.isArray(response) && response.length > 0) {
+          setCarMakes(response);
+          setCarMakeId(response.id)
         } else {
           console.error("Data not available");
         }
@@ -45,30 +48,33 @@ const CarModelsAdd = () => {
     }
 
     useEffect(()=>{
-      fetchCarOwners();  
-      //fetchCarModels();     
+      fetchCarMakes();  
+      fetchCarEngineTypes();     
      
     },[]);
    
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await CarModelStore.addCarModel(registrationNumber, carOwnerId); 
-    if (CarModelStore.addStatus.error) {
-      alert('Adding item failed.');
-    } else {
-      CarModelStore.currentPage = 1;
-      navigate(RouteNames.CAR_REGISTRATION_LIST);
-    }
+    const handleSubmit = async (e) => {
+      e.preventDefault();   
+                    
+      await CarModelStore.addCarModel(name, abrv, (parseInt(carMakeId)), (parseInt(carEngineTypeId)));
     
-  };
+      if (CarModelStore.addStatus.error) {
+        alert('Adding item failed.');
+      } else {
+        CarModelStore.currentPage = 1;
+        navigate(RouteNames.CAR_MODEL_LIST);
+      }
+    };
+    
 
   const handleCancel = () => {    
-    setModelNumber('');
-    setCarOwnerId('');
-    //setCarModelId('');
+    setCarModelName('');
+    setCarModelAbrv('');
+    setCarMakeId('');
+    setCarEngineTypeId('');
     CarModelStore.currentPage = 1;
-    navigate(RouteNames.CAR_REGISTRATION_LIST);
+    navigate(RouteNames.CAR_MODEL_LIST);
   };
 
   return (
@@ -76,26 +82,51 @@ const CarModelsAdd = () => {
       <h2>Add Car Model</h2>
       
       <div className="form-group">
-        <label htmlFor="registrationNumber">Model Number</label>
+        <label htmlFor="name">Car Model</label>
         <input
           type="text"
-          id="registrationNumber"
-          value={registrationNumber}
-          onChange={(e) => setModelNumber(e.target.value)}
-          placeholder="Enter registration number"
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter a car model name"
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="abrv">Car Model Abrv</label>
+        <input
+          type="text"
+          id="abrv"
+          value={abrv}
+          onChange={(e) => setAbrv(e.target.value)}
+          placeholder="Enter a car model abrv"
         />
       </div>
 
       
       <div className="form-group">
-        <label htmlFor="carOwner">Car Owner</label>
+        <label htmlFor="carMakeId">Car Make</label>
         <Form.Select 
-            onChange={(e)=>{setCarOwnerId(e.target.value)}}
+            onChange={(e)=>{setCarMakeId(e.target.value)}}
             >
-            <option value="">Select a car owner</option>
-            {carOwners && carOwners.map((s,index)=>(
+            <option value="">Select a car make</option>
+            {carMakes && carMakes.map((s,index)=>(
               <option key={index} value={s.id}>
-                {s.firstName}{s.lastName}
+                {s.name}
+              </option>
+            ))}
+            </Form.Select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="carEngineTypeId">Car Engine Type</label>
+        <Form.Select 
+            onChange={(e)=>{setCarEngineTypeId(e.target.value)}}
+            >
+            <option value="">Select a car engine type</option>
+            {carEngineTypes && carEngineTypes.map((s,index)=>(
+              <option key={index} value={s.id}>
+                {s.type}
               </option>
             ))}
             </Form.Select>
