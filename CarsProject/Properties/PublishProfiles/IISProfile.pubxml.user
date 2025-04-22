@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA2H0tFF+eSESZTU9iVKVAOwAAAAACAAAAAAAQZgAAAAEAACAAAACm/1xQdZWuL3r6Zl5RwMTSVoeDq9ysGfshWUulO90uowAAAAAOgAAAAAIAACAAAAAUcI38nUmb9zxa31PKHMMgN6hnSK+vaMQRNunvNacy3CAAAABHQ1KO/LyTH+ivP1uA33ie4rc+TBjRo91OSNYqFgOF9kAAAACma8v+am/7AcHPfz1Z1OcQsPPpv2oFUA0OIdYiMppyxI+mf0J9wOCDsSJSPDRYqQs9j9+CFWh2qj9a+vKN3qfw</EncryptedPassword>
+    <History>False|2025-04-22T18:33:50.9124652Z||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Server=.%3bDatabase=cars%3bTrusted_Connection=True%3bMultipleActiveResultSets=true%3bTrustServerCertificate=True</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>
