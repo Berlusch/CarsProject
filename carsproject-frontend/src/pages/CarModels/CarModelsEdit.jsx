@@ -127,7 +127,7 @@ const CarModelsEdit = observer(() => {
         value={carMakeId}
         onChange={(e) => setCarMakeId(e.target.value)}
       >
-        <option value=""></option>
+        <option value="">Select a car make</option>
         {carMakes && carMakes.map((s, index) => (
           <option key={index} value={s.id}>
           {s.name}
@@ -140,7 +140,7 @@ const CarModelsEdit = observer(() => {
         value={carEngineTypeId}
         onChange={(e) => setCarEngineTypeId(e.target.value)}
       >
-        <option value=""></option>
+        <option value="">Select a car engine Type</option>
         {carEngineTypes && carEngineTypes.map((s, index) => (
           <option key={index} value={s.id}>
           {s.type}
