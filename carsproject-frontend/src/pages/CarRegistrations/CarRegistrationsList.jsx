@@ -7,6 +7,7 @@ import { RouteNames } from '../../common/constants';
 import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
 import { useNavigate } from 'react-router-dom';
+import sharedStore from '../../stores/SharedStore';
 
 const CarRegistrationsList = observer(() => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const CarRegistrationsList = observer(() => {
     const { currentPage, pageSize, searchTerm } = CarRegistrationStore.filters;
     const response = await CarRegistrationService.getCarRegistrationsPFS(currentPage, pageSize, "registrationNumber", searchTerm);
     setCarRegistrations(response);
+    sharedStore.setCarRegistrations(response);
     setCurrentPageSize(response.length);
   };  
 

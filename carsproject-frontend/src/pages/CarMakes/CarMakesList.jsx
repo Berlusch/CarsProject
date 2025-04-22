@@ -7,6 +7,7 @@ import { RouteNames } from '../../common/constants';
 import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
 import { useNavigate } from 'react-router-dom';
+import sharedStore from '../../stores/SharedStore';
 
 
 
@@ -22,6 +23,7 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
 
     const response = await CarMakeService.getCarMakesPFS(currentPage, pageSize, "name", searchTerm);
     setCarMakes(response);  
+    sharedStore.setCarOwners(response);
     setCurrentPageSize(response.length);
     
   };

@@ -7,6 +7,7 @@ import { RouteNames } from '../../common/constants';
 import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
 import { useNavigate } from 'react-router-dom';
+import sharedStore from '../../stores/SharedStore';
 
 const CarModelsList = observer(() => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const filtered = response.filter(model =>
 );
 
 setCarModels(filtered);
+sharedStore.setCarModels(response);
 setCurrentPageSize(filtered.length);
 
   };  
