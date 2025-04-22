@@ -17,9 +17,16 @@ const CarModelsList = observer(() => {
 
   const fetchCarModels = async () => {
     const { currentPage, pageSize, searchTerm } = CarModelStore.filters;
-    const response = await CarModelService.getCarModelsPFS(currentPage, pageSize, "name", searchTerm);
-    setCarModels(response);
-    setCurrentPageSize(response.length);
+    const response = await CarModelService.getCarModelsPFS(currentPage, pageSize, "name", ""); // prazno jer filtriraš ručno
+
+// Filtriranje po carMakeName (case-insensitive)
+const filtered = response.filter(model =>
+  model.carMakeName.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+setCarModels(filtered);
+setCurrentPageSize(filtered.length);
+
   };  
 
   useEffect(() => {
@@ -101,6 +108,7 @@ const CarModelsList = observer(() => {
         value={CarModelStore.searchTerm}
         onChange={(value) => CarModelStore.setSearchTerm(value)}
         onSearch={handleSearch}
+        placeholder="Search by car make"
       />
       <Table
         columns={columns}

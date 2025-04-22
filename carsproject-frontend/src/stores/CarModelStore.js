@@ -80,9 +80,14 @@ class CarModelStore {
       return { error: true, message: "Error updating Car Model." };
     }
   }
-  
 
-  
+  //Search by Make
+  get filteredModels() {
+    return this.carModels.filter((model) =>
+      model.carMakeName?.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  } 
+ 
   
 }
 
