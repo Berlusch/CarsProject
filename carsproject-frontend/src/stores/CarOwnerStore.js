@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import CarOwnerService from "../common/Services/CarOwnerService";
+import sharedStore from "./SharedStore";
 
 
 class CarOwnerStore {
@@ -22,6 +23,7 @@ class CarOwnerStore {
   setSearchTerm(term) {
     this.searchTerm = term;
     this.currentPage = 1;  
+    sharedStore.setSearchTerm(term);
   }
 
   
