@@ -6,7 +6,7 @@ async function getCarModelsPFS(page = 1, pageSize = 5, sort = "name", filter = "
       params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
     });
     console.log(response.data);
-    if (response.data.items && response.data.items.length === 0) {
+    if (response.data.items && response.data.items.length === 0 && page>1) {
       console.log("Sorry, no more data available, please go back!");
     }
     return response.data;
