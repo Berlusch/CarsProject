@@ -53,9 +53,9 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
   };
 
     
-  const columns = [
-    { header: 'First Name', accessor: 'firstName' },
+  const columns = [    
     { header: 'Last Name', accessor: 'lastName' },
+    { header: 'First Name', accessor: 'firstName' },
     { header: 'Date of Birth', accessor: 'dateOfBirth' },
     { header: 'Edit', accessor: 'edit' },
     { header: 'Remove', accessor: 'remove' }
@@ -64,9 +64,9 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
   const data = carOwners && carOwners.map(carOwner => {
       
     return {
-      id: carOwner.id,
-      firstName: carOwner.firstName,
+      id: carOwner.id,      
       lastName: carOwner.lastName,
+      firstName: carOwner.firstName,
       dateOfBirth: carOwner.dateOfBirth,
       edit: (      
         
@@ -120,6 +120,7 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
       value={CarOwnerStore.searchTerm}  
          onChange={(value) => CarOwnerStore.setSearchTerm(value)}  
          onSearch={handleSearch}  
+         placeholder="Search by last name..."
       />
       <Table
         columns={columns}
