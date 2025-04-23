@@ -1,11 +1,10 @@
 import axios from "axios";
-import { Backend_URL } from "../constants";
+import {PRODUKCIJA} from "../constants";
 
 export const HttpService=axios.create({
-    baseURL:Backend_URL,
+    baseURL: PRODUKCIJA,
     headers:{
         'Content-Type':'application/json'
     }
 });
-
 
