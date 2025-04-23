@@ -1,5 +1,3 @@
-using AutoMapper;
-using CarsProject;
 using CarsProject.DAL;
 using CarsProject.Mapping;
 using CarsProject.Repository;
@@ -17,13 +15,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // frontend port
+            policy.WithOrigins("http://localhost:5173") 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
 
-//Ninject
 builder.Host.UseServiceProviderFactory(new NinjectServiceProviderFactory());
 
 
@@ -43,24 +40,20 @@ builder.Host.ConfigureContainer<IKernel>(kernel =>
     
 });
 
-//Automapper configuration
 builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
 
 
 builder.Services.AddControllers();
-// Swagger configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// Dodavanje DbContext za povezivanje s bazom podataka
 builder.Services.AddDbContext<CarsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CarsDbContext"),
         b => b.MigrationsAssembly("CarsProject.DAL")));
 
 var app = builder.Build();
 
-// Swagger middleware za razvojnu okolinu
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -74,6 +67,13 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
+
+//Preparation for production
+/*app.UseStaticFiles();
+app.UseDefaultFiles();
+app.MapFallbackToFile("index.html");
+
+app.UseCors("CorsPolicy");*/
 
 app.Run();
 
