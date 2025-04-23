@@ -8,10 +8,10 @@
 }
 
 .add-button {
-  width: 100%; /* Gumb je iste širine kao tablica */
+  width: 100%; 
   padding: 10px;
-  margin: 0; /* Ukloni sve margine */
-  background-color: #2a9ead; /* Tirkizna boja */
+  margin: 0; 
+  background-color: #2a9ead; 
   color: white;
   border: none;
   border-radius: 4px;
@@ -44,7 +44,7 @@
 }
 
 .row-light {
-  background-color: #eff7f6; /* svijetlotirkizna */
+  background-color: #eff7f6; 
 }
 
 .row-white {

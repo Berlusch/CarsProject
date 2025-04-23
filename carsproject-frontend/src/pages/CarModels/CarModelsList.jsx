@@ -20,18 +20,16 @@ const CarModelsList = observer(() => {
     const { currentPage, pageSize, searchTerm } = CarModelStore.filters;
     const response = await CarModelService.getCarModelsPFS(currentPage, pageSize, "name", ""); // prazno jer filtriraš ručno
 
-// Filtriranje po carMakeName (case-insensitive)
-const filtered = response.filter(model =>
+
+  const filtered = response.filter(model =>
   model.carMakeName.toLowerCase().includes(searchTerm.toLowerCase())
 );
 
 setCarModels(filtered);
 
 setCurrentPageSize(filtered.length);
-
   };  
-
-  useEffect(() => {
+    useEffect(() => {
     fetchCarModels();    
     
   }, [CarModelStore.filters]);
@@ -48,12 +46,7 @@ setCurrentPageSize(filtered.length);
     fetchCarModels();
   }, [currentPage, pageSize, searchTerm]);
 
-  const hasNextPage = currentPageSize === pageSize;
-
-  const onPageChange = (newPage) => {
-    CarModelStore.setPage(newPage);
-    fetchCarModels();
-  };
+  const hasNextPage = currentPageSize === pageSize;  
 
   const columns = [
     { header: 'Model Name', accessor: 'name' },
@@ -117,7 +110,7 @@ setCurrentPageSize(filtered.length);
         data={data}
         onEdit={handleEdit}
         onRemove={handleRemove}
-        onAdd={() => console.log('Add new car make')}
+        onAdd={() => console.log('Add a new car model')}
         routeNames={RouteNames.CAR_MODEL_ADD}
         entityName="Car Model"
       />

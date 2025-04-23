@@ -2,7 +2,7 @@ import React from 'react';
 import './Table.css';
 import { Link } from 'react-router-dom';
 
-const Table = ({ columns, data, onEdit, onRemove, onAdd, routeNames }) => {
+const Table = ({ columns, data, onAdd, routeNames, page }) => {
   const hasData = data && data.length > 0;
 
   return (
@@ -36,7 +36,11 @@ const Table = ({ columns, data, onEdit, onRemove, onAdd, routeNames }) => {
           ) : (
             <tr>
               <td colSpan={columns.length} className="no-data-message">
-                Oops! No more data to show. You can go back or add a new car make.
+                {page > 1 ? (
+                  "Oops! No more data to show. You can go back or add a new car make."
+                ) : (
+                  "Sorry, no data available."
+                )}
               </td>
             </tr>
           )}

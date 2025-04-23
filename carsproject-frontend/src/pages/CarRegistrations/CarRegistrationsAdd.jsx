@@ -8,8 +8,7 @@ import CarOwnerService from '../../common/Services/CarOwnerService';
 import CarModelService from '../../common/Services/CarModelService'
 
 
-const CarRegistrationsAdd = () => {
-  const [CarRegistration, setCarRegistration] = useState({});
+const CarRegistrationsAdd = () => {  
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [carOwners, setCarOwners] = useState([]);    
   const [carModels, setCarModels] = useState([]);
@@ -22,7 +21,7 @@ const CarRegistrationsAdd = () => {
       const response = await CarModelService.getCarModelsPFS(1, 100, "name", "");
       if (Array.isArray(response) && response.length > 0) {
         setCarModels(response);
-        setCarModelId(response[0].id); // ili neki drugi default
+        setCarModelId(response.id); 
       } else {
         console.error("Data not available");
       }

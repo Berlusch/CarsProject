@@ -29,7 +29,7 @@ const Pagination = ({ currentPage, onPageChange, hasNextPage, currentPageSize })
         <button
           className="pagination-btn"
           onClick={handleNextPage}
-          disabled={!hasNextPage} // Onemogući gumb ako nema podataka na sljedećoj stranici
+          disabled={!hasNextPage} 
         >
           Next
         </button>

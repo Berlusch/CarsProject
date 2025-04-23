@@ -2,11 +2,10 @@ import { HttpService } from "./HttpService";
 
 async function getCarEngineTypesListOnly() {
   try {
-    const response = await HttpService.get('/CarEngineType/getPfs');
-    console.log('API odgovor:', response.data);  
+    const response = await HttpService.get('/CarEngineType/getPfs');    
     return response.data;    
   } catch (error) {
-    console.error("Greška prilikom dohvaćanja engine tipova:", error);
+    console.error("Error while fetching engine types:", error);
     throw error;
   }
 }

@@ -16,7 +16,7 @@ body {
   align-items: start; 
   min-height: 100vh;
   background-color: #ffffff;
-  font-size: 17px; /* POVEĆANJE svega */
+  font-size: 17px;
 }
 
 .header {
@@ -46,7 +46,7 @@ body {
 /* Prilagodba za mobilne uređaje */
 @media (max-width: 600px) {
   .header {
-    padding: 8px; /* manji razmak */
+    padding: 8px; 
   }
 
   .logo {
@@ -54,7 +54,6 @@ body {
   }
 }
 
-/* Glavni sadržaj */
 .main {
   display: flex;
   flex-direction: column;
@@ -83,7 +82,7 @@ body {
   background-color: #19a5a5; /* Tirkizna boja */
   color: white;
   border: none;
-  border-radius: 0; /* Ovdje nema zaobljenja jer je šiljak */
+  border-radius: 0; 
   font-family: 'Helvetica', serif;
   font-size: 20px;
   font-weight: normal;
@@ -101,7 +100,7 @@ body {
 }
 
 .signpost-button:hover {
-  background-color: #148a8a; /* Tamnija tirkizna boja */
+  background-color: #148a8a; 
   color: white;
 }
 
@@ -140,7 +139,7 @@ input, select {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin: 0 auto; /* Centriranje */
+  margin: 0 auto; 
   display: block;  
 }
 

@@ -18,11 +18,9 @@ const CarOwnersEdit = observer(() => {
   
       const result = await CarOwnerStore.getCarOwnerById(id);       
   
-      if (result.error) {
-        console.log('Error fetching Car Owner:', result.message);  
+      if (result.error) {        
         setMessage("Car Owner not found.");
-      } else {
-        console.log('Fetched Car Owner:', result.message);  
+      } else {         
         setFirstName(result.message.firstName);
         setLastName(result.message.lastName);
         setDateOfBirth(result.message.dateOfBirth)
@@ -32,9 +30,8 @@ const CarOwnersEdit = observer(() => {
   
     if (id) {
       fetchCarOwner();
-    } else {
-      console.log('No ID provided');  
-    }
+    }  
+    
   }, [id]);
   
 

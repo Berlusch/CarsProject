@@ -5,13 +5,9 @@ async function getCarRegistrationsPFS(page = 1, pageSize = 5, sort = "registrati
     const response = await HttpService.get('/CarRegistration/getPfs', {
       params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
     });
-    console.log(response.data);
-    if (response.data.items && response.data.items.length === 0 && page>1) {
-      console.log("Sorry, no more data available, please go back!");
-    }
+
     return response.data;
   } catch (error) {
-    console.error("Fetching data error:", error);
     throw error;
   }
 }
@@ -31,14 +27,14 @@ async function add(CarRegistration) {
     return { error: false, message: 'Car registration added successfully' };
   } catch (error) {
     console.error('Error adding car registration:', error);
-    return { error: true, message: 'Problem adding car registration' };
+    return { error: true, message: 'Adding failed' };
   }
 }
 
 async function edit(id, CarRegistration){
     return await HttpService.put('/CarRegistration/'+id, CarRegistration)
     .then(()=>{return{error:false, message: 'Edited'}})
-    .catch(()=>{return{error:true, message:'Editing problem'}})
+    .catch(()=>{return{error:true, message:'Editing failed'}})
 }
 
 async function remove(id,CarRegistration){

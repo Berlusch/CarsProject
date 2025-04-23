@@ -21,9 +21,7 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
 
 
     const response = await CarOwnerService.getCarOwnersPFS(currentPage, pageSize, "last name", searchTerm);
-    setCarOwners(response);  
-    console.log("Data:", response)
-    
+    setCarOwners(response);          
     setCurrentPageSize(response.length);
     
   };
@@ -45,14 +43,7 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
   }, [currentPage, pageSize, searchTerm]);
 
   const hasNextPage = currentPageSize === pageSize;
-
-  // Funkcija za promjenu stranice
-  const onPageChange = (newPage) => {
-    CarOwnerStore.setPage(newPage);
-    fetchCarOwners();  
-  };
-
-    
+   
   const columns = [    
     { header: 'Last Name', accessor: 'lastName' },
     { header: 'First Name', accessor: 'firstName' },
@@ -99,16 +90,13 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
     if (response.error) {
       alert(response.message);
       return;
-    }
-
-    
+    }   
 
     fetchCarOwners();  
   };
 
   const handleEdit = (id) => {navigate(RouteNames.CAR_OWNER_EDIT.replace(':id', id))};
   
-
   return (
     <div> 
       <header className="entityName">

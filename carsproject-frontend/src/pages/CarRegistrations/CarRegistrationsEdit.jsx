@@ -8,8 +8,7 @@ import { Form } from "react-bootstrap";
 
 const CarRegistrationsEdit = observer(() => {  
   const navigate = useNavigate();  
-
-  const [carRegistration, setCarRegistration] = useState("");
+  
   const [registrationNumber, setRegistrationNumber] = useState("");
   
   const [carOwners, setCarOwners] = useState("");
@@ -22,20 +21,40 @@ const CarRegistrationsEdit = observer(() => {
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
 
+  async function fetchCarOwners() {
+    try {
+      const response = await CarOwnerService.getCarOwnersPFS(1, 100, "last name", "");
+      if (Array.isArray(response) && response.length > 0) {
+        setCarOwners(response);            
+      } else {
+        console.error("Data not available");
+      }
+    } catch (error) {
+      console.error("Fetching error:", error);
+    }
+  }
+   
+async function fetchCarModels() {
+    try {
+      const response = await CarModelService.getCarModelsPFS(1, 100, "name", "");
+      if (Array.isArray(response) && response.length > 0) {
+        setCarModels (response);            
+      } else {
+        console.error("Data not available");
+      }
+    } catch (error) {
+      console.error("Fetching error:", error);
+    }
+  }       
 
   async function fetchCarRegistration() {              
     const result = await CarRegistrationStore.getCarRegistrationById(id);       
 
-    if (result.error) {
-      console.log('Error fetching Car Registration:', result.message);  // Ispis poruke o grešci
+    if (result.error) {       
       setMessage("Car Registration not found.");
-    } else {
-      console.log('Fetched Car Registration:', result.message);  // Ispis podataka ako su uspješno dohvaćeni
-                      
-    }
-    
-    let p = result.message
-      setCarRegistration(p);
+    } 
+
+    let p = result.message      
       setRegistrationNumber(p.registrationNumber);
       setCarOwnerId(p.carOwnerId);  
       setCarModelId(p.carModelId);        
@@ -54,32 +73,6 @@ useEffect(()=>{
   fetchInitialData();        
 },[]);
 
-
-  async function fetchCarOwners() {
-          try {
-            const response = await CarOwnerService.getCarOwnersPFS(1, 100, "last name", "");
-            if (Array.isArray(response) && response.length > 0) {
-              setCarOwners(response);            
-            } else {
-              console.error("Data not available");
-            }
-          } catch (error) {
-            console.error("Fetching error:", error);
-          }
-        }
-         
-  async function fetchCarModels() {
-          try {
-            const response = await CarModelService.getCarModelsPFS(1, 100, "name", "");
-            if (Array.isArray(response) && response.length > 0) {
-              setCarModels (response);            
-            } else {
-              console.error("Data not available");
-            }
-          } catch (error) {
-            console.error("Fetching error:", error);
-          }
-        }       
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -91,6 +84,7 @@ useEffect(()=>{
       alert("Please select a car owner!");
       return;
     }
+    
     const result = await CarRegistrationStore.editCarRegistration
     (id, { registrationNumber, carOwnerId: parseInt(carOwnerId), carModelId: parseInt(carModelId)});
     setMessage(result.message);
@@ -125,8 +119,7 @@ useEffect(()=>{
 
       <Form.Select 
         value={carOwnerId}
-        onChange={(e) => {setCarOwnerId(e.target.value)}}
-        required
+        onChange={(e) => {setCarOwnerId(e.target.value)}}        
       > <option value="">Select a car owner</option> 
         {carOwners && carOwners.map((s, index) => (
           <option key={index} value={s.id}>
@@ -138,8 +131,7 @@ useEffect(()=>{
 
       <Form.Select 
         value={carModelId}
-        onChange={(e) => {setCarModelId(e.target.value)}}
-        required
+        onChange={(e) => setCarModelId(e.target.value)}        
       > <option value="">Select a car model</option>
         {carModels && carModels.map((s, index) => (
           <option key={index} value={s.id}>

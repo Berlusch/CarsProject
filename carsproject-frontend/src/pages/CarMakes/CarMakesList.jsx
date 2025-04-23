@@ -45,14 +45,7 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
   }, [currentPage, pageSize, searchTerm]);
 
   const hasNextPage = currentPageSize === pageSize;
-
-  // Funkcija za promjenu stranice
-  const onPageChange = (newPage) => {
-    CarMakeStore.setPage(newPage);
-    fetchCarMakes();  
-  };
-
-    
+      
   const columns = [
     { header: 'Name', accessor: 'name' },
     { header: 'Abrv', accessor: 'abrv' },
@@ -125,7 +118,7 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
         data={data}
         onEdit={handleEdit}
         onRemove={handleRemove}
-        onAdd={() => console.log('Add new car make')}
+        onAdd={() => console.log('Add a new car make')}
         routeNames={RouteNames.CAR_MAKE_ADD}
         entityName="Car Make"
       />

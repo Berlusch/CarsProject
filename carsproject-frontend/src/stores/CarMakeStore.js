@@ -3,10 +3,9 @@ import CarMakeService from "../common/Services/CarMakeService";
 
 
 class CarMakeStore {
-  searchTerm = '';  // Pretraga
-  currentPage = 1;  // Trenutna stranica
-  pageSize = 5;     // Broj stavki po stranici
-  sortDirection = "asc";  // Smjer sortiranja ('asc' ili 'desc')
+  searchTerm = '';  
+  currentPage = 1;  
+  pageSize = 5;     
   hasNextPage = false; 
   addStatus = { error: false, message: '' }; 
   carMakes = [];
@@ -18,19 +17,17 @@ class CarMakeStore {
   constructor() {
     makeAutoObservable(this);
   }
-
-  // Postavljanje termina za pretragu
+  
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1;  // Resetiranje stranice na 1 pri novoj pretrazi
+    this.currentPage = 1;    
   }
 
-  // Postavljanje trenutne stranice
+  
   setPage(page) {
     this.currentPage = page;
   }
-    
-  // Getter za filtere
+      
   get filters() {
     return {
       searchTerm: this.searchTerm,   
@@ -39,22 +36,20 @@ class CarMakeStore {
       hasNextPage: this.hasNextPage   
     };
   }
-  // Add Car Make
+  
   async addCarMake(name, abrv) {
-    this.addStatus = { error: false, message: 'Adding car make...' }; // Inicijaliziramo status
+    this.addStatus = { error: false, message: 'Adding car make...' }; 
   
     try {
-      const result = await CarMakeService.add({ name, abrv });  // Pozivamo servis za dodavanje
-  
-      // Provjera ako result nije null ili undefined
+      const result = await CarMakeService.add({ name, abrv });        
       if (result && result.error) {
-        this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };  // Ako dođe do greške, postavljamo status
+        this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };  
       } else {
-        this.carMakes.push({ name, abrv });  // Ako je uspješno, dodajemo novi car make u store
-        this.addStatus = { error: false, message: result.message || 'Car make added successfully!' };  // Ažuriramo status s uspješnim porukama
+        this.carMakes.push({ name, abrv });  
+        this.addStatus = { error: false, message: result.message || 'Car make added successfully!' };  
       }
     } catch (error) {
-      this.addStatus = { error: true, message: 'Problem adding car make' };  // Ako dođe do greške u komunikaciji, postavljamo status
+      this.addStatus = { error: true, message: 'Problem adding car make' };  
       console.error('Error adding car make:', error);
     }
   }
@@ -67,14 +62,14 @@ class CarMakeStore {
       }
       return result;
     } catch (error) {
-      return { error: true, message: "Error fetching Car Make." };
+      return { error: true, message: "Error fetching a car make." };
     }
   }
 
   async editCarMake(id, carMake) {
     try {
       await CarMakeService.edit(id, carMake);
-      return { error: false, message: "Car Make edited successfully." };
+      return { error: false, message: "Car make edited successfully." };
     } catch (error) {
       return { error: true, message: "Error updating Car Make." };
     }

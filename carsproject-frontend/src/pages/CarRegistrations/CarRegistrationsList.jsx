@@ -10,11 +10,11 @@ import { useNavigate } from 'react-router-dom';
 
 
 const CarRegistrationsList = observer(() => {
+
   const navigate = useNavigate();
   const [carRegistrations, setCarRegistrations] = useState([]);
   const [currentPageSize, setCurrentPageSize] = useState(0);
-  const { currentPage, pageSize, searchTerm } = CarRegistrationStore.filters;
-  
+  const { currentPage, pageSize, searchTerm } = CarRegistrationStore.filters;  
 
   const fetchCarRegistrations = async () => {
     const { currentPage, pageSize, searchTerm } = CarRegistrationStore.filters;
@@ -40,15 +40,10 @@ const CarRegistrationsList = observer(() => {
     fetchCarRegistrations();
   }, [currentPage, pageSize, searchTerm]);
 
-  const hasNextPage = currentPageSize === pageSize;
-
-  const onPageChange = (newPage) => {
-    CarRegistrationStore.setPage(newPage);
-    fetchCarRegistrations();
-  };
+  const hasNextPage = currentPageSize === pageSize;  
 
   const columns = [
-    { header: 'Registration Number', accessor: 'registrationNumber' },
+    { header: 'Registration', accessor: 'registrationNumber' },
     { header: 'Car Owner', accessor: 'carOwner' },
     { header: 'Car Model', accessor: 'carModel' },
     { header: 'Edit', accessor: 'edit' },

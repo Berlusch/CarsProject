@@ -1,4 +1,3 @@
-// U tvojoj komponenti za dodavanje
 import { observer } from 'mobx-react-lite';
 import CarOwnerStore from '../../stores/CarOwnerStore';
 import { useState } from 'react';
@@ -20,8 +19,7 @@ const CarOwnersAdd = () => {
     } else {
       CarOwnerStore.currentPage = 1;
       navigate(RouteNames.CAR_OWNER_LIST);
-    }
-    
+    }    
   };
 
   const handleCancel = () => {

@@ -5,13 +5,9 @@ async function getCarOwnersPFS(page = 1, pageSize = 5, sort = "last name", filte
     const response = await HttpService.get('/CarOwner/getPfs', {
       params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
     });
-    console.log("Service data", response.data);
-    if (response.data.items && response.data.items.length === 0 && page>1) {
-      console.log("Sorry, no more data available, please go back!");
-    }
+
     return response.data;
   } catch (error) {
-    console.error("Fetching data error:", error);
     throw error;
   }
 }
@@ -31,14 +27,14 @@ async function add(CarOwner) {
     return { error: false, message: 'Car make added successfully' };
   } catch (error) {
     console.error('Error adding car make:', error);
-    return { error: true, message: 'Problem adding car make' };
+    return { error: true, message: 'Adding failed' };
   }
 }
 
 async function edit(id, CarOwner){
     return await HttpService.put('/CarOwner/'+id, CarOwner)
     .then(()=>{return{error:false, message: 'Edited'}})
-    .catch(()=>{return{error:true, message:'Editing problem'}})
+    .catch(()=>{return{error:true, message:'Editing failed'}})
 }
 
 async function remove(id,CarOwner){

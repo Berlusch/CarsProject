@@ -15,8 +15,7 @@ const SearchBox = ({ value, onChange, onSearch, placeholder }) => {
       <input
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)} // Ažurira lokalni state kad korisnik upisuje
-        onKeyPress={handleKeyPress}  // Pokreće pretragu na Enter
+        onChange={(e) => onChange(e.target.value)}         
         placeholder={placeholder || 'Search...'}
         className="search-input"
       />

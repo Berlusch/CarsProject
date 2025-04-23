@@ -3,10 +3,9 @@ import CarModelService from "../common/Services/CarModelService";
 
 
 class CarModelStore {
-  searchTerm = '';  // Pretraga
-  currentPage = 1;  // Trenutna stranica
-  pageSize = 5;     // Broj stavki po stranici
-  sortDirection = "asc";  // Smjer sortiranja ('asc' ili 'desc')
+  searchTerm = '';  
+  currentPage = 1;  
+  pageSize = 5;      
   hasNextPage = false; 
   addStatus = { error: false, message: '' }; 
   carModels = [];
@@ -18,19 +17,16 @@ class CarModelStore {
   constructor() {
     makeAutoObservable(this);
   }
-
-  // Postavljanje termina za pretragu
+ 
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1;  // Resetiranje stranice na 1 pri novoj pretrazi
+    this.currentPage = 1;  
   }
-
-  // Postavljanje trenutne stranice
+  
   setPage(page) {
     this.currentPage = page;
-  }
-    
-  // Getter za filtere
+  }    
+  
   get filters() {
     return {
       searchTerm: this.searchTerm,   
@@ -39,7 +35,7 @@ class CarModelStore {
       hasNextPage: this.hasNextPage   
     };
   }
-  // Add Car Model
+  
   async addCarModel(name, abrv, carMakeId, carEngineTypeId) {
     this.addStatus = { error: false, message: 'Adding car model...' }; 
   
@@ -60,13 +56,11 @@ class CarModelStore {
   
   async getCarModelById(id) {
     try {      
-      const result = await CarModelService.getById(id);  
-      console.log("Store vraća: ", result);
+      const result = await CarModelService.getById(id);        
         if (result.error) {
         return { error: true, message: "Car Model not found." };
       }
-      return result;
-      
+      return result;      
     } catch (error) {
       return { error: true, message: "Error fetching car model." };
     }
@@ -80,14 +74,12 @@ class CarModelStore {
       return { error: true, message: "Error updating Car Model." };
     }
   }
-
-  //Search by Make
+  
   get filteredModels() {
     return this.carModels.filter((model) =>
       model.carMakeName?.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   } 
- 
   
 }
 

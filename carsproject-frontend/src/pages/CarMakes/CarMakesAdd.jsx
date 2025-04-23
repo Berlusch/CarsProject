@@ -1,4 +1,3 @@
-// U tvojoj komponenti za dodavanje
 import { observer } from 'mobx-react-lite';
 import CarMakeStore from '../../stores/CarMakeStore';
 import { useState } from 'react';
@@ -13,7 +12,7 @@ const CarMakesAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await CarMakeStore.addCarMake(name, abrv); // Pozivamo metodu iz store-a
+    await CarMakeStore.addCarMake(name, abrv); 
     if (CarMakeStore.addStatus.error) {
       alert('Adding item failed.');
     } else {
@@ -23,8 +22,7 @@ const CarMakesAdd = () => {
     
   };
 
-  const handleCancel = () => {
-    // Funkcija za poništavanje (možeš dodati logiku za vraćanje na prethodnu stranicu)
+  const handleCancel = () => {    
     setName('');
     setAbrv('');
     CarMakeStore.currentPage = 1;

@@ -11,17 +11,16 @@ const CarMakesEdit = observer(() => {
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
 
-  // Dohvati podatke za carMake prema id-u
   useEffect(() => {
     const fetchCarMake = async () => {              
   
       const result = await CarMakeStore.getCarMakeById(id);       
   
       if (result.error) {
-        console.log('Error fetching Car Make:', result.message);  // Ispis poruke o grešci
+        console.log('Error fetching Car Make:', result.message);  
         setMessage("Car Make not found.");
       } else {
-        console.log('Fetched Car Make:', result.message);  // Ispis podataka ako su uspješno dohvaćeni
+        console.log('Fetched Car Make:', result.message);  
         setName(result.message.name);
         setAbrv(result.message.abrv);
       }
@@ -49,7 +48,7 @@ const CarMakesEdit = observer(() => {
     navigate("/car-makes");
   };
 
-  if (loading) return <p>Loading...</p>; // Prikazuje se "Loading..." dok se podaci ne učitaju
+  if (loading) return <p>Loading...</p>; 
 
   return (
     <div className="form-container">

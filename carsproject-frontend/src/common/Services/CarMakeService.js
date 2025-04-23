@@ -3,16 +3,12 @@ import { HttpService } from "./HttpService";
 async function getCarMakesPFS(page = 1, pageSize = 5, sort = "name", filter = "") {
   try {
     const response = await HttpService.get('/CarMake/getPfs', {
-      params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
-    });
-    console.log(response.data);
-    if (response.data.items && response.data.items.length === 0 && page>1) {
-      console.log("Sorry, no more data available, please go back!");
-    }
+      params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter: filter },
+    });   
+     
     return response.data;
-  } catch (error) {
-    console.error("Fetching data error:", error);
-    throw error;
+  } catch (error) {    
+    throw error;  
   }
 }
 
@@ -30,15 +26,15 @@ async function add(CarMake) {
     await HttpService.post('/CarMake', CarMake);
     return { error: false, message: 'Car make added successfully' };
   } catch (error) {
-    console.error('Error adding car make:', error);
-    return { error: true, message: 'Problem adding car make' };
+    console.error('Error while adding car make:', error);
+    return { error: true, message: 'Problem adding a car make' };
   }
 }
 
 async function edit(id, CarMake){
     return await HttpService.put('/CarMake/'+id, CarMake)
     .then(()=>{return{error:false, message: 'Edited'}})
-    .catch(()=>{return{error:true, message:'Editing problem'}})
+    .catch(()=>{return{error:true, message:'Editing failed'}})
 }
 
 async function remove(id,CarMake){

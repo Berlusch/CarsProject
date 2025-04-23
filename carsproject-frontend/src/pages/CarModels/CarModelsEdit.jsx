@@ -9,11 +9,9 @@ import { Form } from "react-bootstrap";
 const CarModelsEdit = observer(() => {  
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [abrv, setAbrv] = useState("");
-  const [carMake, setCarMake] = useState("");
+  const [abrv, setAbrv] = useState("");  
   const [carMakes, setCarMakes] = useState("");
-  const [carMakeId, setCarMakeId] = useState("");
-  const [carEngineType, setCarEngineType] = useState("");
+  const [carMakeId, setCarMakeId] = useState("");  
   const [carEngineTypes, setCarEngineTypes] = useState("");
   const [carEngineTypeId, setCarEngineTypeId] = useState("");
   const [message, setMessage] = useState("");
@@ -26,24 +24,19 @@ const CarModelsEdit = observer(() => {
   
       const result = await CarModelStore.getCarModelById(id);       
   
-      if (result.error) {
-        console.log('Error fetching Car Model:', result.message);  
+      if (result.error) {        
         setMessage("Car Model not found.");
       } else {
-        console.log('Fetched Car Model:', result.message);  
         setName(result.message.name);
-        setAbrv(result.message.abrv);
-        setCarMake(result.message.carMake);
-        setCarEngineType(result.message.carEngineType);
+        setAbrv(result.message.abrv);               
       }
       setLoading(false);
     };
   
     if (id) {
       fetchCarModel();
-    } else {
-      console.log('No ID provided');  
-    }
+    } 
+    
   }, [id]);
 
   async function fetchCarMakes() {

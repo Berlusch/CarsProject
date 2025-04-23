@@ -1,6 +1,5 @@
 import { makeAutoObservable } from "mobx";
 import CarOwnerService from "../common/Services/CarOwnerService";
-import sharedStore from "./SharedStore";
 
 
 class CarOwnerStore {
@@ -12,20 +11,17 @@ class CarOwnerStore {
   carOwners = [];
   addStatus = { error: false, message: '' };
   selectedCarOwner = null;
-  error = null;
-  
+  error = null;  
 
   constructor() {
     makeAutoObservable(this);
   }
-
   
   setSearchTerm(term) {
     this.searchTerm = term;
     this.currentPage = 1;  
-    sharedStore.setSearchTerm(term);
+    
   }
-
   
   setPage(page) {
     this.currentPage = page;
@@ -62,7 +58,7 @@ class CarOwnerStore {
     try {      
       const result = await CarOwnerService.getById(id);  
         if (result.error) {
-        return { error: true, message: "Car Owner not found." };
+        return { error: true, message: "Car owner not found." };
       }
       return result;
     } catch (error) {
@@ -73,14 +69,12 @@ class CarOwnerStore {
   async editCarOwner(id, carOwner) {
     try {
       await CarOwnerService.edit(id, carOwner);
-      return { error: false, message: "Car Owner edited successfully." };
+      return { error: false, message: "Car owner edited successfully." };
     } catch (error) {
       return { error: true, message: "Error updating Car Owner." };
     }
   }
-  
-
-  
+ 
   
 }
 

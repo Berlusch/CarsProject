@@ -5,13 +5,13 @@
 }
 
 .pagination-btn {
-  background-color: #81d1ca; /* tirkizna */
+  background-color: #81d1ca;
   color: white;
   border: none;
-  padding: 4px 10px; /* manji padding */
+  padding: 4px 10px; 
   margin: 0 4px;
-  border-radius: 6px; /* blago zaobljeno */
-  font-size: 14px; /* manji font */
+  border-radius: 6px; 
+  font-size: 14px; 
   cursor: pointer;
   transition: background-color 0.3s ease;
 }

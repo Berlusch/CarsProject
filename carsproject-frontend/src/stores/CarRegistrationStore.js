@@ -3,10 +3,9 @@ import CarRegistrationService from "../common/Services/CarRegistrationService";
 
 
 class CarRegistrationStore {
-  searchTerm = '';  // Pretraga
-  currentPage = 1;  // Trenutna stranica
-  pageSize = 5;     // Broj stavki po stranici
-  sortDirection = "asc";  // Smjer sortiranja ('asc' ili 'desc')
+  searchTerm = '';  
+  currentPage = 1;  
+  pageSize = 5;    
   hasNextPage = false; 
   addStatus = { error: false, message: '' }; 
   carRegistrations = [];
@@ -18,19 +17,16 @@ class CarRegistrationStore {
   constructor() {
     makeAutoObservable(this);
   }
-
-  // Postavljanje termina za pretragu
+  
   setSearchTerm(term) {
     this.searchTerm = term;
     this.currentPage = 1;  // Resetiranje stranice na 1 pri novoj pretrazi
   }
-
-  // Postavljanje trenutne stranice
+  
   setPage(page) {
     this.currentPage = page;
   }
-    
-  // Getter za filtere
+      
   get filters() {
     return {
       searchTerm: this.searchTerm,   
@@ -44,8 +40,7 @@ class CarRegistrationStore {
   
     try {
       const result = await CarRegistrationService.add({ registrationNumber, carOwnerId, carModelId });
-      console.log('Response from server:', result);
-  
+        
       if (result && result.error) {
         this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };
       } else {
@@ -58,7 +53,6 @@ class CarRegistrationStore {
       
     }  
   }
-
   
   async getCarRegistrationById(id) {
     try {      
@@ -80,9 +74,7 @@ class CarRegistrationStore {
       return { error: true, message: "Error updating Car Registration." };
     }
   }
-  
-
-  
+    
   
 }
 
