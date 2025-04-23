@@ -7,7 +7,7 @@ import { RouteNames } from '../../common/constants';
 import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
 import { useNavigate } from 'react-router-dom';
-import sharedStore from '../../stores/SharedStore';
+
 
 const CarModelsList = observer(() => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const filtered = response.filter(model =>
 );
 
 setCarModels(filtered);
-sharedStore.setCarModels(response);
+
 setCurrentPageSize(filtered.length);
 
   };  
@@ -110,7 +110,7 @@ setCurrentPageSize(filtered.length);
         value={CarModelStore.searchTerm}
         onChange={(value) => CarModelStore.setSearchTerm(value)}
         onSearch={handleSearch}
-        placeholder="Search by car make"
+        placeholder="Search by car make..."
       />
       <Table
         columns={columns}
