@@ -121,6 +121,7 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
         onAdd={() => console.log('Add a new car make')}
         routeNames={RouteNames.CAR_MAKE_ADD}
         entityName="Car Make"
+        page={currentPage}
       />
       <Pagination
         currentPage={CarMakeStore.currentPage}        

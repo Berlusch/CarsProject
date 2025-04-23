@@ -106,6 +106,7 @@ const CarRegistrationsList = observer(() => {
         onAdd={() => console.log('Add new car make')}
         routeNames={RouteNames.CAR_REGISTRATION_ADD}
         entityName="Car Registration"
+        page={currentPage}
       />
       <Pagination
         currentPage={CarRegistrationStore.currentPage}

@@ -2,9 +2,13 @@ import React from 'react';
 import './Table.css';
 import { Link } from 'react-router-dom';
 
-const Table = ({ columns, data, onAdd, routeNames, page }) => {
-  const hasData = data && data.length > 0;
+const Table = ({ columns, data, onAdd, routeNames, page=1}) => {
+const hasData = Array.isArray(data) && data.length > 0;
 
+console.log("Data:", data);
+console.log("Page:", page);
+console.log("hasData:", hasData);
+  
   return (
     <div className="table-container">
       <table className="custom-table">
@@ -25,26 +29,24 @@ const Table = ({ columns, data, onAdd, routeNames, page }) => {
           </tr>
         </thead>
         <tbody>
-          {hasData ? (
-            data.map((item, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
-                {columns.map(col => (
-                  <td key={col.accessor}>{item[col.accessor]}</td>
-                ))}
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={columns.length} className="no-data-message">
-                {page > 1 ? (
-                  "Oops! No more data to show. You can go back or add a new car make."
-                ) : (
-                  "Sorry, no data available."
-                )}
-              </td>
-            </tr>
-          )}
-        </tbody>
+  {hasData &&
+    data.map((item, index) => (
+      <tr key={index} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
+        {columns.map((col) => (
+          <td key={col.accessor}>{item[col.accessor]}</td>
+        ))}
+      </tr>
+    ))}
+
+  {!hasData && page > 1 && (
+    <tr>
+      <td colSpan={columns.length} className="no-data-message">
+        Oops! No more data to show. You can go back or add a new item.
+      </td>
+    </tr>
+  )}
+</tbody>
+
       </table>
     </div>
   );

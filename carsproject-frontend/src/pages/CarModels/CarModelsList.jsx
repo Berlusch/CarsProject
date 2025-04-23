@@ -77,11 +77,11 @@ setCurrentPageSize(filtered.length);
     };
   });
 
-
+  
   const handleRemove = async (id) => {
     const carModel = carModels.find(c => c.id === id);
-    const carModelNumber = carModel.registrationNumber;
-    if (!confirm(`Are you sure you want to remove ${carModelNumber}?`)) {
+    const carModelName = carModel.name;
+    if (!confirm(`Are you sure you want to remove ${carModelName}?`)) {
       return;
     }
     const response = await CarModelService.remove(id);
@@ -113,6 +113,7 @@ setCurrentPageSize(filtered.length);
         onAdd={() => console.log('Add a new car model')}
         routeNames={RouteNames.CAR_MODEL_ADD}
         entityName="Car Model"
+        page={currentPage}
       />
       <Pagination
         currentPage={CarModelStore.currentPage}

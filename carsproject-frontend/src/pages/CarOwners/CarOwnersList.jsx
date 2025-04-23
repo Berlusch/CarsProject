@@ -81,7 +81,7 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
     const carOwnerFirstName = carOwner.firstName;
     const carOwnerLastName = carOwner.lastName;
 
-    if (!confirm(`Are you sure you want to remove ${carOwnerFirstName + carOwnerLastName}?`)) {
+    if (!confirm(`Are you sure you want to remove ${carOwnerFirstName +" "+ carOwnerLastName}?`)) {
       return;
     }
 
@@ -118,6 +118,7 @@ const { currentPage, pageSize, searchTerm} = CarOwnerStore.filters;
         onAdd={() => console.log('Add new car make')}
         routeNames={RouteNames.CAR_OWNER_ADD}
         entityName="Car Owner"
+        page={currentPage}
       />
       <Pagination
         currentPage={CarOwnerStore.currentPage}        
