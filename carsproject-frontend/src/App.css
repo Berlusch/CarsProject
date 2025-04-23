@@ -19,7 +19,6 @@ body {
   font-size: 17px; /* POVEĆANJE svega */
 }
 
-
 .header {
   display: flex;
   align-items: center;
@@ -36,12 +35,23 @@ body {
   padding-bottom: 10px; 
 }
 
-/* Logo */
+
 .logo {
   height: 160px;
   object-fit: contain;
   margin-top: 20px;
   border-bottom: 2px solid #69c1d1; 
+}
+
+/* Prilagodba za mobilne uređaje */
+@media (max-width: 600px) {
+  .header {
+    padding: 8px; /* manji razmak */
+  }
+
+  .logo {
+    max-width: 280px; 
+  }
 }
 
 /* Glavni sadržaj */
@@ -166,6 +176,7 @@ input, select {
   font-weight: bold;
   color:#19a5a5;
   text-align: center;
+  margin-top: 20px;
   
 }
 
