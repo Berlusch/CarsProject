@@ -15,16 +15,15 @@ namespace CarsProject.Service.Tests
         private readonly CarRegistrationService _service;
         private readonly Mock<ICarOwnerRepository> _mockCarOwnerRepository;
         private readonly Mock<ICarModelRepository> _mockCarModelRepository;
-        private readonly Mock<ICarOwnerService> _mockCarOwnerService;
-
+        
         public CarRegistrationServiceTests()
         {
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
+
             _mockCarRegistrationRepository = new Mock<ICarRegistrationRepository>();
             _mockCarOwnerRepository = new Mock<ICarOwnerRepository>();
-            _mockCarModelRepository = new Mock<ICarModelRepository>();
-            _mockCarOwnerService = new Mock<ICarOwnerService>();
+            _mockCarModelRepository = new Mock<ICarModelRepository>();            
 
             _mockUnitOfWork.Setup(uow => uow.CarRegistrationRepository).Returns(_mockCarRegistrationRepository.Object);
             _mockUnitOfWork.Setup(uow => uow.CarOwnerRepository).Returns(_mockCarOwnerRepository.Object);
@@ -146,8 +145,7 @@ namespace CarsProject.Service.Tests
             };
 
             var expectedDto = new CarRegistrationDTORead(1, "Registration A", "John Travolta", "Golf");
-
-            // Dodaj mockove za repozitorije
+            
             var mockCarOwnerRepository = new Mock<ICarOwnerRepository>();
             mockCarOwnerRepository
                 .Setup(r => r.GetByIdAsync(1))
@@ -165,24 +163,20 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork
                 .Setup(u => u.CarModelRepository)
                 .Returns(mockCarModelRepository.Object);
-
-            // Postojeći mockovi
+            
             _mockMapper.Setup(m => m.Map<CarRegistration>(carRegistrationDto)).Returns(carRegistration);
             _mockUnitOfWork.Setup(u => u.CarRegistrationRepository.AddAsync(carRegistration)).ReturnsAsync(carRegistration);
             _mockUnitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
             _mockMapper.Setup(m => m.Map<CarRegistrationDTORead>(carRegistration)).Returns(expectedDto);
-
-            // Poziv metode
+            
             var result = await _service.AddCarRegistrationAsync(carRegistrationDto);
-
-            // Provjera
+                        
             result.Should().BeEquivalentTo(expectedDto);
         }
 
         [Fact]
         public async Task UpdateCarRegistrationAsync_ValidInput_UpdatesAndReturnsDTO()
-        {
-            // Arrange
+        {            
             var id = 1;
 
             var carRegistrationDto = new CarRegistrationDTOInsertUpdate(
@@ -224,11 +218,9 @@ namespace CarsProject.Service.Tests
 
             _mockMapper.Setup(m => m.Map<CarRegistrationDTORead>(existingCarRegistration))
                 .Returns(expectedDto);
-
-            // Act
+            
             var result = await _service.UpdateCarRegistrationAsync(id, carRegistrationDto);
-
-            // Assert
+            
             Assert.NotNull(result);
             Assert.Equal(expectedDto.Id, result.Id);
             Assert.Equal(expectedDto.RegistrationNumber, result.RegistrationNumber);
@@ -277,7 +269,6 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork.Verify(u => u.CarRegistrationRepository.DeleteAsync(id), Times.Once);
             _mockUnitOfWork.Verify(u => u.SaveChangesAsync(), Times.Once);
         }
-
 
 
     }

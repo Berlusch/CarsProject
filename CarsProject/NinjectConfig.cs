@@ -10,8 +10,7 @@ namespace CarsProject
         public static IKernel CreateKernel()
         {
             var kernel = new StandardKernel();
-
-            // Repository bindings
+            
             kernel.Bind<ICarRegistrationService>().To<CarRegistrationService>();
             kernel.Bind<ICarModelService>().To<CarModelService>();
             kernel.Bind<ICarEngineTypeService>().To<CarEngineTypeService>();

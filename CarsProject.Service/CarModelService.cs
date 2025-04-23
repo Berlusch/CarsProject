@@ -2,7 +2,6 @@
 using CarsProject.Model;
 using CarsProject.Model.DTO;
 using CarsProject.Repository.Common;
-using CarsProject.Service;
 
 namespace CarsProject.Service
 {
@@ -16,20 +15,19 @@ namespace CarsProject.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
-        // PFS (pagination, filtering, sorting)
+                
         public async Task<IEnumerable<CarModelDTORead>> GetCarModelsPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
         {
             var carModelsQuery = await _unitOfWork.CarModelRepository.GetAllCarModelsAsync();
 
-            // Filtering
+            
             if (!string.IsNullOrEmpty(filter))
             {
                 string lowerFilter = filter.ToLower();
                 carModelsQuery = carModelsQuery.Where(c => c.Name.ToLower().Contains(lowerFilter));
             }
 
-            // Sorting
+            
             if (!string.IsNullOrEmpty(sortBy))
             {
                 if (sortBy.ToLower() == "name")
@@ -41,14 +39,13 @@ namespace CarsProject.Service
                     carModelsQuery = carModelsQuery.OrderBy(c => c.Id);
                 }
             }
-
-            // Pagination
+                        
             var carModelsPaged = carModelsQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToList();  // Pretvori u List<CarModel>
+                .ToList();  
 
-            // Mapiraj List<CarModel> u List<CarModelDTORead>
+            
             var result = _mapper.Map<List<CarModelDTORead>>(carModelsPaged);
 
             return result;
@@ -68,22 +65,19 @@ namespace CarsProject.Service
         }
 
         public async Task<CarModelDTORead> AddCarModelAsync(CarModelDTOInsertUpdate carModelDto)
-        {
-            // Provjera postoji li CarMake s navedenim ID-em
+        {            
             var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(carModelDto.CarMakeId);
             if (carMake == null)
             {
                 throw new Exception($"CarMake with ID {carModelDto.CarMakeId} not found.");
             }
-
-            // Check if CarEngineType with the specified ID exists
+            
             var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(carModelDto.CarEngineTypeId);
             if (carEngineType == null)
             {
                 throw new Exception($"CarEngineType with ID {carModelDto.CarEngineTypeId} not found.");
             }
-
-            // Check if a CarModel with the same name already exists
+                        
             var carModels = await _unitOfWork.CarModelRepository.GetAllCarModelsAsync();
             var existingCarModel = carModels.FirstOrDefault(c => c.Name.Equals(carModelDto.Name, StringComparison.OrdinalIgnoreCase));
 
@@ -92,7 +86,6 @@ namespace CarsProject.Service
             {
                 throw new Exception($"CarModel with the name {carModelDto.Name} already exists.");
             }
-
 
             var carModel = _mapper.Map<CarModel>(carModelDto);
             carModel.CarMake = carMake;
@@ -113,27 +106,26 @@ namespace CarsProject.Service
             {
                 throw new KeyNotFoundException($"CarModel with ID {id} not found.");
             }
-
-            // Provjera postoji li CarMake s navedenim ID-em za ažuriranje
+                        
             var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(carModelDto.CarMakeId);
             if (carMake == null)
             {
                 throw new Exception($"CarMake with ID {carModelDto.CarMakeId} not found.");
             }
 
-            // Provjera postoji li CarEngineType s navedenim ID-em za ažuriranje
+            
             var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(carModelDto.CarEngineTypeId);
             if (carEngineType == null)
             {
                 throw new Exception($"CarEngineType with ID {carModelDto.CarEngineTypeId} not found.");
             }
 
-            // Mapiranje novog DTO-a u postojeći entitet
+            
             _mapper.Map(carModelDto, existingCarModel);
-            existingCarModel.CarMake = carMake;  // Ažuriranje CarMake
-            existingCarModel.CarEngineType = carEngineType;  // Ažuriranje CarEngineType
+            existingCarModel.CarMake = carMake;  
+            existingCarModel.CarEngineType = carEngineType;  
 
-            // Ažuriranje modela u bazi
+            
             var updatedCarModel = await _unitOfWork.CarModelRepository.UpdateAsync(existingCarModel);
             await _unitOfWork.SaveChangesAsync();
 

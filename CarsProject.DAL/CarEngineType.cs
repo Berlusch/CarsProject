@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CarsProject.DAL
+﻿namespace CarsProject.DAL
 {
     internal class CarEngineType:EntityBase
     {        

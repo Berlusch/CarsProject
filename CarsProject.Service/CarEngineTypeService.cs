@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CarsProject.Model;
 using CarsProject.Model.DTO;
 using CarsProject.Repository.Common;
 
@@ -15,20 +14,20 @@ namespace CarsProject.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
-        // PFS (pagination, filtering, sorting)
-        public async Task<IEnumerable<CarEngineTypeDTORead>> GetCarEngineTypesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
+        
+        public async Task<IEnumerable<CarEngineTypeDTORead>> GetCarEngineTypesPagedAsync
+            (int pageNumber, int pageSize, string sortBy, string filter)
         {
             var carEngineTypesQuery = await _unitOfWork.CarEngineTypeRepository.GetAllCarEngineTypesAsync();
 
-            // Filtering
+            
             if (!string.IsNullOrEmpty(filter))
             {
                 string lowerFilter = filter.ToLower();
                 carEngineTypesQuery = carEngineTypesQuery.Where(c => c.Type.ToLower().Contains(lowerFilter));
             }
 
-            // Sorting
+            
             if (!string.IsNullOrEmpty(sortBy))
             {
                 if (sortBy.ToLower() == "type")
@@ -41,7 +40,7 @@ namespace CarsProject.Service
                 }
             }
 
-            // Pagination
+            
             var carEngineTypesPaged = carEngineTypesQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

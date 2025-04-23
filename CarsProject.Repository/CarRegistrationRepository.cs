@@ -8,13 +8,11 @@ namespace CarsProject.Repository
     public class CarRegistrationRepository : GenericRepository<CarRegistration>, ICarRegistrationRepository
     {
         private readonly CarsDbContext _context;
-
-        // Konstruktori
+        
         public CarRegistrationRepository(CarsDbContext context) : base(context)
         {
             _context = context;
         }
-
 
         public async Task<IEnumerable<CarRegistration>> GetAllCarRegistrationsAsync()
         {

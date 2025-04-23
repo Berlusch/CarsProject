@@ -9,13 +9,12 @@ namespace CarsProject.Repository
     {
         private readonly CarsDbContext _context;
 
-        // Konstruktori
+        
         public CarModelRepository(CarsDbContext context) : base(context)
         {
             _context = context;
         }
-
-        
+                
         public async Task<IEnumerable<CarModel>> GetAllCarModelsAsync()
         {
             

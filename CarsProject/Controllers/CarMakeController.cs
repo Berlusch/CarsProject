@@ -47,10 +47,10 @@ namespace CarsProject.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var carMake = _mapper.Map<CarMake>(carMakeDto); // Mapiraj DTO u domain model
+            var carMake = _mapper.Map<CarMake>(carMakeDto); 
             var createdCarMake = await _carMakeService.AddCarMakeAsync(carMakeDto);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeDTORead>(createdCarMake)); // Mapiraj domain model u DTO
+            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeDTORead>(createdCarMake)); 
         }
 
         [HttpPut("{id}")]
@@ -61,7 +61,7 @@ namespace CarsProject.Controllers
             if (updatedCarMake == null)
                 return NotFound();
 
-            return Ok(updatedCarMake); // Već je DTORead iz servisa
+            return Ok(updatedCarMake); 
         }
 
         [HttpDelete("{id}")]

@@ -2,9 +2,7 @@
 using CarsProject.Model;
 using CarsProject.Model.DTO;
 using CarsProject.Repository.Common;
-using FluentAssertions;
 using Moq;
-using System.Globalization;
 
 namespace CarsProject.Service.Tests
 
@@ -21,17 +19,14 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
             _mockCarEngineTypeRepository = new Mock<ICarEngineTypeRepository>();
-
-            // Mockanje povratne vrijednosti iz IUnitOfWork
+            
             _mockUnitOfWork.Setup(uow => uow.CarEngineTypeRepository).Returns(_mockCarEngineTypeRepository.Object);
-
-            // Kreiranje instance servisa
+            
             _service = new CarEngineTypeService(_mockUnitOfWork.Object, _mockMapper.Object);
         }
         [Fact]
         public async Task GetCarEngineTypesPagedAsync_ReturnsPagedFilteredSortedCarEngineTypes()
-        {
-            // Arrange
+        {            
             var pageNumber = 1;
             var pageSize = 2;
             var sortBy = "name";
@@ -53,10 +48,9 @@ namespace CarsProject.Service.Tests
             _mockMapper.Setup(m => m.Map<IEnumerable<CarEngineTypeDTORead>>(It.IsAny<IEnumerable<CarEngineType>>()))
                        .Returns(expectedDTOs);
 
-            // Act
+            
             var result = await _service.GetCarEngineTypesPagedAsync(pageNumber, pageSize, sortBy, filter);
-
-            // Assert
+            
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
             Assert.Contains(result, x => x.Type == "FirstType");
@@ -64,9 +58,8 @@ namespace CarsProject.Service.Tests
         }
 
         [Fact]
-        public async Task GetCarEngineTypeByIdAsync_ReturnsCorrectCarEngineTypeDTO()
+        public async Task GetCarEngineTypeByIdAsync_ReturnsCorrectCarEngineTypeDTO()     
         {
-            // Arrange
             var id = 1;
             var carEngineType = new CarEngineType { Id = id, Type = "Hybrid", Abrv = "HBR"};
             var expectedDto = new CarEngineTypeDTORead(id, "Hybrid", "HBR");
@@ -74,10 +67,9 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork.Setup(u => u.CarEngineTypeRepository.GetByIdAsync(id)).ReturnsAsync(carEngineType);
             _mockMapper.Setup(m => m.Map<CarEngineTypeDTORead>(carEngineType)).Returns(expectedDto);
 
-            // Act
+            
             var result = await _service.GetCarEngineTypeByIdAsync(id);
-
-            // Assert
+            
             Assert.Equal(expectedDto.Id, result.Id);
             Assert.Equal(expectedDto.Type, result.Type);
             Assert.Equal(expectedDto.Abrv, result.Abrv);

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CarsProject.Model;
 using CarsProject.Model.DTO;
 using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;

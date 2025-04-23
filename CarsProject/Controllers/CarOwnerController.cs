@@ -50,7 +50,7 @@ namespace CarsProject.Controllers
             var carOwner = _mapper.Map<CarOwner>(carOwnerDto); 
             var createdCarOwner = await _carOwnerService.AddCarOwnerAsync(carOwnerDto);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarOwner.Id }, _mapper.Map<CarOwnerDTORead>(createdCarOwner)); // Mapiraj domain model u DTO
+            return CreatedAtAction(nameof(GetById), new { id = createdCarOwner.Id }, _mapper.Map<CarOwnerDTORead>(createdCarOwner)); 
         }
 
         [HttpPut("{id}")]

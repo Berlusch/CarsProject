@@ -16,19 +16,18 @@ namespace CarsProject.Service
             _mapper = mapper;
         }
 
-        // PFS (pagination, filtering, sorting)
         public async Task<IEnumerable<CarMakeDTORead>> GetCarMakesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
         {
             var carMakesQuery = await _unitOfWork.CarMakeRepository.GetAllCarMakesAsync();
 
-            // Filtering
+            
             if (!string.IsNullOrEmpty(filter))
             {
                 string lowerFilter = filter.ToLower();
                 carMakesQuery = carMakesQuery.Where(c => c.Name.ToLower().Contains(lowerFilter));
             }
 
-            // Sorting
+            
             if (!string.IsNullOrEmpty(sortBy))
             {
                 if (sortBy.ToLower() == "name")
@@ -41,7 +40,7 @@ namespace CarsProject.Service
                 }
             }
 
-            // Pagination
+            
             var carMakesPaged = carMakesQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

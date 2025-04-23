@@ -47,10 +47,10 @@ namespace CarsProject.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var carModel = _mapper.Map<CarModel>(carModelDto); // Mapiraj DTO u domain model
+            var carModel = _mapper.Map<CarModel>(carModelDto); 
             var createdCarModel = await _carModelService.AddCarModelAsync(carModelDto);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarModel.Id }, _mapper.Map<CarModelDTORead>(createdCarModel)); // Mapiraj domain model u DTO
+            return CreatedAtAction(nameof(GetById), new { id = createdCarModel.Id }, _mapper.Map<CarModelDTORead>(createdCarModel)); 
         }
 
         [HttpPut("{id}")]

@@ -14,20 +14,18 @@ public class CarRegistrationService : ICarRegistrationService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-
-    // PFS (pagination, filtering, sorting)
+    
     public async Task<IEnumerable<CarRegistrationDTORead>> GetCarRegistrationsPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
     {
         var carRegistrationsQuery = await _unitOfWork.CarRegistrationRepository.GetAllCarRegistrationsAsync();
-
-        // Filtering
+                
         if (!string.IsNullOrEmpty(filter))
         {
             string lowerFilter = filter.ToLower();
             carRegistrationsQuery = carRegistrationsQuery.Where(c => c.RegistrationNumber.ToLower().Contains(lowerFilter));
         }
 
-        // Sorting
+        
         if (!string.IsNullOrEmpty(sortBy))
         {
             if (sortBy.ToLower() == "registration number")
@@ -39,14 +37,12 @@ public class CarRegistrationService : ICarRegistrationService
                 carRegistrationsQuery = carRegistrationsQuery.OrderBy(c => c.Id);
             }
         }
-
-        // Pagination
+                
         var carRegistrationsPaged = carRegistrationsQuery
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToList();  // Pretvori u List<CarRegistration>
-
-        // Mapiraj List<CarRegistration> u List<CarRegistrationDTORead>
+            .ToList();  
+                
         var result = _mapper.Map<List<CarRegistrationDTORead>>(carRegistrationsPaged);
 
         return result;
@@ -82,7 +78,8 @@ public class CarRegistrationService : ICarRegistrationService
 
         // Check if the same CarRegistration already exists
         var carRegistrations = await _unitOfWork.CarRegistrationRepository.GetAllCarRegistrationsAsync();
-        var existingCarRegistration = carRegistrations.FirstOrDefault(c => c.RegistrationNumber.Equals(carRegistrationDto.RegistrationNumber, StringComparison.OrdinalIgnoreCase));
+        var existingCarRegistration = carRegistrations.FirstOrDefault
+            (c => c.RegistrationNumber.Equals(carRegistrationDto.RegistrationNumber, StringComparison.OrdinalIgnoreCase));
 
 
         if (existingCarRegistration != null)
@@ -126,8 +123,8 @@ public class CarRegistrationService : ICarRegistrationService
 
         
         _mapper.Map(carRegistrationDto, existingCarRegistration);
-        existingCarRegistration.CarOwner = carOwner;  // Ažuriranje CarOwner
-        existingCarRegistration.CarModel = carModel;  // Ažuriranje CarModel
+        existingCarRegistration.CarOwner = carOwner;  
+        existingCarRegistration.CarModel = carModel;  
 
         
         var updatedCarRegistration = await _unitOfWork.CarRegistrationRepository.UpdateAsync(existingCarRegistration);

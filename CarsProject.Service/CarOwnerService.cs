@@ -15,20 +15,17 @@ namespace CarsProject.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
-        // PFS (pagination, filtering, sorting)
+                
         public async Task<IEnumerable<CarOwnerDTORead>> GetCarOwnersPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
         {
             var carOwnersQuery = await _unitOfWork.CarOwnerRepository.GetAllCarOwnersAsync();
-
-            // Filtering
+                        
             if (!string.IsNullOrEmpty(filter))
             {
                 string lowerFilter = filter.ToLower();
                 carOwnersQuery = carOwnersQuery.Where(c => c.LastName.ToLower().Contains(lowerFilter));
             }
-
-            // Sorting
+                        
             if (!string.IsNullOrEmpty(sortBy))
             {
                 if (sortBy.ToLower() == "last name")
@@ -40,8 +37,7 @@ namespace CarsProject.Service
                     carOwnersQuery = carOwnersQuery.OrderBy(c => c.Id);
                 }
             }
-
-            // Pagination
+                        
             var carOwnersPaged = carOwnersQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

@@ -20,62 +20,52 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
             _mockCarMakeRepository = new Mock<ICarMakeRepository>();
-
-            // Mockanje povratne vrijednosti iz IUnitOfWork
+            
             _mockUnitOfWork.Setup(uow => uow.CarMakeRepository).Returns(_mockCarMakeRepository.Object);
-
-            // Kreiranje instance servisa
+            
             _service = new CarMakeService(_mockUnitOfWork.Object, _mockMapper.Object);
         }
 
         [Fact]
         public async Task GetCarMakesPagedAsync_ShouldReturnPagedCarMakes_WhenValidParams()
-        {
-            // Arrange
+        {            
             var carMakes = new List<CarMake>
         {
             new CarMake { Id = 1, Name = "Ford" },
             new CarMake { Id = 2, Name = "Toyota" }
         };
 
-            // DTO verzija
+            
             var carMakesDto = new List<CarMakeDTORead>
         {
             new CarMakeDTORead(1, "Ford", "FOR"),
             new CarMakeDTORead(2, "Toyota", "TOY")
         };
 
-            // Mockiranje repozitorija za vraćanje popisa automobila
             _mockCarMakeRepository.Setup(repo => repo.GetAllCarMakesAsync()).ReturnsAsync(carMakes);
 
-            // Mockiranje AutoMapper-a za mapiranje CarMake u CarMakeDTORead
+            
             _mockMapper.Setup(m => m.Map<IEnumerable<CarMakeDTORead>>(It.IsAny<IEnumerable<CarMake>>()))
-                       .Returns((IEnumerable<CarMake> carMakes) => carMakes.Select(carMake => new CarMakeDTORead(carMake.Id, carMake.Name, carMake.Name.Substring(0, 3).ToUpper())));
-
-            // Act
+                       .Returns((IEnumerable<CarMake> carMakes) => carMakes.Select
+                       (carMake => new CarMakeDTORead(carMake.Id, carMake.Name, carMake.Name.Substring(0, 3).ToUpper())));
+            
             var result = await _service.GetCarMakesPagedAsync(1, 2, "name", "");
-
-            // Assert
+            
             result.Should().BeEquivalentTo(carMakesDto);
         }
 
         [Fact]
         public async Task GetCarMakesPagedAsync_ShouldReturnEmpty_WhenNoCarMakes()
-        {
-            // Arrange
+        {           
             var carMakes = new List<CarMake>();
             var carMakesDto = new List<CarMakeDTORead>();
-
-            // Mockiranje repozitorija za vraćanje praznog popisa automobila
+            
             _mockCarMakeRepository.Setup(repo => repo.GetAllCarMakesAsync()).ReturnsAsync(carMakes);
-
-            // Mockiranje AutoMapper-a
+            
             _mockMapper.Setup(m => m.Map<IEnumerable<CarMakeDTORead>>(It.IsAny<IEnumerable<CarMake>>())).Returns(carMakesDto);
-
-            // Act
+            
             var result = await _service.GetCarMakesPagedAsync(1, 2, "name", "");
-
-            // Assert
+            
             result.Should().BeEmpty();
         }
 
@@ -188,19 +178,16 @@ namespace CarsProject.Service.Tests
 
         [Fact]
         public async Task GetCarMakeByIdAsync_ReturnsCorrectCarMakeDTO()
-        {
-            // Arrange
+        {            
             var id = 1;
             var carMake = new CarMake { Id = id, Name = "TestMake" };
             var expectedDto = new CarMakeDTORead (1,"Ford","FOR" );
 
             _mockUnitOfWork.Setup(u => u.CarMakeRepository.GetByIdAsync(id)).ReturnsAsync(carMake);
             _mockMapper.Setup(m => m.Map<CarMakeDTORead>(carMake)).Returns(expectedDto);
-
-            // Act
+                       
             var result = await _service.GetCarMakeByIdAsync(id);
-
-            // Assert
+                        
             Assert.Equal(expectedDto.Id, result.Id);
             Assert.Equal(expectedDto.Name, result.Name);
             Assert.Equal(expectedDto.Abrv, result.Abrv);
@@ -208,8 +195,7 @@ namespace CarsProject.Service.Tests
 
         [Fact]
         public async Task GetCarMakesPagedAsync_ReturnsPagedFilteredSortedCarMakes()
-        {
-            // Arrange
+        {            
             var pageNumber = 1;
             var pageSize = 2;
             var sortBy = "name";
@@ -231,11 +217,9 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork.Setup(u => u.CarMakeRepository.GetAllCarMakesAsync()).ReturnsAsync(carMakes);
             _mockMapper.Setup(m => m.Map<IEnumerable<CarMakeDTORead>>(It.IsAny<IEnumerable<CarMake>>()))
                        .Returns(expectedDTOs);
-
-            // Act
+                        
             var result = await _service.GetCarMakesPagedAsync(pageNumber, pageSize, sortBy, filter);
-
-            // Assert
+           
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
             Assert.Contains(result, x => x.Name == "Ford");
@@ -244,8 +228,7 @@ namespace CarsProject.Service.Tests
 
         [Fact]
         public async Task AddCarMakeAsync_ReturnsAddedCarMakeDTO()
-        {
-            // Arrange
+        {            
             var carMakeDto = new CarMakeDTOInsertUpdate ("Tesla","TES" );
             var carMake = new CarMake { Id = 4, Name = "Tesla", Abrv = "TES" };
 
@@ -255,11 +238,9 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork.Setup(u => u.CarMakeRepository.AddAsync(It.IsAny<CarMake>())).ReturnsAsync(carMake);
             _mockUnitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
             _mockMapper.Setup(m => m.Map<CarMakeDTORead>(carMake)).Returns(expectedDto);
-
-            // Act
+                        
             var result = await _service.AddCarMakeAsync(carMakeDto);
-
-            // Assert
+                        
             Assert.NotNull(result);
             Assert.Equal(expectedDto.Id, result.Id);
             Assert.Equal(expectedDto.Name, result.Name);
@@ -268,8 +249,7 @@ namespace CarsProject.Service.Tests
 
         [Fact]
         public async Task UpdateCarMakeAsync_ReturnsUpdatedCarMakeDTO()
-        {
-            // Arrange
+        {           
             var id = 1;
             var carMakeDto = new CarMakeDTOInsertUpdate ( "UpdatedMake", "UPD" );
             var existingCarMake = new CarMake { Id = id, Name = "OldMake", Abrv = "OLD" };
@@ -281,11 +261,9 @@ namespace CarsProject.Service.Tests
             _mockUnitOfWork.Setup(u => u.CarMakeRepository.UpdateAsync(It.IsAny<CarMake>())).ReturnsAsync(updatedCarMake);
             _mockUnitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
             _mockMapper.Setup(m => m.Map<CarMakeDTORead>(updatedCarMake)).Returns(expectedDto);
-
-            // Act
+            
             var result = await _service.UpdateCarMakeAsync(id, carMakeDto);
-
-            // Assert
+           
             Assert.NotNull(result);
             Assert.Equal(expectedDto.Id, result.Id);
             Assert.Equal(expectedDto.Name, result.Name);
@@ -294,19 +272,15 @@ namespace CarsProject.Service.Tests
 
         [Fact]
         public async Task DeleteCarMakeAsync_ReturnsTrue_WhenCarMakeIsDeleted()
-        {
-            // Arrange
+        {            
             var id = 1;
             var carMake = new CarMake { Id = id, Name = "Fiat", Abrv = "FIA" };
-
-            // Postavljanje mocka za GetByIdAsync
+            
             _mockUnitOfWork.Setup(u => u.CarMakeRepository.GetByIdAsync(id)).ReturnsAsync(carMake);
             _mockUnitOfWork.Setup(u => u.CarMakeRepository.DeleteAsync(id)).ReturnsAsync(true);
-
-            // Act
+            
             var result = await _service.DeleteCarMakeAsync(id);
-
-            // Assert
+                        
             Assert.True(result);
             _mockUnitOfWork.Verify(u => u.CarMakeRepository.DeleteAsync(id), Times.Once); 
             _mockUnitOfWork.Verify(u => u.SaveChangesAsync(), Times.Once); 
