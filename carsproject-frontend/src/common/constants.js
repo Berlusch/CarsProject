@@ -29,4 +29,4 @@ export const PRODUKCIJA ='https://berlusch-001-site1.ktempurl.com/api/v1';
 
 
 // Lokalni URL za razvoj:
-//export const Backend_URL ='https://localhost:7023/api/v1';
+//export const PRODUKCIJA ='https://localhost:7023/api/v1';
