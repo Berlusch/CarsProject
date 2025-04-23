@@ -80,6 +80,14 @@ const CarModelsEdit = observer(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!carMakeId) {
+      alert("Please select a car make!");
+      return;
+    }
+    if (!carEngineTypeId) {
+      alert("Please select a car engine type!");
+      return;
+    }
     const result = await CarModelStore.editCarModel
     (id, { name, abrv, carMakeId, carEngineTypeId});
     setMessage(result.message);
