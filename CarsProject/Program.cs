@@ -1,4 +1,5 @@
 using CarsProject.DAL;
+using CarsProject.Extensions;
 using CarsProject.Mapping;
 using CarsProject.Repository;
 using CarsProject.Repository.Common;
@@ -10,16 +11,6 @@ using Ninject.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173") 
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
 
 builder.Host.UseServiceProviderFactory(new NinjectServiceProviderFactory());
 
@@ -46,6 +37,7 @@ builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCarsProjectCORS();
 
 
 builder.Services.AddDbContext<CarsDbContext>(options =>
@@ -62,18 +54,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend");
-
-app.UseAuthorization();
-
 app.MapControllers();
 
-//Preparation for production
-/*app.UseStaticFiles();
+//PRODUCTION
+app.UseStaticFiles();
 app.UseDefaultFiles();
 app.MapFallbackToFile("index.html");
-
-app.UseCors("CorsPolicy");*/
+app.UseCors("CorsPolicy");
 
 app.Run();
 
