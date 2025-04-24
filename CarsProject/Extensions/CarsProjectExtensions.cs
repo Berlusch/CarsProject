@@ -2,17 +2,15 @@
 {
     public static class CarsProjectExtensions
     {
-        public static void AddCarsProjectCORS(this IServiceCollection services)
+        public static void AddCarsProjectCORS(this IServiceCollection Services)
         {
-            services.AddCors(options =>
+            Services.AddCors(opcije =>
             {
-                options.AddPolicy("CorsPolicy",
+                opcije.AddPolicy("CorsPolicy",
                     builder =>
-                        builder
-                            .AllowAnyOrigin()
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
                 );
+
             });
         }
     }

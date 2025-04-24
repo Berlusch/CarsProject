@@ -54,14 +54,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapControllers();
+
+
 app.UseStaticFiles();
 app.UseDefaultFiles();
-app.UseRouting(); 
+app.MapFallbackToFile("index.html");
 
 app.UseCors("CorsPolicy");
-
-app.MapControllers();
-app.MapFallbackToFile("index.html");
 
 app.Run();
 
