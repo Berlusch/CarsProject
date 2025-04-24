@@ -43,14 +43,19 @@ body {
   border-bottom: 2px solid #69c1d1; 
 }
 
-/* Prilagodba za mobilne uređaje */
 @media (max-width: 600px) {
   .header {
-    padding: 8px; 
+    width: 100%;        
+    padding: 8px 16px; 
+    box-sizing: border-box; 
   }
 
   .logo {
-    max-width: 320px; 
+    width: 80%;        
+    max-width: 400px;   
+    height: auto;       
+    display: block;
+    margin: 0 auto;     
   }
 }
 
