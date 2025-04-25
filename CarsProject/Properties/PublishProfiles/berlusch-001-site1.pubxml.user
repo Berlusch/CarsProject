@@ -3,13 +3,14 @@
 <Project>
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA2H0tFF+eSESZTU9iVKVAOwAAAAACAAAAAAAQZgAAAAEAACAAAACm/1xQdZWuL3r6Zl5RwMTSVoeDq9ysGfshWUulO90uowAAAAAOgAAAAAIAACAAAAAUcI38nUmb9zxa31PKHMMgN6hnSK+vaMQRNunvNacy3CAAAABHQ1KO/LyTH+ivP1uA33ie4rc+TBjRo91OSNYqFgOF9kAAAACma8v+am/7AcHPfz1Z1OcQsPPpv2oFUA0OIdYiMppyxI+mf0J9wOCDsSJSPDRYqQs9j9+CFWh2qj9a+vKN3qfw</EncryptedPassword>
-    <History>True|2025-04-25T06:16:43.9155697Z||;True|2025-04-25T07:16:42.4855171+02:00||;True|2025-04-24T21:48:33.5909586+02:00||;True|2025-04-24T21:00:33.1501705+02:00||;True|2025-04-24T20:52:42.4271574+02:00||;True|2025-04-24T20:44:08.9837642+02:00||;True|2025-04-24T19:35:23.1939638+02:00||;True|2025-04-24T18:58:03.7534166+02:00||;True|2025-04-24T17:44:12.7286793+02:00||;True|2025-04-24T17:15:01.4751342+02:00||;True|2025-04-24T11:02:18.8070452+02:00||;False|2025-04-24T11:00:42.0577060+02:00||;True|2025-04-23T18:27:20.9817883+02:00||;True|2025-04-23T14:09:36.4930236+02:00||;False|2025-04-22T20:33:50.9124652+02:00||;</History>
+    <EncryptedPassword>
+    </EncryptedPassword>
+    <History>True|2025-04-25T14:10:13.8783025Z||;True|2025-04-25T16:03:48.8759131+02:00||;True|2025-04-25T15:49:33.0004790+02:00||;True|2025-04-25T15:37:55.7348702+02:00||;True|2025-04-25T15:16:09.1144169+02:00||;True|2025-04-25T08:16:43.9155697+02:00||;True|2025-04-25T07:16:42.4855171+02:00||;True|2025-04-24T21:48:33.5909586+02:00||;True|2025-04-24T21:00:33.1501705+02:00||;True|2025-04-24T20:52:42.4271574+02:00||;True|2025-04-24T20:44:08.9837642+02:00||;True|2025-04-24T19:35:23.1939638+02:00||;True|2025-04-24T18:58:03.7534166+02:00||;True|2025-04-24T17:44:12.7286793+02:00||;True|2025-04-24T17:15:01.4751342+02:00||;True|2025-04-24T11:02:18.8070452+02:00||;False|2025-04-24T11:00:42.0577060+02:00||;True|2025-04-23T18:27:20.9817883+02:00||;True|2025-04-23T14:09:36.4930236+02:00||;False|2025-04-22T20:33:50.9124652+02:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
-    <DestinationConnectionStrings Include="DefaultConnection">
-      <Value>Server=.%3bDatabase=cars%3bTrusted_Connection=True%3bMultipleActiveResultSets=true%3bTrustServerCertificate=True</Value>
+    <DestinationConnectionStrings Include="CarsProjectContext">
+      <Value>Data Source=sql1003.site4now.net%3bInitial Catalog=db_ab7fa3_cars%3bUser ID =db_ab7fa3_cars_admin%3bPassword=Kamilica2023</Value>
     </DestinationConnectionStrings>
   </ItemGroup>
 </Project>
