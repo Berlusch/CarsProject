@@ -18,6 +18,12 @@
 		<PackageReference Include="Ninject.Extensions.DependencyInjection" Version="1.0.2" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	</ItemGroup>
+	
+	<ItemGroup>
+		<Content Update="appsettings.json">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\CarsProject.Common\CarsProject.Common.csproj" />
