@@ -32,6 +32,17 @@
   table-layout: auto; 
 }
 
+@media (max-width: 600px) {
+  
+  .table-container {
+    width: 90%;        
+    max-width: 400px;   
+    height: auto;       
+    display: block;
+    margin: 0 auto;     
+  }
+}
+
 .custom-table th,
 .custom-table td {
   padding: 10px;
