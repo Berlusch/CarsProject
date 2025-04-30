@@ -1,5 +1,4 @@
 ﻿using CarsProject.Model.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarsProject.Model
 {
