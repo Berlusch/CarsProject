@@ -1,0 +1,16 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CarsProject.Model.DTO
+{
+    public record CarOwnerDTOInsertUpdate
+    (
+        [Required(ErrorMessage = "First name is required.")]
+        string FirstName,
+
+        [Required(ErrorMessage = "Last name is required.")]
+        string LastName,
+
+        [Required(ErrorMessage = "Date of birth is required.")]
+        DateOnly DateOfBirth
+    );
+}
