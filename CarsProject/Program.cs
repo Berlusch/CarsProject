@@ -41,7 +41,7 @@ builder.Services.AddCarsProjectCORS();
 
 
 builder.Services.AddDbContext<CarsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CarsProjectContext"),
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CarsDbContext"),
         b => b.MigrationsAssembly("CarsProject.DAL")));
 
 var app = builder.Build();
