@@ -5,7 +5,7 @@ using Ninject;
 
 namespace CarsProject
 {
-    public static class NinjectConfig
+    public static class DependencyInjection
     {
         public static IKernel CreateKernel()
         {
