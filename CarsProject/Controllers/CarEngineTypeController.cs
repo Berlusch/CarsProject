@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CarsProject.Common;
 using CarsProject.WebApi.DTO;
 using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,15 @@ namespace CarsProject.WebApi.Controllers
 
         [HttpGet("getPfs")]
         public async Task<ActionResult> GetPfs(
-    [FromQuery] int pageNumber = 1,
-    [FromQuery] int pageSize = 5,
-    [FromQuery] string sortBy = "type",
-    [FromQuery] string filter = "")
+            [FromQuery] PagingParameters paging,
+            [FromQuery] SortingParameters sorting,
+            [FromQuery] FilterParameters filter)
         {
-            var carEngineTypes = await _carEngineTypeService.GetCarEngineTypesPagedAsync(pageNumber, pageSize, sortBy, filter);
+                var carEngineTypes = await _carEngineTypeService.GetCarEngineTypesPagedAsync(
+                paging,
+                sorting,
+                filter
+            );
 
             if (carEngineTypes == null || !carEngineTypes.Any())
                 return NotFound("No car engine types found.");
@@ -33,7 +37,6 @@ namespace CarsProject.WebApi.Controllers
             var carEngineTypeDtos = _mapper.Map<IEnumerable<CarEngineTypeDTORead>>(carEngineTypes);
             return Ok(carEngineTypeDtos);
         }
-
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CarEngineTypeDTORead>> GetById(int id)
@@ -43,9 +46,8 @@ namespace CarsProject.WebApi.Controllers
                 return NotFound();
 
             return Ok(_mapper.Map<CarEngineTypeDTORead>(carEngineType));
-        }        
-
-
+        }
     }
 }
+
 
