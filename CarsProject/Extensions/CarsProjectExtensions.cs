@@ -4,9 +4,9 @@
     {
         public static void AddCarsProjectCORS(this IServiceCollection Services)
         {
-            Services.AddCors(opcije =>
+            Services.AddCors(options =>
             {
-                opcije.AddPolicy("CorsPolicy",
+                options.AddPolicy("CorsPolicy",
                     builder =>
                         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
                 );
