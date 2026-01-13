@@ -2,5 +2,6 @@
 {
     public class FilterParameters
     {
+        public string Filter { get; set; } = "";
     }
 }
