@@ -3,7 +3,7 @@ using CarsProject.Repository.Common;
 using CarsProject.Service;
 using Ninject;
 
-namespace CarsProject
+namespace CarsProject.WebApi
 {
     public static class DependencyInjection
     {

@@ -4,7 +4,7 @@ using CarsProject.WebApi.DTO;
 using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CarsProject.Controllers
+namespace CarsProject.WebApi.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]

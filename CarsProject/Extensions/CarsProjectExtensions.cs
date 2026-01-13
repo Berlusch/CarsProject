@@ -1,4 +1,4 @@
-﻿namespace CarsProject.Extensions
+﻿namespace CarsProject.WebApi.Extensions
 {
     public static class CarsProjectExtensions
     {
