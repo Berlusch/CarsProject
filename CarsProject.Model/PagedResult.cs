@@ -1,6 +1,6 @@
-﻿using CarsProject.Model.Common;
+﻿using CarsProject.WebApi.Common;
 
-namespace CarsProject.Model
+namespace CarsProject.WebApi
 {
     public class PagedResult<T> : IPagedResult<T>
     {

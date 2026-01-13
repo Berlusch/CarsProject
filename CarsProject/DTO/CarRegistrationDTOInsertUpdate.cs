@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CarsProject.Model.DTO
+namespace CarsProject.WebApi.DTO
 {
     public record CarRegistrationDTOInsertUpdate
     (

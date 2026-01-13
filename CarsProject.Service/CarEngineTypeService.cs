@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CarsProject.Model.DTO;
+using CarsProject.WebApi.DTO;
 using CarsProject.Repository.Common;
 
 namespace CarsProject.Service

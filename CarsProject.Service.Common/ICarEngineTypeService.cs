@@ -1,4 +1,4 @@
-﻿using CarsProject.Model.DTO;
+﻿using CarsProject.WebApi.DTO;
 
 namespace CarsProject.Service
 {

@@ -1,4 +1,4 @@
-﻿namespace CarsProject.Model
+﻿namespace CarsProject.WebApi
 {
     public abstract class EntityBase
     {

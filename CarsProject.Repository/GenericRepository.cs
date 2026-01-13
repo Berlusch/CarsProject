@@ -92,7 +92,7 @@ namespace CarsProject.Repository
             return false;
         }
 
-        Task<Model.PagedResult<T>> ICRUDRepository<T>.GetPagedAsync
+        Task<WebApi.PagedResult<T>> ICRUDRepository<T>.GetPagedAsync
             (int pageNumber, int pageSize, Func<IQueryable<T>, IQueryable<T>>? filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy)
         {
             throw new NotImplementedException();

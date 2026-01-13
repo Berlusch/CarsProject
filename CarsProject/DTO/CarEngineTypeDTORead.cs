@@ -1,4 +1,4 @@
-﻿namespace CarsProject.Model.DTO
+﻿namespace CarsProject.WebApi.DTO
 {
     public record CarEngineTypeDTORead
    (

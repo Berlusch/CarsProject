@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CarsProject.Model.DTO;
+using CarsProject.WebApi.DTO;
 using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-﻿namespace CarsProject.Model.Common
+﻿namespace CarsProject.WebApi.Common
 {
     public interface ICarRegistration : IEntityBase
     {
