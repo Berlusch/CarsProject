@@ -1,6 +1,6 @@
 ﻿namespace CarsProject.WebApi.DTO
 {
-    public record CarOwnerDTORead
+    public record CarOwnerReadDto
     (
         int Id,
         string FirstName,

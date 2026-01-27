@@ -2,7 +2,7 @@
 
 namespace CarsProject.WebApi.DTO
 {
-    public record CarRegistrationDTOInsertUpdate
+    public record CarRegistrationInsertUpdateDto
     (
         [Required(ErrorMessage = "Registration number is required.")]   
         string RegistrationNumber,

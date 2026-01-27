@@ -20,29 +20,29 @@ namespace CarsProject.WebApi.Controllers
         }
 
         [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarMakeDTORead>>> GetPfs(
+        public async Task<ActionResult<IEnumerable<CarMakeReadDto>>> GetPfs(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string sortBy = "name",
             [FromQuery] string filter = "")
         {
             var carMakes = await _carMakeService.GetCarMakesPagedAsync(pageNumber, pageSize, sortBy, filter);
-            var carMakeDtos = _mapper.Map<IEnumerable<CarMakeDTORead>>(carMakes);
+            var carMakeDtos = _mapper.Map<IEnumerable<CarMakeReadDto>>(carMakes);
             return Ok(carMakeDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CarMakeDTORead>> GetById(int id)
+        public async Task<ActionResult<CarMakeReadDto>> GetById(int id)
         {
             var carMake = await _carMakeService.GetCarMakeByIdAsync(id);
             if (carMake == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CarMakeDTORead>(carMake)); 
+            return Ok(_mapper.Map<CarMakeReadDto>(carMake)); 
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarMakeDTOInsertUpdate carMakeDto)
+        public async Task<ActionResult> Create([FromBody] CarMakeInsertUpdateDto carMakeDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -50,11 +50,11 @@ namespace CarsProject.WebApi.Controllers
             var carMake = _mapper.Map<CarMake>(carMakeDto); 
             var createdCarMake = await _carMakeService.AddCarMakeAsync(carMakeDto);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeDTORead>(createdCarMake)); 
+            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeReadDto>(createdCarMake)); 
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarMakeDTOInsertUpdate carMakeDto)
+        public async Task<IActionResult> Update(int id, [FromBody] CarMakeInsertUpdateDto carMakeDto)
         {
             var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMakeDto);
 

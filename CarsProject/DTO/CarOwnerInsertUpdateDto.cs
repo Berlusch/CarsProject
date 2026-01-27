@@ -2,7 +2,7 @@
 
 namespace CarsProject.WebApi.DTO
 {
-    public record CarOwnerDTOInsertUpdate
+    public record CarOwnerInsertUpdateDto
     (
         [Required(ErrorMessage = "First name is required.")]
         string FirstName,

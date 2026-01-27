@@ -20,29 +20,29 @@ namespace CarsProject.WebApi.Controllers
         }
 
         [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarRegistrationDTORead>>> GetPfs(
+        public async Task<ActionResult<IEnumerable<CarRegistrationReadDto>>> GetPfs(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string sortBy = "name",
             [FromQuery] string filter = "")
         {
             var carRegistrations = await _carRegistrationService.GetCarRegistrationsPagedAsync(pageNumber, pageSize, sortBy, filter);
-            var carRegistrationDtos = _mapper.Map<IEnumerable<CarRegistrationDTORead>>(carRegistrations);
+            var carRegistrationDtos = _mapper.Map<IEnumerable<CarRegistrationReadDto>>(carRegistrations);
             return Ok(carRegistrationDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CarRegistrationDTORead>> GetById(int id)
+        public async Task<ActionResult<CarRegistrationReadDto>> GetById(int id)
         {
             var carRegistration = await _carRegistrationService.GetCarRegistrationByIdAsync(id);
             if (carRegistration == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CarRegistrationDTORead>(carRegistration));
+            return Ok(_mapper.Map<CarRegistrationReadDto>(carRegistration));
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarRegistrationDTOInsertUpdate carRegistrationDto)
+        public async Task<ActionResult> Create([FromBody] CarRegistrationInsertUpdateDto carRegistrationDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -50,11 +50,11 @@ namespace CarsProject.WebApi.Controllers
             var carRegistration = _mapper.Map<CarRegistration>(carRegistrationDto); 
             var createdCarRegistration = await _carRegistrationService.AddCarRegistrationAsync(carRegistrationDto);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarRegistration.Id }, _mapper.Map<CarRegistrationDTORead>(createdCarRegistration)); 
+            return CreatedAtAction(nameof(GetById), new { id = createdCarRegistration.Id }, _mapper.Map<CarRegistrationReadDto>(createdCarRegistration)); 
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarRegistrationDTOInsertUpdate carRegistrationDto)
+        public async Task<IActionResult> Update(int id, [FromBody] CarRegistrationInsertUpdateDto carRegistrationDto)
         {
             var updatedCarRegistration = await _carRegistrationService.UpdateCarRegistrationAsync(id, carRegistrationDto);
 

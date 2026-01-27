@@ -34,18 +34,18 @@ namespace CarsProject.WebApi.Controllers
             if (carEngineTypes == null || !carEngineTypes.Any())
                 return NotFound("No car engine types found.");
 
-            var carEngineTypeDtos = _mapper.Map<IEnumerable<CarEngineTypeDTORead>>(carEngineTypes);
+            var carEngineTypeDtos = _mapper.Map<IEnumerable<CarEngineTypeReadDto>>(carEngineTypes);
             return Ok(carEngineTypeDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CarEngineTypeDTORead>> GetById(int id)
+        public async Task<ActionResult<CarEngineTypeReadDto>> GetById(int id)
         {
             var carEngineType = await _carEngineTypeService.GetCarEngineTypeByIdAsync(id);
             if (carEngineType == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CarEngineTypeDTORead>(carEngineType));
+            return Ok(_mapper.Map<CarEngineTypeReadDto>(carEngineType));
         }
     }
 }

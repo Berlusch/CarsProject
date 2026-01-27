@@ -20,29 +20,29 @@ namespace CarsProject.WebApi.Controllers
         }
 
         [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarOwnerDTORead>>> GetPfs(
+        public async Task<ActionResult<IEnumerable<CarOwnerReadDto>>> GetPfs(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 5,
             [FromQuery] string sortBy = "last name",
             [FromQuery] string filter = "")
         {
             var carOwners = await _carOwnerService.GetCarOwnersPagedAsync(pageNumber, pageSize, sortBy, filter);
-            var carOwnerDtos = _mapper.Map<IEnumerable<CarOwnerDTORead>>(carOwners);
+            var carOwnerDtos = _mapper.Map<IEnumerable<CarOwnerReadDto>>(carOwners);
             return Ok(carOwnerDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CarOwnerDTORead>> GetById(int id)
+        public async Task<ActionResult<CarOwnerReadDto>> GetById(int id)
         {
             var carOwner = await _carOwnerService.GetCarOwnerByIdAsync(id);
             if (carOwner == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CarOwnerDTORead>(carOwner));
+            return Ok(_mapper.Map<CarOwnerReadDto>(carOwner));
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarOwnerDTOInsertUpdate carOwnerDto)
+        public async Task<ActionResult> Create([FromBody] CarOwnerInsertUpdateDto carOwnerDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -50,11 +50,11 @@ namespace CarsProject.WebApi.Controllers
             var carOwner = _mapper.Map<CarOwner>(carOwnerDto); 
             var createdCarOwner = await _carOwnerService.AddCarOwnerAsync(carOwnerDto);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarOwner.Id }, _mapper.Map<CarOwnerDTORead>(createdCarOwner)); 
+            return CreatedAtAction(nameof(GetById), new { id = createdCarOwner.Id }, _mapper.Map<CarOwnerReadDto>(createdCarOwner)); 
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarOwnerDTOInsertUpdate carOwnerDto)
+        public async Task<IActionResult> Update(int id, [FromBody] CarOwnerInsertUpdateDto carOwnerDto)
         {
             var updatedCarOwner = await _carOwnerService.UpdateCarOwnerAsync(id, carOwnerDto);
 

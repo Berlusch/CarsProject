@@ -2,7 +2,7 @@
 
 namespace CarsProject.WebApi.DTO
 {
-    public record CarMakeDTOInsertUpdate
+    public record CarMakeInsertUpdateDto
     (
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(20, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 20 characters.")]
