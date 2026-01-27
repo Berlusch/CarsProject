@@ -1,22 +1,26 @@
-﻿using CarsProject.DAL;
-using CarsProject.WebApi;
+﻿using CarsProject.Common;
+using CarsProject.DAL;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
+using CarsProject.WebApi;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Repository
 {
     public class CarEngineTypeRepository : GenericRepository<CarEngineType>, ICarEngineTypeRepository
     {
-        private readonly CarsDbContext _context;
-        
-        public CarEngineTypeRepository(CarsDbContext context) : base(context)
+        public CarEngineTypeRepository(CarsDbContext context)
+            : base(context) 
         {
-            _context = context;
         }
-                
-        public async Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync()
+
+        public async Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync(PSFParameters psf)
         {
-            return await _context.CarEngineTypes.ToListAsync(); // Dohvati sve CarEngineTypes iz baze   
+            var query = GetQuery(psf); 
+            return await query
+                .Skip((psf.Paging.PageNumber - 1) * psf.Paging.PageSize)
+                .Take(psf.Paging.PageSize)
+                .ToListAsync();
         }
     }
 }
