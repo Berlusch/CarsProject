@@ -1,4 +1,4 @@
-﻿namespace CarsProject.WebApi.Common
+﻿namespace CarsProject.Model.Common
 {
     public interface IPagedResult<T>
     {

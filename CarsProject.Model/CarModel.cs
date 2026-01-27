@@ -1,6 +1,6 @@
-﻿using CarsProject.WebApi.Common;
+﻿using CarsProject.Model.Common;
 
-namespace CarsProject.WebApi
+namespace CarsProject.Model
 {
     public class CarModel : EntityBase, ICarModel
     {

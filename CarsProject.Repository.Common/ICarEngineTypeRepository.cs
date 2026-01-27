@@ -1,5 +1,5 @@
 ﻿using CarsProject.Common;
-using CarsProject.WebApi;
+using CarsProject.Model;
 
 namespace CarsProject.Repository.Common
 {

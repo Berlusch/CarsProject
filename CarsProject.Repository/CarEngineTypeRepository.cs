@@ -1,8 +1,7 @@
 ﻿using CarsProject.Common;
 using CarsProject.DAL;
-using CarsProject.Model;
 using CarsProject.Repository.Common;
-using CarsProject.WebApi;
+using CarsProject.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Repository
@@ -10,13 +9,13 @@ namespace CarsProject.Repository
     public class CarEngineTypeRepository : GenericRepository<CarEngineType>, ICarEngineTypeRepository
     {
         public CarEngineTypeRepository(CarsDbContext context)
-            : base(context) 
+            : base(context)
         {
         }
 
         public async Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync(PSFParameters psf)
         {
-            var query = GetQuery(psf); 
+            var query = GetQuery(psf);
             return await query
                 .Skip((psf.Paging.PageNumber - 1) * psf.Paging.PageSize)
                 .Take(psf.Paging.PageSize)
