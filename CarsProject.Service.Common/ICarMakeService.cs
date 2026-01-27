@@ -1,13 +1,14 @@
-﻿using CarsProject.WebApi.DTO;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 
-namespace CarsProject.Service
+namespace CarsProject.Service.Common
 {
     public interface ICarMakeService
     {
-        Task<IEnumerable<CarMakeDTORead>> GetCarMakesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter);
-        Task<CarMakeDTORead> GetCarMakeByIdAsync(int id);
-        Task<CarMakeDTORead> AddCarMakeAsync(CarMakeDTOInsertUpdate carMakeDto);
-        Task<CarMakeDTORead> UpdateCarMakeAsync(int id, CarMakeDTOInsertUpdate carMakeDto);
+        Task<IEnumerable<CarMake>> GetCarMakesAsync(PSFParameters pfs);
+        Task<CarMake> GetCarMakeByIdAsync(int id);
+        Task<CarMake> AddCarMakeAsync(CarMake carMake);
+        Task<CarMake> UpdateCarMakeAsync(int id, CarMake carMake);
         Task<bool> DeleteCarMakeAsync(int id);
     }
 }
