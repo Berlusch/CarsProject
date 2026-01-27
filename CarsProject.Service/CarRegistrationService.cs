@@ -1,152 +1,92 @@
-﻿using AutoMapper;
-using CarsProject.WebApi;
-using CarsProject.WebApi.DTO;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
-using CarsProject.Service;
+using CarsProject.Service.Common;
 
-public class CarRegistrationService : ICarRegistrationService
+namespace CarsProject.Service
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
+    public class CarRegistrationService : ICarRegistrationService
+    {
+        private readonly IGenericRepository<CarRegistration> _carRegistrationRepository;
+        private readonly IGenericRepository<CarOwner> _carOwnerRepository;
+        private readonly IGenericRepository<CarModel> _carModelRepository;
 
-    public CarRegistrationService(IUnitOfWork unitOfWork, IMapper mapper)
-    {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-    
-    public async Task<IEnumerable<CarRegistrationDTORead>> GetCarRegistrationsPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
-    {
-        var carRegistrationsQuery = await _unitOfWork.CarRegistrationRepository.GetAllCarRegistrationsAsync();
-                
-        if (!string.IsNullOrEmpty(filter))
+        public CarRegistrationService(
+            IGenericRepository<CarRegistration> carRegistrationRepository,
+            IGenericRepository<CarOwner> carOwnerRepository,
+            IGenericRepository<CarModel> carModelRepository)
         {
-            string lowerFilter = filter.ToLower();
-            carRegistrationsQuery = carRegistrationsQuery.Where(c => c.RegistrationNumber.ToLower().Contains(lowerFilter));
+            _carRegistrationRepository = carRegistrationRepository;
+            _carOwnerRepository = carOwnerRepository;
+            _carModelRepository = carModelRepository;
         }
 
-        
-        if (!string.IsNullOrEmpty(sortBy))
+        public async Task<IEnumerable<CarRegistration>> GetCarRegistrationsAsync(PSFParameters pfs)
         {
-            if (sortBy.ToLower() == "registration number")
+            var query = _carRegistrationRepository.GetQuery(pfs);
+
+            if (pfs.Paging.PageSize > 0)
+                query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                             .Take(pfs.Paging.PageSize);
+
+            return await Task.FromResult(query.ToList());
+        }
+
+        public async Task<CarRegistration> GetCarRegistrationByIdAsync(int id)
+        {
+            return await _carRegistrationRepository.GetByIdAsync(id);
+        }
+
+        public async Task<CarRegistration> AddCarRegistrationAsync(CarRegistration carRegistration)
+        {            
+            var carOwner = await _carOwnerRepository.GetByIdAsync(carRegistration.CarOwnerId);
+            if (carOwner == null)
+                throw new System.Exception($"CarOwner with ID {carRegistration.CarOwnerId} not found.");
+            
+            var carModel = await _carModelRepository.GetByIdAsync(carRegistration.CarModelId);
+            if (carModel == null)
+                throw new System.Exception($"CarModel with ID {carRegistration.CarModelId} not found.");
+            
+            var existing = _carRegistrationRepository.GetQuery(new PSFParameters
             {
-                carRegistrationsQuery = carRegistrationsQuery.OrderBy(c => c.RegistrationNumber);
-            }
-            else
-            {
-                carRegistrationsQuery = carRegistrationsQuery.OrderBy(c => c.Id);
-            }
+                Filter = new FilterParameters { PropertyName = "RegistrationNumber", Filter = carRegistration.RegistrationNumber }
+            }).FirstOrDefault(c => c.RegistrationNumber.Equals(carRegistration.RegistrationNumber, System.StringComparison.OrdinalIgnoreCase));
+
+            if (existing != null)
+                throw new System.Exception($"CarRegistration with RegistrationNumber {carRegistration.RegistrationNumber} already exists.");
+
+            carRegistration.CarOwner = carOwner;
+            carRegistration.CarModel = carModel;
+
+            return await _carRegistrationRepository.AddAsync(carRegistration);
         }
-                
-        var carRegistrationsPaged = carRegistrationsQuery
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();  
-                
-        var result = _mapper.Map<List<CarRegistrationDTORead>>(carRegistrationsPaged);
 
-        return result;
-    }
-
-
-    public async Task<CarRegistrationDTORead> GetCarRegistrationByIdAsync(int id)
-    {
-        var carRegistration = await _unitOfWork.CarRegistrationRepository.GetByIdAsync(id);
-
-        if (carRegistration == null)
+        public async Task<CarRegistration> UpdateCarRegistrationAsync(int id, CarRegistration carRegistration)
         {
-            throw new Exception($"CarRegistration with ID {id} not found.");
+            var existing = await _carRegistrationRepository.GetByIdAsync(id);
+            if (existing == null)
+                throw new KeyNotFoundException($"CarRegistration with ID {id} not found.");
+            
+            var carOwner = await _carOwnerRepository.GetByIdAsync(carRegistration.CarOwnerId);
+            if (carOwner == null)
+                throw new System.Exception($"CarOwner with ID {carRegistration.CarOwnerId} not found.");
+            
+            var carModel = await _carModelRepository.GetByIdAsync(carRegistration.CarModelId);
+            if (carModel == null)
+                throw new System.Exception($"CarModel with ID {carRegistration.CarModelId} not found.");
+            
+            existing.RegistrationNumber = carRegistration.RegistrationNumber;
+            existing.CarOwner = carOwner;
+            existing.CarModel = carModel;
+            existing.CarOwnerId = carRegistration.CarOwnerId;
+            existing.CarModelId = carRegistration.CarModelId;
+
+            return await _carRegistrationRepository.UpdateAsync(existing);
         }
 
-        return _mapper.Map<CarRegistrationDTORead>(carRegistration);
-    }
-
-    public async Task<CarRegistrationDTORead> AddCarRegistrationAsync(CarRegistrationDTOInsertUpdate carRegistrationDto)
-    {
-        
-        var carOwner = await _unitOfWork.CarOwnerRepository.GetByIdAsync(carRegistrationDto.CarOwnerId);
-        if (carOwner == null)
+        public async Task<bool> DeleteCarRegistrationAsync(int id)
         {
-            throw new Exception($"CarOwner with ID {carRegistrationDto.CarOwnerId} not found.");
+            return await _carRegistrationRepository.DeleteAsync(id);
         }
-                
-        var carModel = await _unitOfWork.CarModelRepository.GetByIdAsync(carRegistrationDto.CarModelId);
-        if (carModel == null)
-        {
-            throw new Exception($"CarModel with ID {carRegistrationDto.CarModelId} not found.");
-        }
-
-        // Check if the same CarRegistration already exists
-        var carRegistrations = await _unitOfWork.CarRegistrationRepository.GetAllCarRegistrationsAsync();
-        var existingCarRegistration = carRegistrations.FirstOrDefault
-            (c => c.RegistrationNumber.Equals(carRegistrationDto.RegistrationNumber, StringComparison.OrdinalIgnoreCase));
-
-
-        if (existingCarRegistration != null)
-        {
-            throw new Exception($"CarRegistration with the name {carRegistrationDto.RegistrationNumber} already exists.");
-        }
-
-
-        var carRegistration = _mapper.Map<CarRegistration>(carRegistrationDto);
-        carRegistration.CarOwner = carOwner;
-        carRegistration.CarModel = carModel;
-
-
-        var addedCarRegistration = await _unitOfWork.CarRegistrationRepository.AddAsync(carRegistration);
-        await _unitOfWork.SaveChangesAsync();
-
-        return _mapper.Map<CarRegistrationDTORead>(addedCarRegistration);
-    }
-
-    public async Task<CarRegistrationDTORead> UpdateCarRegistrationAsync(int id, CarRegistrationDTOInsertUpdate carRegistrationDto)
-    {
-        var existingCarRegistration = await _unitOfWork.CarRegistrationRepository.GetByIdAsync(id);
-
-        if (existingCarRegistration == null)
-        {
-            throw new KeyNotFoundException($"CarRegistration with ID {id} not found.");
-        }
-                
-        var carOwner = await _unitOfWork.CarOwnerRepository.GetByIdAsync(carRegistrationDto.CarOwnerId);
-        if (carOwner == null)
-        {
-            throw new Exception($"CarOwner with ID {carRegistrationDto.CarOwnerId} not found.");
-        }
-
-        
-        var carModel = await _unitOfWork.CarModelRepository.GetByIdAsync(carRegistrationDto.CarModelId);
-        if (carModel == null)
-        {
-            throw new Exception($"CarModel with ID {carRegistrationDto.CarModelId} not found.");
-        }
-
-        
-        _mapper.Map(carRegistrationDto, existingCarRegistration);
-        existingCarRegistration.CarOwner = carOwner;  
-        existingCarRegistration.CarModel = carModel;  
-
-        
-        var updatedCarRegistration = await _unitOfWork.CarRegistrationRepository.UpdateAsync(existingCarRegistration);
-        await _unitOfWork.SaveChangesAsync();
-
-        return _mapper.Map<CarRegistrationDTORead>(updatedCarRegistration);
-    }
-
-    public async Task<bool> DeleteCarRegistrationAsync(int id)
-    {
-        var existingCarRegistration = await _unitOfWork.CarRegistrationRepository.GetByIdAsync(id);
-        if (existingCarRegistration == null)
-        {
-            return false;
-        }
-
-        var deleted = await _unitOfWork.CarRegistrationRepository.DeleteAsync(id);
-        if (!deleted)
-            return false;
-
-        await _unitOfWork.SaveChangesAsync();
-        return true;
     }
 }
-
