@@ -1,121 +1,70 @@
-﻿using AutoMapper;
-using CarsProject.WebApi;
-using CarsProject.WebApi.DTO;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
+using CarsProject.Service.Common;
 
 namespace CarsProject.Service
 {
     public class CarOwnerService : ICarOwnerService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IGenericRepository<CarOwner> _carOwnerRepository;
 
-        public CarOwnerService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CarOwnerService(IGenericRepository<CarOwner> carOwnerRepository)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
-                
-        public async Task<IEnumerable<CarOwnerDTORead>> GetCarOwnersPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
-        {
-            var carOwnersQuery = await _unitOfWork.CarOwnerRepository.GetAllCarOwnersAsync();
-                        
-            if (!string.IsNullOrEmpty(filter))
-            {
-                string lowerFilter = filter.ToLower();
-                carOwnersQuery = carOwnersQuery.Where(c => c.LastName.ToLower().Contains(lowerFilter));
-            }
-                        
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                if (sortBy.ToLower() == "last name")
-                {
-                    carOwnersQuery = carOwnersQuery.OrderBy(c => c.LastName);
-                }
-                else
-                {
-                    carOwnersQuery = carOwnersQuery.OrderBy(c => c.Id);
-                }
-            }
-                        
-            var carOwnersPaged = carOwnersQuery
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            
-            var result = _mapper.Map<IEnumerable<CarOwnerDTORead>>(carOwnersPaged);
-
-            return result;
+            _carOwnerRepository = carOwnerRepository;
         }
 
-        public async Task<CarOwnerDTORead> GetCarOwnerByIdAsync(int id)
+        public async Task<IEnumerable<CarOwner>> GetCarOwnersAsync(PSFParameters pfs)
         {
-            var carOwner = await _unitOfWork.CarOwnerRepository.GetByIdAsync(id);
+            var query = _carOwnerRepository.GetQuery(pfs);
 
-            if (carOwner == null)
-            {
-                throw new Exception($"CarOwner with ID {id} not found.");
-            }
+            if (pfs.Paging.PageSize > 0)
+                query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                             .Take(pfs.Paging.PageSize);
 
-            return _mapper.Map<CarOwnerDTORead>(carOwner);
+            return await Task.FromResult(query.ToList());
         }
 
-        public async Task<CarOwnerDTORead> AddCarOwnerAsync(CarOwnerDTOInsertUpdate carOwnerDto)
+        public async Task<CarOwner> GetCarOwnerByIdAsync(int id)
         {
-            
-            var carOwners = await _unitOfWork.CarOwnerRepository.GetAllCarOwnersAsync(); 
-
-            var existingCarOwner = carOwners.FirstOrDefault(c => c.LastName.Equals(carOwnerDto.LastName, StringComparison.OrdinalIgnoreCase));
-
-            if (existingCarOwner != null)
-            {
-                throw new Exception($"CarOwner with the name {carOwnerDto.LastName} already exists.");
-            }
-
-            
-            var carOwner = _mapper.Map<CarOwner>(carOwnerDto);
-
-            var addedCarOwner = await _unitOfWork.CarOwnerRepository.AddAsync(carOwner);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CarOwnerDTORead>(addedCarOwner);
+            return await _carOwnerRepository.GetByIdAsync(id);
         }
 
-        public async Task<CarOwnerDTORead> UpdateCarOwnerAsync(int id, CarOwnerDTOInsertUpdate carOwnerDto)
-        {
-            var existingCarOwner = await _unitOfWork.CarOwnerRepository.GetByIdAsync(id);
-
-            if (existingCarOwner == null)
+        public async Task<CarOwner> AddCarOwnerAsync(CarOwner carOwner)
+        {            
+            var potentialMatches = _carOwnerRepository.GetQuery(new PSFParameters
             {
+                Filter = new FilterParameters { PropertyName = "LastName", Filter = carOwner.LastName }
+            }).ToList();
+
+            var existing = potentialMatches.FirstOrDefault(c =>
+                c.FirstName.Equals(carOwner.FirstName, System.StringComparison.OrdinalIgnoreCase) &&
+                c.LastName.Equals(carOwner.LastName, System.StringComparison.OrdinalIgnoreCase) &&
+                c.DateOfBirth == carOwner.DateOfBirth
+            );
+
+            if (existing != null)
+                throw new System.Exception($"CarOwner {carOwner.FirstName} {carOwner.LastName} with the same date of birth already exists.");
+
+            return await _carOwnerRepository.AddAsync(carOwner);
+        }
+
+        public async Task<CarOwner> UpdateCarOwnerAsync(int id, CarOwner carOwner)
+        {
+            var existing = await _carOwnerRepository.GetByIdAsync(id);
+            if (existing == null)
                 throw new KeyNotFoundException($"CarOwner with ID {id} not found.");
-            }
-
             
-            _mapper.Map(carOwnerDto, existingCarOwner);
+            existing.FirstName = carOwner.FirstName;
+            existing.LastName = carOwner.LastName;
+            existing.DateOfBirth = carOwner.DateOfBirth;
 
-            var updatedCarOwner = await _unitOfWork.CarOwnerRepository.UpdateAsync(existingCarOwner);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CarOwnerDTORead>(updatedCarOwner);
+            return await _carOwnerRepository.UpdateAsync(existing);
         }
 
         public async Task<bool> DeleteCarOwnerAsync(int id)
         {
-            var existingCarOwner = await _unitOfWork.CarOwnerRepository.GetByIdAsync(id);
-            if (existingCarOwner == null)
-            {
-                return false; 
-            }
-
-            var deleted = await _unitOfWork.CarOwnerRepository.DeleteAsync(id);
-            if (!deleted)
-                return false;
-
-            await _unitOfWork.SaveChangesAsync();
-            return true;        }
-
-        
+            return await _carOwnerRepository.DeleteAsync(id);
+        }
     }
 }
-
