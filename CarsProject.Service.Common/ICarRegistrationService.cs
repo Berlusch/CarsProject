@@ -1,13 +1,14 @@
-﻿using CarsProject.WebApi.DTO;
+﻿using CarsProject.Common; 
+using CarsProject.Model;
 
-namespace CarsProject.Service
+namespace CarsProject.Service.Common
 {
     public interface ICarRegistrationService
     {
-        Task<IEnumerable<CarRegistrationDTORead>> GetCarRegistrationsPagedAsync(int pageNumber, int pageSize, string sortBy, string filter);
-        Task<CarRegistrationDTORead> GetCarRegistrationByIdAsync(int id);
-        Task<CarRegistrationDTORead> AddCarRegistrationAsync(CarRegistrationDTOInsertUpdate carRegistrationDto);
-        Task<CarRegistrationDTORead> UpdateCarRegistrationAsync(int id, CarRegistrationDTOInsertUpdate carRegistrationDto);
+        Task<IEnumerable<CarRegistration>> GetCarRegistrationsAsync(PSFParameters pfs);
+        Task<CarRegistration> GetCarRegistrationByIdAsync(int id);
+        Task<CarRegistration> AddCarRegistrationAsync(CarRegistration carRegistration);
+        Task<CarRegistration> UpdateCarRegistrationAsync(int id, CarRegistration carRegistration);
         Task<bool> DeleteCarRegistrationAsync(int id);
     }
 }
