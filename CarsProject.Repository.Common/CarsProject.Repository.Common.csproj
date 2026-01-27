@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CarsProject.Common\CarsProject.Common.csproj" />
     <ProjectReference Include="..\CarsProject.DAL\CarsProject.DAL.csproj" />
     <ProjectReference Include="..\CarsProject.Model\CarsProject.Model.csproj" />
   </ItemGroup>
