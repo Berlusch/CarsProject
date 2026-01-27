@@ -1,70 +1,39 @@
-﻿using AutoMapper;
-using CarsProject.WebApi.DTO;
+﻿using CarsProject.Model;
 using CarsProject.Repository.Common;
+using CarsProject.Service.Common;
+using CarsProject.Common;
 
 namespace CarsProject.Service
 {
     public class CarEngineTypeService : ICarEngineTypeService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly ICarEngineTypeRepository _carEngineTypeRepository;
 
-        public CarEngineTypeService(IUnitOfWork unitOfWork, IMapper mapper) 
+        public CarEngineTypeService(ICarEngineTypeRepository carEngineTypeRepository)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
-        
-        public async Task<IEnumerable<CarEngineTypeDTORead>> GetCarEngineTypesPagedAsync
-            (int pageNumber, int pageSize, string sortBy, string filter)
-        {
-            var carEngineTypesQuery = await _unitOfWork.CarEngineTypeRepository.GetAllCarEngineTypesAsync();
-
-            
-            if (!string.IsNullOrEmpty(filter))
-            {
-                string lowerFilter = filter.ToLower();
-                carEngineTypesQuery = carEngineTypesQuery.Where(c => c.Type.ToLower().Contains(lowerFilter));
-            }
-
-            
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                if (sortBy.ToLower() == "type")
-                {
-                    carEngineTypesQuery = carEngineTypesQuery.OrderBy(c => c.Type);
-                }
-                else
-                {
-                    carEngineTypesQuery = carEngineTypesQuery.OrderBy(c => c.Id);
-                }
-            }
-
-            
-            var carEngineTypesPaged = carEngineTypesQuery
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            
-            var result = _mapper.Map<IEnumerable<CarEngineTypeDTORead>>(carEngineTypesPaged);
-
-            return result;
+            _carEngineTypeRepository = carEngineTypeRepository;
         }
 
-        public async Task<CarEngineTypeDTORead> GetCarEngineTypeByIdAsync(int id)
+        public async Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PSFParameters pfs)
+        {            
+            if (pfs.Paging.PageSize <= 0)
+            {
+                pfs.Paging.PageNumber = 1;
+                pfs.Paging.PageSize = 1000;
+            }
+
+            return await _carEngineTypeRepository.GetAllCarEngineTypesAsync(pfs);
+        }
+
+        public async Task<CarEngineType> GetCarEngineTypeByIdAsync(int id)
         {
-            var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(id);
+            var carEngineType = await _carEngineTypeRepository.GetByIdAsync(id);
 
             if (carEngineType == null)
-            {
                 throw new Exception($"CarEngineType with ID {id} not found.");
-            }
 
-            return _mapper.Map<CarEngineTypeDTORead>(carEngineType);
+            return carEngineType;
         }
-
-        
     }
 }
 
