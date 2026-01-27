@@ -1,15 +1,11 @@
-﻿using CarsProject.WebApi;
+﻿using CarsProject.Common;
 
 namespace CarsProject.Repository.Common
 {
     public interface IGenericRepository<T> where T : class
     {
         
-        Task<PagedResult<T>> GetPagedAsync(
-            int pageNumber,
-            int pageSize,
-            Func<IQueryable<T>, IQueryable<T>>? filter = null, 
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null); 
+        IQueryable<T> GetQuery(PSFParameters parameters);
 
         Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
