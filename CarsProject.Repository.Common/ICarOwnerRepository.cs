@@ -1,10 +1,9 @@
-﻿using CarsProject.WebApi;
+﻿using CarsProject.Model;
 
 namespace CarsProject.Repository.Common
 {
     public interface ICarOwnerRepository : IGenericRepository<CarOwner>
-
     {
-        Task<IEnumerable<CarOwner>> GetAllCarOwnersAsync();
+        
     }
 }
