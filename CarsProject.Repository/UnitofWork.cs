@@ -1,33 +1,38 @@
 ﻿using CarsProject.DAL;
 using CarsProject.Repository.Common;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CarsProject.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly CarsDbContext _context;
+        private IDbContextTransaction? _transaction;
 
-        public ICarMakeRepository CarMakeRepository { get; }
-        public ICarModelRepository CarModelRepository { get; }
-        public ICarOwnerRepository CarOwnerRepository { get; }
-        public ICarRegistrationRepository CarRegistrationRepository { get; }
-        public ICarEngineTypeRepository CarEngineTypeRepository { get; }
-
-        public UnitOfWork(
-
-            CarsDbContext context,
-            ICarMakeRepository carMakeRepository,
-            ICarModelRepository carModelRepository,
-            ICarOwnerRepository carOwnerRepository,
-            ICarRegistrationRepository carRegistrationRepository,
-            ICarEngineTypeRepository carEngineTypeRepository)
+        public UnitOfWork(CarsDbContext context)
         {
             _context = context;
-            CarMakeRepository = carMakeRepository;
-            CarModelRepository = carModelRepository;
-            CarOwnerRepository = carOwnerRepository;
-            CarRegistrationRepository = carRegistrationRepository;
-            CarEngineTypeRepository = carEngineTypeRepository;
+        }
+
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task CommitAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.CommitAsync();
+            }
+        }
+
+        public async Task RollbackAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+            }
         }
 
         public async Task<int> SaveChangesAsync()
@@ -37,8 +42,8 @@ namespace CarsProject.Repository
 
         public void Dispose()
         {
+            _transaction?.Dispose();
             _context.Dispose();
         }
     }
 }
-
