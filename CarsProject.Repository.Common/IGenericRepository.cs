@@ -2,7 +2,7 @@
 
 namespace CarsProject.Repository.Common
 {
-    public interface ICRUDRepository<T> where T : class
+    public interface IGenericRepository<T> where T : class
     {
         
         Task<PagedResult<T>> GetPagedAsync(

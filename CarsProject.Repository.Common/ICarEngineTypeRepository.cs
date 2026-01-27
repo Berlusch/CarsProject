@@ -2,7 +2,7 @@
 
 namespace CarsProject.Repository.Common
 {
-    public interface ICarEngineTypeRepository : ICRUDRepository<CarEngineType>
+    public interface ICarEngineTypeRepository : IGenericRepository<CarEngineType>
     {
         Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync();        
         

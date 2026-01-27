@@ -3,7 +3,7 @@
 
 namespace CarsProject.Repository.Common
 {
-    public interface ICarModelRepository : ICRUDRepository<CarModel>
+    public interface ICarModelRepository : IGenericRepository<CarModel>
 
     {
         Task<IEnumerable<CarModel>> GetAllCarModelsAsync();

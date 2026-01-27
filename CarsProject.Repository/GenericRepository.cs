@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Repository
 {
-    public class GenericRepository<T> : ICRUDRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly CarsDbContext _context;
         private readonly DbSet<T> _dbSet;
@@ -92,7 +92,7 @@ namespace CarsProject.Repository
             return false;
         }
 
-        Task<WebApi.PagedResult<T>> ICRUDRepository<T>.GetPagedAsync
+        Task<WebApi.PagedResult<T>> IGenericRepository<T>.GetPagedAsync
             (int pageNumber, int pageSize, Func<IQueryable<T>, IQueryable<T>>? filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy)
         {
             throw new NotImplementedException();
