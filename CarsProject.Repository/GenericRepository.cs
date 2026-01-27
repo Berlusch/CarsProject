@@ -9,20 +9,22 @@ namespace CarsProject.Repository
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected readonly CarsDbContext _context;
-        protected readonly IUnitOfWork _unitOfWork;
         protected readonly DbSet<T> _dbSet;
+       
+        public readonly IUnitOfWork UnitOfWork;
 
-        public GenericRepository(CarsDbContext context, IUnitOfWork unitOfWork)
+        public GenericRepository(CarsDbContext context)
         {
             _context = context;
-            _unitOfWork = unitOfWork;
             _dbSet = context.Set<T>();
+            UnitOfWork = new UnitOfWork(_context); 
         }
 
         public IQueryable<T> GetQuery(PSFParameters parameters)
         {
             IQueryable<T> query = _dbSet;
 
+            // FILTER
             if (!string.IsNullOrEmpty(parameters.Filter.Filter) &&
                 !string.IsNullOrEmpty(parameters.Filter.PropertyName))
             {
@@ -37,6 +39,7 @@ namespace CarsProject.Repository
                 }
             }
 
+            // SORT
             if (!string.IsNullOrEmpty(parameters.Sorting.OrderBy))
             {
                 var propInfo = typeof(T).GetProperty(parameters.Sorting.OrderBy,
@@ -53,7 +56,7 @@ namespace CarsProject.Repository
             return query;
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
@@ -64,14 +67,14 @@ namespace CarsProject.Repository
         public async Task<T> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
             return entity;
         }
 
         public async Task<T> UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            await _unitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
             return entity;
         }
 
@@ -81,7 +84,7 @@ namespace CarsProject.Repository
             if (entity != null)
             {
                 _dbSet.Remove(entity);
-                await _unitOfWork.SaveChangesAsync();
+                await UnitOfWork.SaveChangesAsync();
                 return true;
             }
             return false;
