@@ -1,5 +1,4 @@
 using CarsProject.DAL;
-using CarsProject.Extensions;
 using CarsProject.Mapping;
 using CarsProject.Repository;
 using CarsProject.Repository.Common;
