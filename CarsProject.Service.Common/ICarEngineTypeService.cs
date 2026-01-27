@@ -1,11 +1,11 @@
-﻿using CarsProject.WebApi.DTO;
+﻿using CarsProject.Model; 
+using CarsProject.Common; 
 
-namespace CarsProject.Service
+namespace CarsProject.Service.Common
 {
     public interface ICarEngineTypeService
     {
-        Task<IEnumerable<CarEngineTypeDTORead>> GetCarEngineTypesPagedAsync(int pageNumber, int pageSize, string sortBy, string filter);
-        Task<CarEngineTypeDTORead> GetCarEngineTypeByIdAsync(int id);
-        
+        Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PSFParameters pfs);
+        Task<CarEngineType> GetCarEngineTypeByIdAsync(int id);
     }
 }
