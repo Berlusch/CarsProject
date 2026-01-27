@@ -1,151 +1,66 @@
-﻿using AutoMapper;
-using CarsProject.WebApi;
-using CarsProject.WebApi.DTO;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
+using CarsProject.Service.Common;
 
 namespace CarsProject.Service
 {
     public class CarModelService : ICarModelService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IGenericRepository<CarModel> _carModelRepository;
 
-        public CarModelService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CarModelService(IGenericRepository<CarModel> carModelRepository)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
-                
-        public async Task<IEnumerable<CarModelDTORead>> GetCarModelsPagedAsync(int pageNumber, int pageSize, string sortBy, string filter)
-        {
-            var carModelsQuery = await _unitOfWork.CarModelRepository.GetAllCarModelsAsync();
-
-            
-            if (!string.IsNullOrEmpty(filter))
-            {
-                string lowerFilter = filter.ToLower();
-                carModelsQuery = carModelsQuery.Where(c => c.Name.ToLower().Contains(lowerFilter));
-            }
-
-            
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                if (sortBy.ToLower() == "name")
-                {
-                    carModelsQuery = carModelsQuery.OrderBy(c => c.Name);
-                }
-                else
-                {
-                    carModelsQuery = carModelsQuery.OrderBy(c => c.Id);
-                }
-            }
-                        
-            var carModelsPaged = carModelsQuery
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();  
-
-            
-            var result = _mapper.Map<List<CarModelDTORead>>(carModelsPaged);
-
-            return result;
+            _carModelRepository = carModelRepository;
         }
 
-
-        public async Task<CarModelDTORead> GetCarModelByIdAsync(int id)
+        public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PSFParameters pfs)
         {
-            var carModel = await _unitOfWork.CarModelRepository.GetByIdAsync(id);
+            var query = _carModelRepository.GetQuery(pfs);
 
-            if (carModel == null)
-            {
-                throw new Exception($"CarModel with ID {id} not found.");
-            }
+            if (pfs.Paging.PageSize > 0)
+                query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                             .Take(pfs.Paging.PageSize);
 
-            return _mapper.Map<CarModelDTORead>(carModel);
+            return await Task.FromResult(query.ToList());
         }
 
-        public async Task<CarModelDTORead> AddCarModelAsync(CarModelDTOInsertUpdate carModelDto)
+        public async Task<CarModel> GetCarModelByIdAsync(int id)
+        {
+            return await _carModelRepository.GetByIdAsync(id);
+        }
+
+        public async Task<CarModel> AddCarModelAsync(CarModel carModel)
         {            
-            var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(carModelDto.CarMakeId);
-            if (carMake == null)
+            var existing = _carModelRepository.GetQuery(new PSFParameters
             {
-                throw new Exception($"CarMake with ID {carModelDto.CarMakeId} not found.");
-            }
+                Filter = new FilterParameters { PropertyName = "Name", Filter = carModel.Name }
+            }).FirstOrDefault();
+
+            if (existing != null)
+                throw new Exception($"CarModel with the name {carModel.Name} already exists.");
             
-            var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(carModelDto.CarEngineTypeId);
-            if (carEngineType == null)
-            {
-                throw new Exception($"CarEngineType with ID {carModelDto.CarEngineTypeId} not found.");
-            }
-                        
-            var carModels = await _unitOfWork.CarModelRepository.GetAllCarModelsAsync();
-            var existingCarModel = carModels.FirstOrDefault(c => c.Name.Equals(carModelDto.Name, StringComparison.OrdinalIgnoreCase));
-
-
-            if (existingCarModel != null)
-            {
-                throw new Exception($"CarModel with the name {carModelDto.Name} already exists.");
-            }
-
-            var carModel = _mapper.Map<CarModel>(carModelDto);
-            carModel.CarMake = carMake;
-            carModel.CarEngineType = carEngineType;
-
-
-            var addedCarModel = await _unitOfWork.CarModelRepository.AddAsync(carModel);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CarModelDTORead>(addedCarModel);
+            return await _carModelRepository.AddAsync(carModel);
         }
 
-        public async Task<CarModelDTORead> UpdateCarModelAsync(int id, CarModelDTOInsertUpdate carModelDto)
+        public async Task<CarModel> UpdateCarModelAsync(int id, CarModel carModel)
         {
-            var existingCarModel = await _unitOfWork.CarModelRepository.GetByIdAsync(id);
-
-            if (existingCarModel == null)
-            {
+            var existing = await _carModelRepository.GetByIdAsync(id);
+            if (existing == null)
                 throw new KeyNotFoundException($"CarModel with ID {id} not found.");
-            }
-                        
-            var carMake = await _unitOfWork.CarMakeRepository.GetByIdAsync(carModelDto.CarMakeId);
-            if (carMake == null)
-            {
-                throw new Exception($"CarMake with ID {carModelDto.CarMakeId} not found.");
-            }
-
             
-            var carEngineType = await _unitOfWork.CarEngineTypeRepository.GetByIdAsync(carModelDto.CarEngineTypeId);
-            if (carEngineType == null)
-            {
-                throw new Exception($"CarEngineType with ID {carModelDto.CarEngineTypeId} not found.");
-            }
+            existing.Name = carModel.Name;
+            existing.Abrv = carModel.Abrv;
+            existing.CarMake = carModel.CarMake;
+            existing.CarEngineType = carModel.CarEngineType;
 
-            
-            _mapper.Map(carModelDto, existingCarModel);
-            existingCarModel.CarMake = carMake;  
-            existingCarModel.CarEngineType = carEngineType;  
-
-            
-            var updatedCarModel = await _unitOfWork.CarModelRepository.UpdateAsync(existingCarModel);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CarModelDTORead>(updatedCarModel);
+            return await _carModelRepository.UpdateAsync(existing);
         }
 
         public async Task<bool> DeleteCarModelAsync(int id)
         {
-            var existingCarModel = await _unitOfWork.CarModelRepository.GetByIdAsync(id);
-            if (existingCarModel == null)
-            {
-                return false;
-            }
-
-            var deleted = await _unitOfWork.CarModelRepository.DeleteAsync(id);
-            if (!deleted)
-                return false;
-
-            await _unitOfWork.SaveChangesAsync();
-            return true;
+            return await _carModelRepository.DeleteAsync(id);
         }
     }
 }
+
