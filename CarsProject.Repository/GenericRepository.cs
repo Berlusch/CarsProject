@@ -42,16 +42,20 @@ namespace CarsProject.Repository
             // SORT
             if (!string.IsNullOrEmpty(parameters.Sorting.OrderBy))
             {
-                var propInfo = typeof(T).GetProperty(parameters.Sorting.OrderBy,
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                var propInfo = typeof(T).GetProperty(
+                    parameters.Sorting.OrderBy,
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
+                );
 
                 if (propInfo != null)
                 {
-                    query = parameters.Sorting.Descending
-                        ? query.OrderByDescending(x => propInfo.GetValue(x, null))
-                        : query.OrderBy(x => propInfo.GetValue(x, null));
+                    if (parameters.Sorting.Descending)
+                        query = query.OrderByDescending(e => EF.Property<object>(e, propInfo.Name));
+                    else
+                        query = query.OrderBy(e => EF.Property<object>(e, propInfo.Name));
                 }
             }
+
 
             return query;
         }
