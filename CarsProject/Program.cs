@@ -6,44 +6,41 @@ using CarsProject.Service;
 using CarsProject.Service.Common;
 using CarsProject.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Ninject;
-using Ninject.Extensions.DependencyInjection;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-builder.Host.UseServiceProviderFactory(new NinjectServiceProviderFactory());
+builder.Services.AddScoped<ICarMakeService, CarMakeService>();
+builder.Services.AddScoped<ICarMakeRepository, CarMakeRepository>();
 
+builder.Services.AddScoped<ICarModelService, CarModelService>();
+builder.Services.AddScoped<ICarModelRepository, CarModelRepository>();
 
-builder.Host.ConfigureContainer<IKernel>(kernel =>
-{
-    kernel.Bind<ICarRegistrationService>().To<CarRegistrationService>();
-    kernel.Bind<ICarModelService>().To<CarModelService>();
-    kernel.Bind<ICarEngineTypeService>().To<CarEngineTypeService>();
-    kernel.Bind<ICarOwnerService>().To<CarOwnerService>();
-    kernel.Bind<ICarMakeService>().To<CarMakeService>();
-    kernel.Bind<ICarMakeRepository>().To<CarMakeRepository>();
-    kernel.Bind<ICarModelRepository>().To<CarModelRepository>();
-    kernel.Bind<ICarOwnerRepository>().To<CarOwnerRepository>();
-    kernel.Bind<ICarRegistrationRepository>().To<CarRegistrationRepository>();
-    kernel.Bind<ICarEngineTypeRepository>().To<CarEngineTypeRepository>();
-    kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
-    
-});
+builder.Services.AddScoped<ICarOwnerService, CarOwnerService>();
+builder.Services.AddScoped<ICarOwnerRepository, CarOwnerRepository>();
+
+builder.Services.AddScoped<ICarRegistrationService, CarRegistrationService>();
+builder.Services.AddScoped<ICarRegistrationRepository, CarRegistrationRepository>();
+
+builder.Services.AddScoped<ICarEngineTypeService, CarEngineTypeService>();
+builder.Services.AddScoped<ICarEngineTypeRepository, CarEngineTypeRepository>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCarsProjectCORS();
 
-
 builder.Services.AddDbContext<CarsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CarsDbContext"),
-        b => b.MigrationsAssembly("CarsProject.DAL")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("CarsDbContext"),
+        b => b.MigrationsAssembly("CarsProject.DAL")
+    )
+);
 
 var app = builder.Build();
 
@@ -63,8 +60,4 @@ app.UseStaticFiles();
 app.UseDefaultFiles();
 app.MapFallbackToFile("index.html");
 
-
-
 app.Run();
-
-
