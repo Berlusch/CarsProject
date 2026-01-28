@@ -24,6 +24,7 @@
     <ProjectReference Include="..\CarsProject.Repository\CarsProject.Repository.csproj" />
     <ProjectReference Include="..\CarsProject.Service.Common\CarsProject.Service.Common.csproj" />
     <ProjectReference Include="..\CarsProject.Service\CarsProject.Service.csproj" />
+    <ProjectReference Include="..\CarsProject\CarsProject.WebApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
