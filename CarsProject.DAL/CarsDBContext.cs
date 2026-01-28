@@ -14,23 +14,30 @@ namespace CarsProject.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
             modelBuilder.Entity<CarMake>();
             modelBuilder.Entity<CarModel>();
             modelBuilder.Entity<CarOwner>();
             modelBuilder.Entity<CarRegistration>();
             modelBuilder.Entity<CarEngineType>();
-            
+
             modelBuilder.Entity<CarModel>().HasOne(g => g.CarMake);
             modelBuilder.Entity<CarModel>().HasOne(g => g.CarEngineType)
                 .WithMany();
 
             modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarOwner);
             modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarModel);
+            
+            modelBuilder.Entity<CarEngineType>().HasData(
+                new CarEngineType { Id = 1, Type = "Petrol", Abrv = "PET" },
+                new CarEngineType { Id = 2, Type = "Diesel", Abrv = "DSL" },
+                new CarEngineType { Id = 3, Type = "Electric", Abrv = "ELE" },
+                new CarEngineType { Id = 4, Type = "Hybrid", Abrv = "HYB" }
+            );
         }
     }
 }
 
-    
 
-    
+
+
+
