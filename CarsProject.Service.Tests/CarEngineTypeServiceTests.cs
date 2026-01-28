@@ -1,56 +1,45 @@
 ﻿using AutoMapper;
-using CarsProject.WebApi;
-using CarsProject.WebApi.DTO;
+using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
 using Moq;
+using CarsProject.WebApi.DTO;
 
 namespace CarsProject.Service.Tests
-
 {
     public class CarEngineTypeServiceTests
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<IMapper> _mockMapper;
-        private readonly Mock<ICarEngineTypeRepository> _mockCarEngineTypeRepository;
+        private readonly Mock<ICarEngineTypeRepository> _mockRepo;
         private readonly CarEngineTypeService _service;
 
         public CarEngineTypeServiceTests()
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockMapper = new Mock<IMapper>();
-            _mockCarEngineTypeRepository = new Mock<ICarEngineTypeRepository>();
-            
-            _mockUnitOfWork.Setup(uow => uow.CarEngineTypeRepository).Returns(_mockCarEngineTypeRepository.Object);
-            
-            _service = new CarEngineTypeService(_mockUnitOfWork.Object, _mockMapper.Object);
+            _mockRepo = new Mock<ICarEngineTypeRepository>();
+
+            _service = new CarEngineTypeService(_mockRepo.Object); // SAMO JEDAN ARGUMENT
         }
+
         [Fact]
-        public async Task GetCarEngineTypesPagedAsync_ReturnsPagedFilteredSortedCarEngineTypes()
-        {            
-            var pageNumber = 1;
-            var pageSize = 2;
-            var sortBy = "name";
-            var filter = "f";
+        public async Task GetCarEngineTypesAsync_ReturnsPagedFilteredSortedCarEngineTypes()
+        {
+            var pfs = new PSFParameters
+            {
+                Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
+                Sorting = new SortingParameters { OrderBy = "Type" },
+                Filter = new FilterParameters { PropertyName = "Type", Filter = "F" }
+            };
 
             var carEngineTypes = new List<CarEngineType>
-    {
-        new CarEngineType { Id = 1, Type = "FirstType", Abrv = "FT" },
-        new CarEngineType { Id = 2, Type = "SecondType", Abrv = "ST" }
-    };
+        {
+            new CarEngineType { Id = 1, Type = "FirstType", Abrv = "FT" },
+            new CarEngineType { Id = 2, Type = "SecondType", Abrv = "ST" }
+        };
 
-            var expectedDTOs = new List<CarEngineTypeDTORead>
-    {
-        new CarEngineTypeDTORead(1, "FirstType", "FT"),
-        new CarEngineTypeDTORead(2, "SecondType", "ST")
-    };
+            _mockRepo.Setup(r => r.GetAllCarEngineTypesAsync(pfs))
+                     .ReturnsAsync(carEngineTypes);
 
-            _mockUnitOfWork.Setup(u => u.CarEngineTypeRepository.GetAllCarEngineTypesAsync()).ReturnsAsync(carEngineTypes);
-            _mockMapper.Setup(m => m.Map<IEnumerable<CarEngineTypeDTORead>>(It.IsAny<IEnumerable<CarEngineType>>()))
-                       .Returns(expectedDTOs);
+            var result = await _service.GetCarEngineTypesAsync(pfs);
 
-            
-            var result = await _service.GetCarEngineTypesPagedAsync(pageNumber, pageSize, sortBy, filter);
-            
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
             Assert.Contains(result, x => x.Type == "FirstType");
@@ -58,22 +47,18 @@ namespace CarsProject.Service.Tests
         }
 
         [Fact]
-        public async Task GetCarEngineTypeByIdAsync_ReturnsCorrectCarEngineTypeDTO()     
+        public async Task GetCarEngineTypeByIdAsync_ReturnsCorrectCarEngineType()
         {
             var id = 1;
-            var carEngineType = new CarEngineType { Id = id, Type = "Hybrid", Abrv = "HBR"};
-            var expectedDto = new CarEngineTypeDTORead(id, "Hybrid", "HBR");
+            var carEngineType = new CarEngineType { Id = id, Type = "Hybrid", Abrv = "HBR" };
 
-            _mockUnitOfWork.Setup(u => u.CarEngineTypeRepository.GetByIdAsync(id)).ReturnsAsync(carEngineType);
-            _mockMapper.Setup(m => m.Map<CarEngineTypeDTORead>(carEngineType)).Returns(expectedDto);
+            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(carEngineType);
 
-            
             var result = await _service.GetCarEngineTypeByIdAsync(id);
-            
-            Assert.Equal(expectedDto.Id, result.Id);
-            Assert.Equal(expectedDto.Type, result.Type);
-            Assert.Equal(expectedDto.Abrv, result.Abrv);
-            
+
+            Assert.Equal(carEngineType.Id, result.Id);
+            Assert.Equal(carEngineType.Type, result.Type);
+            Assert.Equal(carEngineType.Abrv, result.Abrv);
         }
     }
 }
