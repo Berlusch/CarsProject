@@ -1,21 +1,25 @@
-﻿namespace CarsProject.WebApi.Extensions
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace CarsProject.WebApi.Extensions
 {
     public static class CarsProjectExtensions
     {
-        public static void AddCarsProjectCORS(this IServiceCollection Services)
+        public static void AddCarsProjectCORS(this IServiceCollection services)
         {
-            Services.AddCors(options =>
+            services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy",
-                    builder =>
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-                );
-
+                options.AddPolicy("AllowViteDev", builder =>
+                {
+                    builder
+                        .WithOrigins("https://localhost:5173") 
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
             });
         }
     }
 }
 
 
-    
-    
+
+
