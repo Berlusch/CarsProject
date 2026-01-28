@@ -3,6 +3,8 @@ using CarsProject.Mapping;
 using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using CarsProject.Service;
+using CarsProject.Service.Common;
+using CarsProject.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Ninject;
 using Ninject.Extensions.DependencyInjection;
