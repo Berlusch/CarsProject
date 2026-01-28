@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CarsProject.Common;
+using CarsProject.Service;
 using CarsProject.Service.Common;
 using CarsProject.WebApi.DTO;
 using Microsoft.AspNetCore.Mvc;
@@ -27,12 +28,13 @@ namespace CarsProject.WebApi.Controllers
 
             var carEngineTypes = await _carEngineTypeService.GetCarEngineTypesAsync(pfs);
 
-            if (carEngineTypes == null || !carEngineTypes.Any())
-                return NotFound("No car engine types found.");
+            if (!carEngineTypes.Any())
+                return NotFound();
 
             var dtos = _mapper.Map<IEnumerable<CarEngineTypeReadDto>>(carEngineTypes);
             return Ok(dtos);
         }
+        
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<CarEngineTypeReadDto>> GetById(int id)
