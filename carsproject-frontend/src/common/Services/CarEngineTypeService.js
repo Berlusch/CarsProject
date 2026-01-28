@@ -4,8 +4,8 @@ async function getCarEngineTypesListOnly() {
   try {
     const pfs = {
   paging: { pageNumber: 1, pageSize: 1000 },
-  filter: { propertyName: "", filter: "" },  
-  sorting: { orderBy: "" }                 
+  filter: { propertyName: "Type", filter: "" },  
+  sorting: { orderBy: "Type" }                 
 };
 
     const response = await HttpService.post('/CarEngineType/pfs', pfs);    
