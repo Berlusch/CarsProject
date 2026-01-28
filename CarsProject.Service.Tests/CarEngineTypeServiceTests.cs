@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using CarsProject.Common;
+﻿using CarsProject.Common;
 using CarsProject.Model;
 using CarsProject.Repository.Common;
 using Moq;
-using CarsProject.WebApi.DTO;
 
 namespace CarsProject.Service.Tests
 {
