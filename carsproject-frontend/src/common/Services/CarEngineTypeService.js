@@ -3,10 +3,10 @@ import { HttpService } from "./HttpService";
 async function getCarEngineTypesListOnly() {
   try {
     const pfs = {
-      paging: { pageNumber: 1, pageSize: 1000 },
-      filter: null,
-      sorting: null
-    };
+  paging: { pageNumber: 1, pageSize: 1000 },
+  filter: { propertyName: "", filter: "" },  
+  sorting: { orderBy: "" }                 
+};
 
     const response = await HttpService.post('/CarEngineType/pfs', pfs);    
     return response.data;    
