@@ -1,6 +1,7 @@
 ﻿using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using CarsProject.Service;
+using CarsProject.Service.Common;
 using Ninject;
 
 namespace CarsProject.WebApi
