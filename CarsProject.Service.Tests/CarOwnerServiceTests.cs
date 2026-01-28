@@ -1,54 +1,141 @@
-﻿using AutoMapper;
-using CarsProject.WebApi;
-using CarsProject.WebApi.DTO;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
 using FluentAssertions;
 using Moq;
 
 namespace CarsProject.Service.Tests
-
 {
     public class CarOwnerServiceTests
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<IMapper> _mockMapper;
-        private readonly Mock<ICarOwnerRepository> _mockCarOwnerRepository;
+        private readonly Mock<IGenericRepository<CarOwner>> _mockRepo;
         private readonly CarOwnerService _service;
 
         public CarOwnerServiceTests()
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockMapper = new Mock<IMapper>();
-            _mockCarOwnerRepository = new Mock<ICarOwnerRepository>();
-            
-            _mockUnitOfWork.Setup(uow => uow.CarOwnerRepository).Returns(_mockCarOwnerRepository.Object);
-            
-            _service = new CarOwnerService(_mockUnitOfWork.Object, _mockMapper.Object);
-        }                   
+            _mockRepo = new Mock<IGenericRepository<CarOwner>>();
+            _service = new CarOwnerService(_mockRepo.Object); 
+        }
 
         [Fact]
-        public async Task GetCarOwnersPagedAsync_ShouldReturnEmpty_WhenNoCarOwners()
-        {           
-            var carOwners = new List<CarOwner>();
-            var carOwnersDto = new List<CarOwnerDTORead>();
-            
-            _mockCarOwnerRepository.Setup(repo => repo.GetAllCarOwnersAsync()).ReturnsAsync(carOwners);
-            
-            _mockMapper.Setup(m => m.Map<IEnumerable<CarOwnerDTORead>>(It.IsAny<IEnumerable<CarOwner>>())).Returns(carOwnersDto);
-            
-            var result = await _service.GetCarOwnersPagedAsync(1, 2, "name", "");
-            
+        public async Task GetCarOwnersPagedAsync_ReturnsEmpty_WhenNoCarOwners()
+        {
+            var pfs = new PSFParameters
+            {
+                Paging = new PagingParameters { PageNumber = 1, PageSize = 5 }
+            };
+
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>()))
+                     .Returns(new List<CarOwner>().AsQueryable());
+
+            var result = await _service.GetCarOwnersAsync(pfs);
+
             result.Should().BeEmpty();
-        }                      
-                
+        }
+
         [Fact]
-        public async Task DeleteCarOwnerAsync_ShouldReturnTrue_WhenDeleted()
+        public async Task GetCarOwnerByIdAsync_ReturnsCorrectCarOwner()
+        {
+            var id = 1;
+            var carOwner = new CarOwner
+            {
+                Id = id,
+                FirstName = "John",
+                LastName = "Doe",
+                DateOfBirth = new DateOnly(1990, 5, 10)
+            };
+
+            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(carOwner);
+
+            var result = await _service.GetCarOwnerByIdAsync(id);
+
+            result.Should().BeEquivalentTo(carOwner);
+        }
+
+        [Fact]
+        public async Task GetCarOwnersPagedAsync_ReturnsPagedFilteredSortedCarOwners()
+        {
+            var pfs = new PSFParameters
+            {
+                Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
+                Sorting = new SortingParameters { OrderBy = "FirstName" },
+                Filter = new FilterParameters { PropertyName = "FirstName", Filter = "f" }
+            };
+
+            var carOwners = new List<CarOwner>
+            {
+                new CarOwner { Id = 1, FirstName = "FirstName1", LastName = "LastName1", DateOfBirth = new DateOnly(2000, 2, 2) },
+                new CarOwner { Id = 2, FirstName = "FirstName2", LastName = "LastName2", DateOfBirth = new DateOnly(1995, 6, 1) }
+            };
+
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(carOwners.AsQueryable());
+
+            var result = await _service.GetCarOwnersAsync(pfs);
+
+            result.Should().HaveCount(2);
+            result.Should().Contain(x => x.FirstName == "FirstName1");
+            result.Should().Contain(x => x.FirstName == "FirstName2");
+        }
+
+        [Fact]
+        public async Task AddCarOwnerAsync_ReturnsAddedCarOwner()
+        {
+            var carOwner = new CarOwner
+            {
+                FirstName = "UpdatedOwner",
+                LastName = "UPD",
+                DateOfBirth = new DateOnly(1990, 5, 10)
+            };
+
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(new List<CarOwner>().AsQueryable());
+            _mockRepo.Setup(r => r.AddAsync(It.IsAny<CarOwner>())).ReturnsAsync((CarOwner c) =>
+            {
+                c.Id = 1; 
+                return c;
+            });
+
+            var result = await _service.AddCarOwnerAsync(carOwner);
+
+            result.Id.Should().Be(1);
+            result.FirstName.Should().Be("UpdatedOwner");
+            result.LastName.Should().Be("UPD");
+        }
+
+        [Fact]
+        public async Task UpdateCarOwnerAsync_ReturnsUpdatedCarOwner()
+        {
+            var id = 1;
+            var existingCarOwner = new CarOwner
+            {
+                Id = id,
+                FirstName = "OldOwner",
+                LastName = "OLD",
+                DateOfBirth = new DateOnly(1985, 1, 1)
+            };
+            var updatedCarOwner = new CarOwner
+            {
+                Id = id,
+                FirstName = "UpdatedOwner",
+                LastName = "UPD",
+                DateOfBirth = new DateOnly(1990, 5, 10)
+            };
+
+            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(existingCarOwner);
+            _mockRepo.Setup(r => r.UpdateAsync(It.IsAny<CarOwner>())).ReturnsAsync(updatedCarOwner);
+
+            var result = await _service.UpdateCarOwnerAsync(id, updatedCarOwner);
+
+            result.Should().BeEquivalentTo(updatedCarOwner);
+        }
+
+        [Fact]
+        public async Task DeleteCarOwnerAsync_ReturnsTrue_WhenCarOwnerIsDeleted()
         {
             var id = 1;
             var carOwner = new CarOwner { Id = id };
 
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.GetByIdAsync(id)).ReturnsAsync(carOwner);
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.DeleteAsync(id)).ReturnsAsync(true);
+            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(carOwner);
+            _mockRepo.Setup(r => r.DeleteAsync(id)).ReturnsAsync(true);
 
             var result = await _service.DeleteCarOwnerAsync(id);
 
@@ -56,132 +143,17 @@ namespace CarsProject.Service.Tests
         }
 
         [Fact]
-        public async Task DeleteCarOwnerAsync_ShouldReturnFalse_WhenDeleteFails()
+        public async Task DeleteCarOwnerAsync_ReturnsFalse_WhenDeleteFails()
         {
             var id = 1;
             var carOwner = new CarOwner { Id = id };
 
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.GetByIdAsync(id)).ReturnsAsync(carOwner);
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.DeleteAsync(id)).ReturnsAsync(false);
+            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(carOwner);
+            _mockRepo.Setup(r => r.DeleteAsync(id)).ReturnsAsync(false);
 
             var result = await _service.DeleteCarOwnerAsync(id);
 
             result.Should().BeFalse();
         }
-
-        [Fact]
-        public async Task GetCarOwnerByIdAsync_ReturnsCorrectCarOwnerDTO()
-        {            
-            var id = 1;
-            var carOwner = new CarOwner { Id = id, FirstName = "John", LastName = "Doe", DateOfBirth = new DateOnly(1990, 5, 10) };
-            var expectedDto = new CarOwnerDTORead(id, "John", "Doe", new DateOnly(1990, 5, 10));
-
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.GetByIdAsync(id)).ReturnsAsync(carOwner);
-            _mockMapper.Setup(m => m.Map<CarOwnerDTORead>(carOwner)).Returns(expectedDto);
-            
-            var result = await _service.GetCarOwnerByIdAsync(id);
-            
-            Assert.Equal(expectedDto.Id, result.Id);
-            Assert.Equal(expectedDto.FirstName, result.FirstName);
-            Assert.Equal(expectedDto.LastName, result.LastName);
-            Assert.Equal(expectedDto.DateOfBirth, result.DateOfBirth);
-        }
-
-
-        [Fact]
-        public async Task GetCarOwnersPagedAsync_ReturnsPagedFilteredSortedCarOwners()
-        {            
-            var pageNumber = 1;
-            var pageSize = 2;
-            var sortBy = "name";
-            var filter = "f";
-
-            var carOwners = new List<CarOwner>
-    {
-        new CarOwner { Id = 1, FirstName = "FirstName1", LastName = "LastName1", DateOfBirth = new DateOnly(2000, 2, 2) },
-        new CarOwner { Id = 2, FirstName = "FirstName2", LastName = "LastName2", DateOfBirth = new DateOnly(1995, 6, 1) }
-    };
-
-            var expectedDTOs = new List<CarOwnerDTORead>
-    {
-        new CarOwnerDTORead(1, "FirstName1", "LastName1", new DateOnly(2000, 2, 2)),
-        new CarOwnerDTORead(2, "FirstName2", "LastName2", new DateOnly(1995, 6, 1))
-    };
-
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.GetAllCarOwnersAsync()).ReturnsAsync(carOwners);
-            _mockMapper.Setup(m => m.Map<IEnumerable<CarOwnerDTORead>>(It.IsAny<IEnumerable<CarOwner>>()))
-                       .Returns(expectedDTOs);
-                        
-            var result = await _service.GetCarOwnersPagedAsync(pageNumber, pageSize, sortBy, filter);
-            
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
-            Assert.Contains(result, x => x.FirstName == "FirstName1");
-            Assert.Contains(result, x => x.FirstName == "FirstName2");
-        }
-
-
-        [Fact]
-        public async Task AddCarOwnerAsync_ReturnsAddedCarOwnerDTO()
-        {            
-            var carOwnerDto = new CarOwnerDTOInsertUpdate("UpdatedOwner", "UPD", new DateOnly(1990, 5, 10));
-            var carOwner = new CarOwner { Id = 1, FirstName = "UpdatedOwner", LastName = "UPD", DateOfBirth = new DateOnly(1990, 5, 10) };
-            var expectedDto = new CarOwnerDTORead(1, "UpdatedOwner", "UPD", new DateOnly(1990, 5, 10));
-
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.AddAsync(It.IsAny<CarOwner>())).ReturnsAsync(carOwner);
-            _mockUnitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
-            _mockMapper.Setup(m => m.Map<CarOwnerDTORead>(carOwner)).Returns(expectedDto);
-                        
-            var result = await _service.AddCarOwnerAsync(carOwnerDto);
-                        
-            Assert.NotNull(result);
-            Assert.Equal(expectedDto.Id, result.Id);
-            Assert.Equal(expectedDto.FirstName, result.FirstName);
-            Assert.Equal(expectedDto.LastName, result.LastName);
-            Assert.Equal(expectedDto.DateOfBirth, result.DateOfBirth);
-        }
-
-
-        [Fact]
-        public async Task UpdateCarOwnerAsync_ReturnsUpdatedCarOwnerDTO()
-        {            
-            var id = 1;
-            var carOwnerDto = new CarOwnerDTOInsertUpdate("UpdatedOwner", "UPD", new DateOnly(1990, 5, 10));
-            var existingCarOwner = new CarOwner { Id = id, FirstName = "OldOwner", LastName = "OLD", DateOfBirth = new DateOnly(1985, 1, 1) };
-            var updatedCarOwner = new CarOwner { Id = id, FirstName = "UpdatedOwner", LastName = "UPD", DateOfBirth = new DateOnly(1990, 5, 10) };
-            var expectedDto = new CarOwnerDTORead(id, "UpdatedOwner", "UPD", new DateOnly(1990, 5, 10));
-
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.GetByIdAsync(id)).ReturnsAsync(existingCarOwner);
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.UpdateAsync(It.IsAny<CarOwner>())).ReturnsAsync(updatedCarOwner);
-            _mockUnitOfWork.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
-            _mockMapper.Setup(m => m.Map<CarOwnerDTORead>(updatedCarOwner)).Returns(expectedDto);
-                       
-            var result = await _service.UpdateCarOwnerAsync(id, carOwnerDto);
-                        
-            Assert.NotNull(result);
-            Assert.Equal(expectedDto.Id, result.Id);
-            Assert.Equal(expectedDto.FirstName, result.FirstName);
-            Assert.Equal(expectedDto.LastName, result.LastName);
-            Assert.Equal(expectedDto.DateOfBirth, result.DateOfBirth);
-        }
-
-
-        [Fact]
-        public async Task DeleteCarOwnerAsync_ReturnsTrue_WhenCarOwnerIsDeleted()
-        {            
-            var id = 1;
-            var carOwner = new CarOwner { Id = id, FirstName = "John", LastName = "Doe", DateOfBirth = new DateOnly(1990, 5, 10) };
-
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.GetByIdAsync(id)).ReturnsAsync(carOwner);
-            _mockUnitOfWork.Setup(u => u.CarOwnerRepository.DeleteAsync(id)).ReturnsAsync(true);
-                        
-            var result = await _service.DeleteCarOwnerAsync(id);
-                        
-            Assert.True(result);
-            _mockUnitOfWork.Verify(u => u.CarOwnerRepository.DeleteAsync(id), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(), Times.Once);
-        }
-
     }
 }
-
