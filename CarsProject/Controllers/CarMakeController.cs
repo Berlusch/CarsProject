@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using CarsProject.WebApi;
+using CarsProject.Common;
+using CarsProject.Model;
+using CarsProject.Service.Common;
 using CarsProject.WebApi.DTO;
-using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarsProject.WebApi.Controllers
@@ -18,57 +19,58 @@ namespace CarsProject.WebApi.Controllers
             _carMakeService = carMakeService;
             _mapper = mapper;
         }
-
-        [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarMakeReadDto>>> GetPfs(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] string sortBy = "name",
-            [FromQuery] string filter = "")
+        
+        [HttpPost("pfs")]
+        public async Task<ActionResult> GetPfs([FromBody] PSFParameters pfs)
         {
-            var carMakes = await _carMakeService.GetCarMakesPagedAsync(pageNumber, pageSize, sortBy, filter);
-            var carMakeDtos = _mapper.Map<IEnumerable<CarMakeReadDto>>(carMakes);
-            return Ok(carMakeDtos);
-        }
+            if (pfs.Paging.PageNumber <= 0)
+                pfs.Paging.PageNumber = 1;
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<CarMakeReadDto>> GetById(int id)
+            if (pfs.Paging.PageSize <= 0)
+                pfs.Paging.PageSize = 5;
+
+            var carMakes = await _carMakeService.GetCarMakesAsync(pfs);
+
+            if (!carMakes.Any())
+                return NotFound();
+
+            var dtos = _mapper.Map<IEnumerable<CarMakeReadDto>>(carMakes);
+            return Ok(dtos);
+        }
+        
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult> GetById(int id)
         {
             var carMake = await _carMakeService.GetCarMakeByIdAsync(id);
-            if (carMake == null)
-                return NotFound();
-
-            return Ok(_mapper.Map<CarMakeReadDto>(carMake)); 
+            return Ok(_mapper.Map<CarMakeReadDto>(carMake));
         }
-
+                
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarMakeInsertUpdateDto carMakeDto)
+        public async Task<ActionResult> Create([FromBody] CarMakeInsertUpdateDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var carMake = _mapper.Map<CarMake>(dto);
+            var created = await _carMakeService.AddCarMakeAsync(carMake);
 
-            var carMake = _mapper.Map<CarMake>(carMakeDto); 
-            var createdCarMake = await _carMakeService.AddCarMakeAsync(carMakeDto);
+            var readDto = _mapper.Map<CarMakeReadDto>(created);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarMake.Id }, _mapper.Map<CarMakeReadDto>(createdCarMake)); 
+            return CreatedAtAction(nameof(GetById), new { id = readDto.Id }, readDto);
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarMakeInsertUpdateDto carMakeDto)
+                
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Update(int id, [FromBody] CarMakeInsertUpdateDto dto)
         {
-            var updatedCarMake = await _carMakeService.UpdateCarMakeAsync(id, carMakeDto);
+            var carMake = _mapper.Map<CarMake>(dto);
+            var updated = await _carMakeService.UpdateCarMakeAsync(id, carMake);
 
-            if (updatedCarMake == null)
-                return NotFound();
-
-            return Ok(updatedCarMake); 
+            return Ok(_mapper.Map<CarMakeReadDto>(updated));
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+       
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            var success = await _carMakeService.DeleteCarMakeAsync(id);
-            if (!success)
+            var deleted = await _carMakeService.DeleteCarMakeAsync(id);
+
+            if (!deleted)
                 return NotFound();
 
             return NoContent();
