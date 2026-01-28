@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using CarsProject.WebApi;
+using CarsProject.Common;
+using CarsProject.Model;
+using CarsProject.Service.Common;
 using CarsProject.WebApi.DTO;
-using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarsProject.WebApi.Controllers
@@ -19,49 +20,58 @@ namespace CarsProject.WebApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarRegistrationReadDto>>> GetPfs(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] string sortBy = "name",
-            [FromQuery] string filter = "")
+        [HttpPost("pfs")]
+        public async Task<ActionResult> GetPfs([FromBody] PSFParameters pfs)
         {
-            var carRegistrations = await _carRegistrationService.GetCarRegistrationsPagedAsync(pageNumber, pageSize, sortBy, filter);
-            var carRegistrationDtos = _mapper.Map<IEnumerable<CarRegistrationReadDto>>(carRegistrations);
-            return Ok(carRegistrationDtos);
+            // Default paging for registrations
+            if (pfs.Paging.PageNumber <= 0) pfs.Paging.PageNumber = 1;
+            if (pfs.Paging.PageSize <= 0) pfs.Paging.PageSize = 5;
+
+            var registrations = await _carRegistrationService.GetCarRegistrationsAsync(pfs);
+
+            if (registrations == null || !registrations.Any())
+                return NotFound("No car registrations found.");
+
+            var dtos = _mapper.Map<IEnumerable<CarRegistrationReadDto>>(registrations);
+            return Ok(dtos);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CarRegistrationReadDto>> GetById(int id)
         {
-            var carRegistration = await _carRegistrationService.GetCarRegistrationByIdAsync(id);
-            if (carRegistration == null)
+            var registration = await _carRegistrationService.GetCarRegistrationByIdAsync(id);
+            if (registration == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CarRegistrationReadDto>(carRegistration));
+            return Ok(_mapper.Map<CarRegistrationReadDto>(registration));
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarRegistrationInsertUpdateDto carRegistrationDto)
+        public async Task<ActionResult> Create([FromBody] CarRegistrationInsertUpdateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var carRegistration = _mapper.Map<CarRegistration>(carRegistrationDto); 
-            var createdCarRegistration = await _carRegistrationService.AddCarRegistrationAsync(carRegistrationDto);
+            var entity = _mapper.Map<CarRegistration>(dto);
+            var created = await _carRegistrationService.AddCarRegistrationAsync(entity);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdCarRegistration.Id }, _mapper.Map<CarRegistrationReadDto>(createdCarRegistration)); 
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = created.Id },
+                _mapper.Map<CarRegistrationReadDto>(created)
+            );
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarRegistrationInsertUpdateDto carRegistrationDto)
+        public async Task<IActionResult> Update(int id, [FromBody] CarRegistrationInsertUpdateDto dto)
         {
-            var updatedCarRegistration = await _carRegistrationService.UpdateCarRegistrationAsync(id, carRegistrationDto);
+            var entity = _mapper.Map<CarRegistration>(dto);
+            var updated = await _carRegistrationService.UpdateCarRegistrationAsync(id, entity);
 
-            if (updatedCarRegistration == null)
+            if (updated == null)
                 return NotFound();
 
-            return Ok(updatedCarRegistration); 
+            return Ok(_mapper.Map<CarRegistrationReadDto>(updated));
         }
 
         [HttpDelete("{id}")]
@@ -75,5 +85,3 @@ namespace CarsProject.WebApi.Controllers
         }
     }
 }
-
-
