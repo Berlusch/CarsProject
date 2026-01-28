@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using CarsProject.WebApi;
+using CarsProject.Common;
+using CarsProject.Model;
+using CarsProject.Service.Common;
 using CarsProject.WebApi.DTO;
-using CarsProject.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarsProject.WebApi.Controllers
@@ -19,53 +20,49 @@ namespace CarsProject.WebApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("getPfs")]
-        public async Task<ActionResult<IEnumerable<CarModelReadDto>>> GetPfs(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5,
-            [FromQuery] string sortBy = "name",
-            [FromQuery] string filter = "")
+        [HttpPost("pfs")]
+        public async Task<ActionResult> GetPfs([FromBody] PSFParameters pfs)
         {
-            var carModels = await _carModelService.GetCarModelsPagedAsync(pageNumber, pageSize, sortBy, filter);
-            var carModelDtos = _mapper.Map<IEnumerable<CarModelReadDto>>(carModels);
-            return Ok(carModelDtos);
+            var carModels = await _carModelService.GetCarModelsAsync(pfs);
+
+            if (!carModels.Any())
+                return NotFound();
+
+            var dtos = _mapper.Map<IEnumerable<CarModelReadDto>>(carModels);
+            return Ok(dtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CarModelReadDto>> GetById(int id)
+        public async Task<ActionResult> GetById(int id)
         {
             var carModel = await _carModelService.GetCarModelByIdAsync(id);
-            if (carModel == null)
-                return NotFound();
-
             return Ok(_mapper.Map<CarModelReadDto>(carModel));
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CarModelInsertUpdateDto carModelDto)
+        public async Task<ActionResult> Create([FromBody] CarModelInsertUpdateDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var carModel = _mapper.Map<CarModel>(dto);
+            var created = await _carModelService.AddCarModelAsync(carModel);
 
-            var carModel = _mapper.Map<CarModel>(carModelDto); 
-            var createdCarModel = await _carModelService.AddCarModelAsync(carModelDto);
-
-            return CreatedAtAction(nameof(GetById), new { id = createdCarModel.Id }, _mapper.Map<CarModelReadDto>(createdCarModel)); 
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = created.Id },
+                _mapper.Map<CarModelReadDto>(created)
+            );
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CarModelInsertUpdateDto carModelDto)
+        public async Task<ActionResult> Update(int id, [FromBody] CarModelInsertUpdateDto dto)
         {
-            var updatedCarModel = await _carModelService.UpdateCarModelAsync(id, carModelDto);
+            var carModel = _mapper.Map<CarModel>(dto);
+            var updated = await _carModelService.UpdateCarModelAsync(id, carModel);
 
-            if (updatedCarModel == null)
-                return NotFound();
-
-            return Ok(updatedCarModel); // Već je DTORead iz servisa
+            return Ok(_mapper.Map<CarModelReadDto>(updated));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var success = await _carModelService.DeleteCarModelAsync(id);
             if (!success)
@@ -75,4 +72,3 @@ namespace CarsProject.WebApi.Controllers
         }
     }
 }
-
