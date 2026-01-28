@@ -16,11 +16,19 @@ namespace CarsProject.Service
 
         public async Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PSFParameters pfs)
         {            
-            if (pfs.Paging.PageSize <= 0)
-            {
+            pfs ??= new PSFParameters();
+            pfs.Paging ??= new PagingParameters();
+            pfs.Sorting ??= new SortingParameters();
+            pfs.Filter ??= new FilterParameters();
+            
+            if (pfs.Paging.PageNumber <= 0)
                 pfs.Paging.PageNumber = 1;
+
+            if (pfs.Paging.PageSize <= 0)
                 pfs.Paging.PageSize = 1000;
-            }
+            
+            if (string.IsNullOrEmpty(pfs.Sorting.OrderBy))
+                pfs.Sorting.OrderBy = "Type";
 
             return await _carEngineTypeRepository.GetAllCarEngineTypesAsync(pfs);
         }
@@ -36,4 +44,3 @@ namespace CarsProject.Service
         }
     }
 }
-
