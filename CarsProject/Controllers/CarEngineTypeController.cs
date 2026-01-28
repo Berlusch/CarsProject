@@ -34,7 +34,7 @@ namespace CarsProject.WebApi.Controllers
             return Ok(dtos);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<CarEngineTypeReadDto>> GetById(int id)
         {
             var carEngineType = await _carEngineTypeService.GetCarEngineTypeByIdAsync(id);
