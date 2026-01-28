@@ -11,7 +11,7 @@ namespace CarsProject.WebApi.Extensions
                 options.AddPolicy("AllowViteDev", builder =>
                 {
                     builder
-                        .WithOrigins("https://localhost:5173") 
+                        .WithOrigins("http://localhost:5173") 
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
