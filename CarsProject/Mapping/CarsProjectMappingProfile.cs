@@ -2,7 +2,7 @@
 using CarsProject.Model;
 using CarsProject.WebApi.DTO;
 
-namespace CarsProject.Mapping
+namespace CarsProject.WebApi.Mapping
 {
     public class CarsProjectMappingProfile : Profile
     {
@@ -18,15 +18,17 @@ namespace CarsProject.Mapping
             CreateMap<CarMake, CarMakeReadDto>();
             CreateMap<CarMakeInsertUpdateDto, CarMake>();
 
-            
-            CreateMap<CarModel, CarModelReadDto>()            
-            .ForCtorParam("CarMakeName", opt => opt.MapFrom(src => src.CarMake.Name))
-            .ForCtorParam("CarEngineTypeType", opt => opt.MapFrom(src => src.CarEngineType.Type));
 
-            CreateMap<CarModel, CarModelInsertUpdateDto>()
-                .ForMember(dest => dest.CarMakeId, opt => opt.MapFrom(src => src.CarMake.Id))
-                .ForMember(dest => dest.CarEngineTypeId, opt => opt.MapFrom(src => src.CarEngineType.Id));                
-               
+            CreateMap<CarModel, CarModelReadDto>()
+                .ForCtorParam("CarMakeName", opt => opt.MapFrom(src => src.CarMake.Name))
+                .ForCtorParam("CarEngineTypeType", opt => opt.MapFrom(src => src.CarEngineType.Type));
+
+            CreateMap<CarModelInsertUpdateDto, CarModel>()
+                .ForMember(dest => dest.CarMakeId, opt => opt.MapFrom(src => src.CarMakeId))
+                .ForMember(dest => dest.CarEngineTypeId, opt => opt.MapFrom(src => src.CarEngineTypeId))
+                .ForMember(dest => dest.CarMake, opt => opt.Ignore())          
+                .ForMember(dest => dest.CarEngineType, opt => opt.Ignore());
+
             CreateMap<CarModelInsertUpdateDto, CarModel>();
             CreateMap<CarModel, CarModelInsertUpdateDto>();
             

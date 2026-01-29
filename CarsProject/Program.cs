@@ -1,5 +1,5 @@
 using CarsProject.DAL;
-using CarsProject.Mapping;
+using CarsProject.WebApi.Mapping;
 using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using CarsProject.Service;
