@@ -1,16 +1,25 @@
 import { HttpService } from "./HttpService"; 
 
-async function getCarRegistrationsPFS(page = 1, pageSize = 5, sort = "registrationNumber", filter = "") {
+async function getCarRegistrationsPFS(currentPage = 1, pageSize = 5, sortBy = "name", searchTerm = "") {
   try {
-    const response = await HttpService.get('/CarRegistration/getPfs', {
-      params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter:filter },
+    const payload = {
+      pfs: {
+        paging: { pageNumber: currentPage - 1, pageSize }, 
+        sorting: { orderBy: sortBy, descending: false },
+        filter: { propertyName: "name", filter: searchTerm }
+      }
+    };
+
+    const response = await HttpService.post('/CarRegistration/pfs', payload, {
+      headers: { 'Content-Type': 'application/json' }
     });
 
-    return response.data;
+    return response.data; 
   } catch (error) {
     throw error;
   }
 }
+
 
 async function getById(id) {
   return await HttpService.get('/CarRegistration/' + id)

@@ -1,17 +1,24 @@
 import { HttpService } from "./HttpService"; 
 
-async function getCarMakesPFS(page = 1, pageSize = 5, sort = "name", filter = "") {
+async function getCarMakesPFS(currentPage = 1, pageSize = 5, sortBy = "name", searchTerm = "") {
   try {
-    const response = await HttpService.get('/CarMake/getPfs', {
-      params: { pageNumber: page, pageSize: pageSize, sortBy: sort, filter: filter },
-    });   
-     
-    return response.data;
-  } catch (error) {    
-    throw error;  
+    const payload = {
+      pfs: {
+        paging: { pageNumber: currentPage - 1, pageSize }, 
+        sorting: { orderBy: sortBy, descending: false },
+        filter: { propertyName: "name", filter: searchTerm }
+      }
+    };
+
+    const response = await HttpService.post('/CarMake/pfs', payload, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    return response.data; 
+  } catch (error) {
+    throw error;
   }
 }
-
 async function getById(id) {
   return await HttpService.get('/CarMake/' + id)
     .then((response)=>{
