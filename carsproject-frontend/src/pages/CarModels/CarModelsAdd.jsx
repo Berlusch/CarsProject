@@ -55,7 +55,16 @@ const CarModelsAdd = () => {
    
 
     const handleSubmit = async (e) => {
-      e.preventDefault();   
+      e.preventDefault();  
+       console.log("Submitting DTO:", {
+    name,
+    abrv,
+    carMakeId,
+    carEngineTypeId,
+    typeofCarMakeId: typeof carMakeId,
+    typeofCarEngineTypeId: typeof carEngineTypeId
+  });
+
                     
       await CarModelStore.addCarModel(name, abrv, (parseInt(carMakeId)), (parseInt(carEngineTypeId)));
     
@@ -105,32 +114,34 @@ const CarModelsAdd = () => {
 
       
       <div className="form-group">
-        <label htmlFor="carMakeId">Car Make</label>
-        <Form.Select 
-            onChange={(e)=>{setCarMakeId(e.target.value)}}
-            >
-            <option value="">Select a car make</option>
-            {carMakes && carMakes.map((s,index)=>(
-              <option key={index} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-            </Form.Select>
-      </div>
+  <label htmlFor="carMakeId">Car Make</label>
+  <Form.Select
+  value={carMakeId || ""}
+  onChange={(e) => setCarMakeId(Number(e.target.value))} 
+>
+  <option value="">Select a car make</option>
+  {carMakes.map((s, index) => (
+    <option key={index} value={s.id}>
+      {s.name}
+    </option>
+  ))}
+</Form.Select>
+</div>
 
       <div className="form-group">
-        <label htmlFor="carEngineTypeId">Car Engine Type</label>
-        <Form.Select 
-            onChange={(e)=>{setCarEngineTypeId(e.target.value)}}
-            >
-            <option value="">Select a car engine type</option>            
-            {carEngineTypes && carEngineTypes.map((s,index)=>(
-              <option key={index} value={s.id}>
-                {s.type}
-              </option>
-            ))}
-            </Form.Select>
-      </div>
+  <label htmlFor="carEngineTypeId">Car Engine Type</label>
+  <Form.Select 
+      value={carEngineTypeId}
+      onChange={(e) => setCarEngineTypeId(Number(e.target.value))} 
+      >
+      <option value="">Select a car engine type</option>            
+      {carEngineTypes && carEngineTypes.map((s) => (
+        <option key={s.id} value={s.id}>
+          {s.type}
+        </option>
+      ))}
+  </Form.Select>
+</div>
 
       <div className="form-button-container">
         <button className="cancel-button" onClick={handleCancel}>Cancel</button>
