@@ -17,12 +17,14 @@ namespace CarsProject.Repository
             var carModel = await _dbSet
                 .Include(cm => cm.CarMake)
                 .Include(cm => cm.CarEngineType)
-                .FirstOrDefaultAsync(cm => cm.Id == id);
+                .FirstOrDefaultAsync(cm => cm.Id == id);            
+
 
             if (carModel == null)
             {
                 throw new KeyNotFoundException($"CarModel with ID {id} not found.");
             }
+                        
 
             return carModel;
         }
