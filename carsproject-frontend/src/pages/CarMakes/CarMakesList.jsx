@@ -8,44 +8,71 @@ import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
 import { useNavigate } from 'react-router-dom';
 
-
-
-
 const CarMakesList = observer(() => {
-const navigate=useNavigate();
-const [carMakes, setCarMakes] = useState([]);
-const [currentPageSize, setCurrentPageSize] = useState(0); 
-const {currentPage, pageSize, searchTerm } = CarMakeStore.filters;
+  const navigate = useNavigate();
 
-const fetchCarMakes = async () => {
-const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
+  const [carMakes, setCarMakes] = useState([]);
+  const [currentPageSize, setCurrentPageSize] = useState(0);
 
+  const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
 
-    const response = await CarMakeService.getCarMakesPFS(currentPage, pageSize, "name", searchTerm);
-    setCarMakes(response);  
-    
-    setCurrentPageSize(response.length);
-    
-  };
+  const fetchCarMakes = async () => {
+  const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
+
+  const response = await CarMakeService.getCarMakesPFS(
+    currentPage,
+    pageSize,
+    "name",
+    searchTerm
+  );
+
+  const data = Array.isArray(response)
+    ? response
+    : response?.data ?? [];
+
+  console.log("FINAL DATA:", data);
+
+  setCarMakes(data);
+  setCurrentPageSize(data.length);
+};
+
 
   useEffect(() => {
     fetchCarMakes();
-  }, [CarMakeStore.filters]); 
+  }, [currentPage, pageSize, searchTerm]);
 
   const handleSearch = (term) => {
-    CarMakeStore.setSearchTerm(term); 
+    CarMakeStore.setSearchTerm(term);
   };
 
   const handlePageChange = (page) => {
-    CarMakeStore.setPage(page); 
+    CarMakeStore.setPage(page);
   };
 
-  useEffect(() => {
-    fetchCarMakes();  
-  }, [currentPage, pageSize, searchTerm]);
+  const handleEdit = (id) => {
+    navigate(RouteNames.CAR_MAKE_EDIT.replace(':id', id));
+  };
+
+  const handleRemove = async (id) => {
+    const carMake = carMakes.find(c => c.id === id);
+    if (!carMake) return;
+
+    if (!confirm(`Are you sure you want to remove ${carMake.name}?`)) {
+      return;
+    }
+
+    const response = await CarMakeService.remove(id);
+
+    if (response?.error) {
+      alert(response.message);
+      return;
+    }
+
+    fetchCarMakes();
+  };
 
   const hasNextPage = currentPageSize === pageSize;
-      
+
   const columns = [
     { header: 'Name', accessor: 'name' },
     { header: 'Abrv', accessor: 'abrv' },
@@ -53,64 +80,37 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
     { header: 'Remove', accessor: 'remove' }
   ];
 
-  const data = carMakes && carMakes.map(carMake => {
-      
-    return {
-      id: carMake.id,
-      name: carMake.name,
-      abrv: carMake.abrv,
-      edit: (      
-        
-          <button className="edit-button" 
-          onClick={() => handleEdit(carMake.id)}>
-            <i className="fas fa-edit"></i>
-          </button>
-       
-      ),
-      remove: (
-        <button className="delete-button" 
-        onClick={() => handleRemove(carMake.id)}>
-          <i className="fas fa-trash"></i>
-        </button>
-      ),
-    };
-  });
-  
-  const handleRemove = async (id) => {
-    const carMake = carMakes.find(c => c.id === id);
-    const carMakeName = carMake.name;
-
-    if (!confirm(`Are you sure you want to remove ${carMakeName}?`)) {
-      return;
-    }
-
-    const response = await CarMakeService.remove(id);
-
-    if (response.error) {
-      alert(response.message);
-      return;
-    }
-
-    
-
-    fetchCarMakes();  
-  };
-
-  const handleEdit = (id) => {navigate(RouteNames.CAR_MAKE_EDIT.replace(':id', id))};
-  
+  const data = carMakes.map(carMake => ({
+    id: carMake.id,
+    name: carMake.name,
+    abrv: carMake.abrv,
+    edit: (
+      <button
+        className="edit-button"
+        onClick={() => handleEdit(carMake.id)}
+      >
+        <i className="fas fa-edit"></i>
+      </button>
+    ),
+    remove: (
+      <button
+        className="delete-button"
+        onClick={() => handleRemove(carMake.id)}
+      >
+        <i className="fas fa-trash"></i>
+      </button>
+    )
+  }));
 
   return (
-    <div> 
-      <header className="entityName">
-        Car Makes
-      </header>
-      
-    
+    <div>
+      <header className="entityName">Car Makes</header>
+
       <SearchBox
-      value={CarMakeStore.searchTerm}  
-         onChange={(value) => CarMakeStore.setSearchTerm(value)}  
-         onSearch={handleSearch}  
-         placeholder="Search by car make..."
+        value={searchTerm}
+        onChange={(value) => CarMakeStore.setSearchTerm(value)}
+        onSearch={handleSearch}
+        placeholder="Search by car make..."
       />
 
       <Table
@@ -118,13 +118,13 @@ const { currentPage, pageSize, searchTerm} = CarMakeStore.filters;
         data={data}
         onEdit={handleEdit}
         onRemove={handleRemove}
-        onAdd={() => console.log('Add a new car make')}
         routeNames={RouteNames.CAR_MAKE_ADD}
         entityName="Car Make"
         page={currentPage}
       />
+
       <Pagination
-        currentPage={CarMakeStore.currentPage}        
+        currentPage={currentPage}
         onPageChange={handlePageChange}
         hasNextPage={hasNextPage}
       />
