@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarsProject.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.DAL
 {
