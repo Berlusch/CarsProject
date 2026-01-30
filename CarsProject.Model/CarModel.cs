@@ -10,8 +10,8 @@ namespace CarsProject.Model
         public int CarMakeId { get; set; }
         public int CarEngineTypeId { get; set; }
         
-        public virtual required CarMake CarMake { get; set; } 
-        public virtual required CarEngineType CarEngineType { get; set; } 
+        public required CarMake CarMake { get; set; } 
+        public required CarEngineType CarEngineType { get; set; } 
 
         ICarEngineType ICarModel.CarEngineType
         {
