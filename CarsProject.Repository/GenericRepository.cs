@@ -20,7 +20,7 @@ namespace CarsProject.Repository
             UnitOfWork = new UnitOfWork(_context); 
         }
 
-        public IQueryable<T> GetQuery(PSFParameters parameters)
+        public virtual IQueryable<T> GetQuery(PSFParameters parameters)
         {
             IQueryable<T> query = _dbSet;
 
