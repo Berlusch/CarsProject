@@ -21,13 +21,30 @@ namespace CarsProject.DAL
             modelBuilder.Entity<CarRegistration>();
             modelBuilder.Entity<CarEngineType>();
 
-            modelBuilder.Entity<CarModel>().HasOne(g => g.CarMake);
-            modelBuilder.Entity<CarModel>().HasOne(g => g.CarEngineType)
-                .WithMany();
+            modelBuilder.Entity<CarModel>()
+                .HasOne(cm => cm.CarMake)
+                .WithMany()
+                .HasForeignKey(cm => cm.CarMakeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarOwner);
-            modelBuilder.Entity<CarRegistration>().HasOne(g => g.CarModel);
-            
+            modelBuilder.Entity<CarModel>()
+                .HasOne(cm => cm.CarEngineType)
+                .WithMany()
+                .HasForeignKey(cm => cm.CarEngineTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CarRegistration>()
+                .HasOne(cr => cr.CarOwner)
+                .WithMany() 
+                .HasForeignKey(cr => cr.CarOwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CarRegistration>()
+                .HasOne(cr => cr.CarModel)
+                .WithMany() 
+                .HasForeignKey(cr => cr.CarModelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<CarEngineType>().HasData(
                 new CarEngineType { Id = 1, Type = "Petrol", Abrv = "PET" },
                 new CarEngineType { Id = 2, Type = "Diesel", Abrv = "DSL" },
