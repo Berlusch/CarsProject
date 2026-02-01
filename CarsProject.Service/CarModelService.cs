@@ -1,5 +1,6 @@
 ﻿using CarsProject.Common;
 using CarsProject.Model;
+using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
 using Microsoft.EntityFrameworkCore;
@@ -68,17 +69,24 @@ namespace CarsProject.Service
         }
 
         public async Task<CarModel> UpdateCarModelAsync(int id, CarModel carModel)
-        {
+        {            
             var existing = await _carModelRepository.GetByIdAsync(id);
             if (existing == null)
                 throw new KeyNotFoundException($"CarModel with ID {id} not found.");
-
+            
             existing.Name = carModel.Name;
             existing.Abrv = carModel.Abrv;
-            existing.CarMakeId = carModel.CarMakeId;          
-            existing.CarEngineTypeId = carModel.CarEngineTypeId; 
+            existing.CarMakeId = carModel.CarMakeId;
+            existing.CarEngineTypeId = carModel.CarEngineTypeId;
+            
+            await _carModelRepository.UpdateAsync(existing);
+           
+            var result = await _carModelRepository.GetQuery(new PSFParameters())
+                                                  .Include(cm => cm.CarMake)
+                                                  .Include(cm => cm.CarEngineType)
+                                                  .FirstOrDefaultAsync(cm => cm.Id == existing.Id);
 
-            return await _carModelRepository.UpdateAsync(existing);
+            return result!;
         }
 
         public async Task<bool> DeleteCarModelAsync(int id)
