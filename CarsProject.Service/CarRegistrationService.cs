@@ -2,6 +2,7 @@
 using CarsProject.Model;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Service
 {
@@ -25,16 +26,31 @@ namespace CarsProject.Service
         {
             var query = _carRegistrationRepository.GetQuery(pfs);
 
+            query = query.Include(cm => cm.CarModel);
+            query = query.Include(cm => cm.CarOwner);
+
             if (pfs.Paging.PageSize > 0)
+            {
                 query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
                              .Take(pfs.Paging.PageSize);
+            }
 
-            return await Task.FromResult(query.ToList());
+            return await query.ToListAsync();
         }
+
 
         public async Task<CarRegistration> GetCarRegistrationByIdAsync(int id)
         {
-            return await _carRegistrationRepository.GetByIdAsync(id);
+            var query = _carRegistrationRepository.GetQuery(new PSFParameters())
+                                           .Include(cm => cm.CarModel)
+                                           .Include(cm => cm.CarOwner);
+
+            var carModel = await query.FirstOrDefaultAsync(cm => cm.Id == id);
+
+            if (carModel == null)
+                throw new KeyNotFoundException($"CarModel with ID {id} not found.");
+
+            return carModel;
         }
 
         public async Task<CarRegistration> AddCarRegistrationAsync(CarRegistration carRegistration)
