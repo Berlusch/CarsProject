@@ -1,5 +1,6 @@
 ﻿using CarsProject.Common;
 using CarsProject.Model;
+using CarsProject.Model.Common;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
 using Microsoft.EntityFrameworkCore;
@@ -55,27 +56,22 @@ namespace CarsProject.Service
 
         public async Task<CarRegistration> AddCarRegistrationAsync(CarRegistration carRegistration)
         {            
-            var carOwner = await _carOwnerRepository.GetByIdAsync(carRegistration.CarOwnerId);
-            if (carOwner == null)
-                throw new System.Exception($"CarOwner with ID {carRegistration.CarOwnerId} not found.");
-            
-            var carModel = await _carModelRepository.GetByIdAsync(carRegistration.CarModelId);
-            if (carModel == null)
-                throw new System.Exception($"CarModel with ID {carRegistration.CarModelId} not found.");
-            
-            var existing = _carRegistrationRepository.GetQuery(new PSFParameters
-            {
-                Filter = new FilterParameters { PropertyName = "RegistrationNumber", Filter = carRegistration.RegistrationNumber }
-            }).FirstOrDefault(c => c.RegistrationNumber.Equals(carRegistration.RegistrationNumber, System.StringComparison.OrdinalIgnoreCase));
+            var existing = await _carRegistrationRepository.GetQuery(new PSFParameters())
+                .FirstOrDefaultAsync(c => c.RegistrationNumber.ToLower() == carRegistration.RegistrationNumber.ToLower());
 
             if (existing != null)
-                throw new System.Exception($"CarRegistration with RegistrationNumber {carRegistration.RegistrationNumber} already exists.");
+                throw new Exception($"CarRegistration with number {carRegistration.RegistrationNumber} already exists.");
+            
+            var added = await _carRegistrationRepository.AddAsync(carRegistration);
+            
+            var result = await _carRegistrationRepository.GetQuery(new PSFParameters())
+                                                          .Include(cr => cr.CarModel)
+                                                          .Include(cr => cr.CarOwner)
+                                                          .FirstOrDefaultAsync(cr => cr.Id == added.Id);
 
-            carRegistration.CarOwner = carOwner;
-            carRegistration.CarModel = carModel;
-
-            return await _carRegistrationRepository.AddAsync(carRegistration);
+            return result!;
         }
+
 
         public async Task<CarRegistration> UpdateCarRegistrationAsync(int id, CarRegistration carRegistration)
         {
