@@ -12,20 +12,7 @@ namespace CarsProject.Repository
         {
         }
         
-        public override async Task<CarRegistration> GetByIdAsync(int id)
-        {
-            var carRegistration = await _dbSet
-                .Include(cr => cr.CarOwner)
-                .Include(cr => cr.CarModel)
-                .FirstOrDefaultAsync(cr => cr.Id == id);
-
-            if (carRegistration == null)
-            {
-                throw new KeyNotFoundException($"CarRegistration with ID {id} not found.");
-            }
-
-            return carRegistration;
-        }
+        
     }
 }
 
