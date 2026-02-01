@@ -56,7 +56,15 @@ namespace CarsProject.Service
             if (existing != null)
                 throw new Exception($"CarModel with the name {carModel.Name} already exists.");
 
-            return await _carModelRepository.AddAsync(carModel);
+            var added = await _carModelRepository.AddAsync(carModel);
+
+            
+            var result = await _carModelRepository.GetQuery(new PSFParameters())
+                                                  .Include(cm => cm.CarMake)
+                                                  .Include(cm => cm.CarEngineType)
+                                                  .FirstOrDefaultAsync(cm => cm.Id == added.Id);
+
+            return result!;
         }
 
         public async Task<CarModel> UpdateCarModelAsync(int id, CarModel carModel)
