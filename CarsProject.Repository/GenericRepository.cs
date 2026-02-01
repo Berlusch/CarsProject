@@ -20,7 +20,7 @@ namespace CarsProject.Repository
             UnitOfWork = new UnitOfWork(_context); 
         }
 
-        public virtual IQueryable<T> GetQuery(PSFParameters parameters)
+        public IQueryable<T> GetQuery(PSFParameters parameters)
         {
             IQueryable<T> query = _dbSet;
 
@@ -60,7 +60,7 @@ namespace CarsProject.Repository
             return query;
         }
 
-        public virtual async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
