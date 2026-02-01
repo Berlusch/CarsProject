@@ -2,6 +2,7 @@
 using CarsProject.Model;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Service
 {
@@ -13,25 +14,40 @@ namespace CarsProject.Service
         {
             _carModelRepository = carModelRepository;
         }
-
+        
         public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PSFParameters pfs)
         {
             var query = _carModelRepository.GetQuery(pfs);
 
+            query = query.Include(cm => cm.CarMake);
+            query = query.Include(cm => cm.CarEngineType);
+
             if (pfs.Paging.PageSize > 0)
+            {
                 query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
                              .Take(pfs.Paging.PageSize);
+            }
 
-            return await Task.FromResult(query.ToList());
+            return await query.ToListAsync();
         }
 
+      
         public async Task<CarModel> GetCarModelByIdAsync(int id)
         {
-            return await _carModelRepository.GetByIdAsync(id);
+            var query = _carModelRepository.GetQuery(new PSFParameters())
+                                           .Include(cm => cm.CarMake)
+                                           .Include(cm => cm.CarEngineType);
+
+            var carModel = await query.FirstOrDefaultAsync(cm => cm.Id == id);
+
+            if (carModel == null)
+                throw new KeyNotFoundException($"CarModel with ID {id} not found.");
+
+            return carModel;
         }
 
         public async Task<CarModel> AddCarModelAsync(CarModel carModel)
-        {            
+        {
             var existing = _carModelRepository.GetQuery(new PSFParameters
             {
                 Filter = new FilterParameters { PropertyName = "Name", Filter = carModel.Name }
@@ -39,7 +55,7 @@ namespace CarsProject.Service
 
             if (existing != null)
                 throw new Exception($"CarModel with the name {carModel.Name} already exists.");
-            
+
             return await _carModelRepository.AddAsync(carModel);
         }
 
@@ -48,11 +64,11 @@ namespace CarsProject.Service
             var existing = await _carModelRepository.GetByIdAsync(id);
             if (existing == null)
                 throw new KeyNotFoundException($"CarModel with ID {id} not found.");
-            
+
             existing.Name = carModel.Name;
             existing.Abrv = carModel.Abrv;
-            existing.CarMake = carModel.CarMake;
-            existing.CarEngineType = carModel.CarEngineType;
+            existing.CarMakeId = carModel.CarMakeId;          
+            existing.CarEngineTypeId = carModel.CarEngineTypeId; 
 
             return await _carModelRepository.UpdateAsync(existing);
         }
@@ -63,4 +79,3 @@ namespace CarsProject.Service
         }
     }
 }
-
