@@ -2,7 +2,7 @@
 {
     public class FilterParameters
     {
-        public string PropertyName { get; set; } = ""; 
+        public string PropertyName { get; set; } = "";
         public string Filter { get; set; } = "";
     }
 }
