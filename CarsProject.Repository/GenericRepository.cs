@@ -10,16 +10,16 @@ namespace CarsProject.Repository
     {
         protected readonly CarsDbContext _context;
         protected readonly DbSet<T> _dbSet;
-       
+
         public readonly IUnitOfWork UnitOfWork;
 
         public GenericRepository(CarsDbContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();
-            UnitOfWork = new UnitOfWork(_context); 
+            UnitOfWork = new UnitOfWork(_context);
         }
-
+        
         public IQueryable<T> GetQuery(PFSParameters parameters)
         {
             IQueryable<T> query = _dbSet;
@@ -56,16 +56,32 @@ namespace CarsProject.Repository
                 }
             }
 
-
             return query;
+        }
+                
+        public async Task<PagedResult<T>> GetAsync(PFSParameters parameters)
+        {
+            var query = GetQuery(parameters);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip(parameters.Paging.Skip)
+                .Take(parameters.Paging.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<T>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Paging = parameters.Paging
+            };
         }
 
         public async Task<T> GetByIdAsync(int id)
         {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException($"Entity with ID {id} not found.");
-            return entity;
+            return await _dbSet.FindAsync(id)
+           ?? throw new KeyNotFoundException($"Entity with ID {id} not found.");
         }
 
         public async Task<T> AddAsync(T entity)
