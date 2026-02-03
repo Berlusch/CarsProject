@@ -14,9 +14,9 @@ namespace CarsProject.Service
             _carEngineTypeRepository = carEngineTypeRepository;
         }
 
-        public async Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PSFParameters pfs)
+        public async Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PFSParameters pfs)
         {            
-            pfs ??= new PSFParameters();
+            pfs ??= new PFSParameters();
             pfs.Paging ??= new PagingParameters();
             pfs.Sorting ??= new SortingParameters();
             pfs.Filter ??= new FilterParameters();
