@@ -16,7 +16,7 @@ namespace CarsProject.Service
             _carModelRepository = carModelRepository;
         }
         
-        public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PSFParameters pfs)
+        public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PFSParameters pfs)
         {
             var query = _carModelRepository.GetQuery(pfs);
 
@@ -35,7 +35,7 @@ namespace CarsProject.Service
       
         public async Task<CarModel> GetCarModelByIdAsync(int id)
         {
-            var query = _carModelRepository.GetQuery(new PSFParameters())
+            var query = _carModelRepository.GetQuery(new PFSParameters())
                                            .Include(cm => cm.CarMake)
                                            .Include(cm => cm.CarEngineType);
 
@@ -49,7 +49,7 @@ namespace CarsProject.Service
 
         public async Task<CarModel> AddCarModelAsync(CarModel carModel)
         {
-            var existing = _carModelRepository.GetQuery(new PSFParameters
+            var existing = _carModelRepository.GetQuery(new PFSParameters
             {
                 Filter = new FilterParameters { PropertyName = "Name", Filter = carModel.Name }
             }).FirstOrDefault();
@@ -60,7 +60,7 @@ namespace CarsProject.Service
             var added = await _carModelRepository.AddAsync(carModel);
 
             
-            var result = await _carModelRepository.GetQuery(new PSFParameters())
+            var result = await _carModelRepository.GetQuery(new PFSParameters())
                                                   .Include(cm => cm.CarMake)
                                                   .Include(cm => cm.CarEngineType)
                                                   .FirstOrDefaultAsync(cm => cm.Id == added.Id);
@@ -81,7 +81,7 @@ namespace CarsProject.Service
             
             await _carModelRepository.UpdateAsync(existing);
            
-            var result = await _carModelRepository.GetQuery(new PSFParameters())
+            var result = await _carModelRepository.GetQuery(new PFSParameters())
                                                   .Include(cm => cm.CarMake)
                                                   .Include(cm => cm.CarEngineType)
                                                   .FirstOrDefaultAsync(cm => cm.Id == existing.Id);

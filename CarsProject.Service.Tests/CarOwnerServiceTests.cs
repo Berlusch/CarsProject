@@ -20,12 +20,12 @@ namespace CarsProject.Service.Tests
         [Fact]
         public async Task GetCarOwnersPagedAsync_ReturnsEmpty_WhenNoCarOwners()
         {
-            var pfs = new PSFParameters
+            var pfs = new PFSParameters
             {
                 Paging = new PagingParameters { PageNumber = 1, PageSize = 5 }
             };
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>()))
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
                      .Returns(new List<CarOwner>().AsQueryable());
 
             var result = await _service.GetCarOwnersAsync(pfs);
@@ -55,7 +55,7 @@ namespace CarsProject.Service.Tests
         [Fact]
         public async Task GetCarOwnersPagedAsync_ReturnsPagedFilteredSortedCarOwners()
         {
-            var pfs = new PSFParameters
+            var pfs = new PFSParameters
             {
                 Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
                 Sorting = new SortingParameters { OrderBy = "FirstName" },
@@ -68,7 +68,7 @@ namespace CarsProject.Service.Tests
                 new CarOwner { Id = 2, FirstName = "FirstName2", LastName = "LastName2", DateOfBirth = new DateOnly(1995, 6, 1) }
             };
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(carOwners.AsQueryable());
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(carOwners.AsQueryable());
 
             var result = await _service.GetCarOwnersAsync(pfs);
 
@@ -87,7 +87,7 @@ namespace CarsProject.Service.Tests
                 DateOfBirth = new DateOnly(1990, 5, 10)
             };
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(new List<CarOwner>().AsQueryable());
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(new List<CarOwner>().AsQueryable());
             _mockRepo.Setup(r => r.AddAsync(It.IsAny<CarOwner>())).ReturnsAsync((CarOwner c) =>
             {
                 c.Id = 1; 

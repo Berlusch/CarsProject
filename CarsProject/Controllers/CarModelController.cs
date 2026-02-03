@@ -21,7 +21,7 @@ namespace CarsProject.WebApi.Controllers
         }
 
         [HttpPost("pfs")]
-        public async Task<ActionResult> GetPfs([FromBody] PSFParameters pfs)
+        public async Task<ActionResult> GetPfs([FromBody] PFSParameters pfs)
         {
             var carModels = await _carModelService.GetCarModelsAsync(pfs);
 

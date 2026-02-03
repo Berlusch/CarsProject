@@ -4,7 +4,7 @@ namespace CarsProject.Repository.Common
 {
     public interface IGenericRepository<T> where T : class
     {
-        IQueryable<T> GetQuery(PSFParameters parameters);
+        IQueryable<T> GetQuery(PFSParameters parameters);
         
         Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);

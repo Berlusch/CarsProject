@@ -14,7 +14,7 @@ namespace CarsProject.Service
             _carOwnerRepository = carOwnerRepository;
         }
 
-        public async Task<IEnumerable<CarOwner>> GetCarOwnersAsync(PSFParameters pfs)
+        public async Task<IEnumerable<CarOwner>> GetCarOwnersAsync(PFSParameters pfs)
         {
             var query = _carOwnerRepository.GetQuery(pfs);
 
@@ -32,7 +32,7 @@ namespace CarsProject.Service
 
         public async Task<CarOwner> AddCarOwnerAsync(CarOwner carOwner)
         {            
-            var potentialMatches = _carOwnerRepository.GetQuery(new PSFParameters
+            var potentialMatches = _carOwnerRepository.GetQuery(new PFSParameters
             {
                 Filter = new FilterParameters { PropertyName = "LastName", Filter = carOwner.LastName }
             }).ToList();

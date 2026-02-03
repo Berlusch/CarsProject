@@ -14,7 +14,7 @@ namespace CarsProject.Service
             _carMakeRepository = carMakeRepository;
         }
 
-        public async Task<IEnumerable<CarMake>> GetCarMakesAsync(PSFParameters pfs)
+        public async Task<IEnumerable<CarMake>> GetCarMakesAsync(PFSParameters pfs)
         {            
             var query = _carMakeRepository.GetQuery(pfs);
            
@@ -32,7 +32,7 @@ namespace CarsProject.Service
 
         public async Task<CarMake> AddCarMakeAsync(CarMake carMake)
         {           
-            var existing = _carMakeRepository.GetQuery(new PSFParameters
+            var existing = _carMakeRepository.GetQuery(new PFSParameters
             {
                 Filter = new FilterParameters { PropertyName = "Name", Filter = carMake.Name }
             }).FirstOrDefault();

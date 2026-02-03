@@ -13,7 +13,7 @@ namespace CarsProject.Repository
         {
         }
 
-        public async Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync(PSFParameters psf)
+        public async Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync(PFSParameters psf)
         {
             var query = GetQuery(psf);
             return await query

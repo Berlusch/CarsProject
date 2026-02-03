@@ -23,7 +23,7 @@ namespace CarsProject.Service
             _carModelRepository = carModelRepository;
         }
 
-        public async Task<IEnumerable<CarRegistration>> GetCarRegistrationsAsync(PSFParameters pfs)
+        public async Task<IEnumerable<CarRegistration>> GetCarRegistrationsAsync(PFSParameters pfs)
         {
             var query = _carRegistrationRepository.GetQuery(pfs);
 
@@ -42,7 +42,7 @@ namespace CarsProject.Service
 
         public async Task<CarRegistration> GetCarRegistrationByIdAsync(int id)
         {
-            var query = _carRegistrationRepository.GetQuery(new PSFParameters())
+            var query = _carRegistrationRepository.GetQuery(new PFSParameters())
                                            .Include(cm => cm.CarModel)
                                            .Include(cm => cm.CarOwner);
 
@@ -56,7 +56,7 @@ namespace CarsProject.Service
 
         public async Task<CarRegistration> AddCarRegistrationAsync(CarRegistration carRegistration)
         {            
-            var existing = await _carRegistrationRepository.GetQuery(new PSFParameters())
+            var existing = await _carRegistrationRepository.GetQuery(new PFSParameters())
                 .FirstOrDefaultAsync(c => c.RegistrationNumber.ToLower() == carRegistration.RegistrationNumber.ToLower());
 
             if (existing != null)
@@ -64,7 +64,7 @@ namespace CarsProject.Service
             
             var added = await _carRegistrationRepository.AddAsync(carRegistration);
             
-            var result = await _carRegistrationRepository.GetQuery(new PSFParameters())
+            var result = await _carRegistrationRepository.GetQuery(new PFSParameters())
                                                           .Include(cr => cr.CarModel)
                                                           .Include(cr => cr.CarOwner)
                                                           .FirstOrDefaultAsync(cr => cr.Id == added.Id);

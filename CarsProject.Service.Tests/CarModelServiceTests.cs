@@ -46,7 +46,7 @@ namespace CarsProject.Service.Tests
         [Fact]
         public async Task GetCarModelsPagedAsync_ReturnsPagedFilteredSortedCarModels()
         {            
-            var pfs = new PSFParameters
+            var pfs = new PFSParameters
             {
                 Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
                 Sorting = new SortingParameters { OrderBy = "name", Descending = true },
@@ -80,7 +80,7 @@ namespace CarsProject.Service.Tests
         new CarModelReadDto(2, "Model B", "MB", "Make B", "Diesel")
     };
                        
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(carModels.AsQueryable());
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(carModels.AsQueryable());
                         
             _mockMapper.Setup(m => m.Map<IEnumerable<CarModelReadDto>>(It.IsAny<IEnumerable<CarModel>>()))
                        .Returns(expectedDTOs);
@@ -109,7 +109,7 @@ namespace CarsProject.Service.Tests
 
             var expectedDto = new CarModelReadDto(1, "Model A", "MA", "Make A", "Gasoline");
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>()))
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
                      .Returns(new List<CarModel>().AsQueryable());
             _mockRepo.Setup(r => r.AddAsync(It.IsAny<CarModel>())).ReturnsAsync(carModel);
             _mockMapper.Setup(m => m.Map<CarModelReadDto>(carModel)).Returns(expectedDto);

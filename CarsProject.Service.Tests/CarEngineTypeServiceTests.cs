@@ -20,7 +20,7 @@ namespace CarsProject.Service.Tests
         [Fact]
         public async Task GetCarEngineTypesAsync_ReturnsPagedFilteredSortedCarEngineTypes()
         {
-            var pfs = new PSFParameters
+            var pfs = new PFSParameters
             {
                 Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
                 Sorting = new SortingParameters { OrderBy = "Type" },

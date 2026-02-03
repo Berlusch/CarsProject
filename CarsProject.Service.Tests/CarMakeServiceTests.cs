@@ -20,7 +20,7 @@ namespace CarsProject.Service.Tests
         [Fact]
         public async Task GetCarMakesAsync_ShouldReturnPagedCarMakes_WhenValidParams()
         {
-            var pfs = new PSFParameters
+            var pfs = new PFSParameters
             {
                 Paging = new PagingParameters
                 {
@@ -73,7 +73,7 @@ namespace CarsProject.Service.Tests
         {
             var carMake = new CarMake { Name = "Honda", Abrv = "HND" };
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(new List<CarMake>().AsQueryable());
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(new List<CarMake>().AsQueryable());
             _mockRepo.Setup(r => r.AddAsync(carMake)).ReturnsAsync(() =>
             {
                 carMake.Id = 1; 
@@ -93,7 +93,7 @@ namespace CarsProject.Service.Tests
             var existing = new CarMake { Id = 1, Name = "Toyota", Abrv = "TOY" };
             var newCarMake = new CarMake { Name = "Toyota", Abrv = "TOY" };
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(new List<CarMake> { existing }.AsQueryable());
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(new List<CarMake> { existing }.AsQueryable());
 
             Func<Task> act = async () => await _service.AddCarMakeAsync(newCarMake);
 

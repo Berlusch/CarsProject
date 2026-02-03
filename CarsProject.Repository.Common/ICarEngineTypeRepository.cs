@@ -5,6 +5,6 @@ namespace CarsProject.Repository.Common
 {
     public interface ICarEngineTypeRepository : IGenericRepository<CarEngineType>
     {
-        Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync(PSFParameters psf);
+        Task<IEnumerable<CarEngineType>> GetAllCarEngineTypesAsync(PFSParameters psf);
     }
 }

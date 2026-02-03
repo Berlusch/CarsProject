@@ -21,7 +21,7 @@ namespace CarsProject.WebApi.Controllers
         }
 
         [HttpPost("pfs")]
-        public async Task<ActionResult> GetPfs([FromBody] PSFParameters pfs)
+        public async Task<ActionResult> GetPfs([FromBody] PFSParameters pfs)
         {
             // Default paging for registrations
             if (pfs.Paging.PageNumber <= 0) pfs.Paging.PageNumber = 1;

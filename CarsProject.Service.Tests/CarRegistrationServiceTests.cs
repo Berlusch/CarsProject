@@ -101,11 +101,11 @@ namespace CarsProject.Service.Tests
                 new CarRegistrationReadDto(2, "Registration 456", "Jane Joe", "Civic")
             };
 
-            _mockRepoRegistration.Setup(r => r.GetQuery(It.IsAny<PSFParameters>())).Returns(carRegistrations.AsQueryable());
+            _mockRepoRegistration.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(carRegistrations.AsQueryable());
             _mockMapper.Setup(m => m.Map<IEnumerable<CarRegistrationReadDto>>(It.IsAny<IEnumerable<CarRegistration>>()))
                        .Returns(expectedDTOs);
 
-            var pfs = new PSFParameters
+            var pfs = new PFSParameters
             {
                 Paging = new PagingParameters { PageNumber = 1, PageSize = 2 }
             };
