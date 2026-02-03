@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace CarsProject.WebApi.Extensions
+﻿namespace CarsProject.WebApi.Extensions
 {
     public static class CarsProjectExtensions
     {
