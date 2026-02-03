@@ -10,8 +10,7 @@ namespace CarsProject.Repository.Common
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity);
         Task<bool> DeleteAsync(int id);
-
-        Task<PagedResult<T>> GetAsync(PFSParameters parameters);
+        
     }
 }
 

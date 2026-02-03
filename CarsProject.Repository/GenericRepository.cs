@@ -19,10 +19,12 @@ namespace CarsProject.Repository
             _dbSet = context.Set<T>();
             UnitOfWork = new UnitOfWork(_context);
         }
-        
-        public IQueryable<T> GetQuery(PFSParameters parameters)
+
+        public IQueryable<T> GetQuery(PFSParameters? parameters = null)
         {
-            IQueryable<T> query = _dbSet;
+            parameters ??= new PFSParameters();
+
+            IQueryable<T> query = _dbSet.AsQueryable();
 
             // FILTER
             if (!string.IsNullOrEmpty(parameters.Filter.Filter) &&
@@ -42,40 +44,18 @@ namespace CarsProject.Repository
             // SORT
             if (!string.IsNullOrEmpty(parameters.Sorting.OrderBy))
             {
-                var propInfo = typeof(T).GetProperty(
-                    parameters.Sorting.OrderBy,
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
-                );
+                var propInfo = typeof(T).GetProperty(parameters.Sorting.OrderBy,
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
                 if (propInfo != null)
                 {
-                    if (parameters.Sorting.Descending)
-                        query = query.OrderByDescending(e => EF.Property<object>(e, propInfo.Name));
-                    else
-                        query = query.OrderBy(e => EF.Property<object>(e, propInfo.Name));
+                    query = parameters.Sorting.Descending
+                        ? query.OrderByDescending(e => EF.Property<object>(e, propInfo.Name))
+                        : query.OrderBy(e => EF.Property<object>(e, propInfo.Name));
                 }
             }
 
             return query;
-        }
-                
-        public async Task<PagedResult<T>> GetAsync(PFSParameters parameters)
-        {
-            var query = GetQuery(parameters);
-
-            var totalCount = await query.CountAsync();
-
-            var items = await query
-                .Skip(parameters.Paging.Skip)
-                .Take(parameters.Paging.PageSize)
-                .ToListAsync();
-
-            return new PagedResult<T>
-            {
-                Items = items,
-                TotalCount = totalCount,
-                Paging = parameters.Paging
-            };
         }
 
         public async Task<T> GetByIdAsync(int id)
