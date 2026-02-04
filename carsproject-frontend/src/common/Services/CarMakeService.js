@@ -1,16 +1,8 @@
 import { HttpService } from "./HttpService"; 
 
-async function getCarMakesPFS(currentPage = 1, pageSize = 5, sortBy = "name", searchTerm = "") {
-  try {
-    const payload = {
-      pfs: {
-        paging: { pageNumber: currentPage - 1, pageSize }, 
-        sorting: { orderBy: sortBy, descending: false },
-        filter: { propertyName: "name", filter: searchTerm }
-      }
-    };
-
-    const response = await HttpService.post('/CarMake/pfs', payload, {
+async function getCarMakesPFS(pfs) {
+  try {    
+    const response = await HttpService.post('/CarMake/pfs', { pfs }, {
       headers: { 'Content-Type': 'application/json' }
     });
 
@@ -19,18 +11,19 @@ async function getCarMakesPFS(currentPage = 1, pageSize = 5, sortBy = "name", se
     throw error;
   }
 }
+
 async function getById(id) {
-  return await HttpService.get('/CarMake/' + id)
-    .then((response)=>{
-      return{error:false, message: response.data};
-    })
-    .catch((e)=>{})
+  try {
+    const response = await HttpService.get('/CarMake/' + id);
+    return { error: false, message: response.data };
+  } catch (error) {
+    return { error: true, message: 'Fetching by ID failed' };
+  }
 }
 
-
-async function add(CarMake) {
+async function add(carMake) {
   try {
-    await HttpService.post('/CarMake', CarMake);
+    await HttpService.post('/CarMake', carMake);
     return { error: false, message: 'Car make added successfully' };
   } catch (error) {
     console.error('Error while adding car make:', error);
@@ -38,27 +31,28 @@ async function add(CarMake) {
   }
 }
 
-async function edit(id, CarMake){
-    return await HttpService.put('/CarMake/'+id, CarMake)
-    .then(()=>{return{error:false, message: 'Edited'}})
-    .catch(()=>{return{error:true, message:'Editing failed'}})
+async function edit(id, carMake) {
+  try {
+    await HttpService.put('/CarMake/' + id, carMake);
+    return { error: false, message: 'Edited' };
+  } catch {
+    return { error: true, message: 'Editing failed' };
+  }
 }
 
-async function remove(id,CarMake){
-    return await HttpService.delete('/CarMake/'+id, CarMake)
-    .then(()=>{return{error:false, message: 'Removed'}})
-    .catch(()=>{return{error:true, message:'Operation failed'}})
+async function remove(id) {
+  try {
+    await HttpService.delete('/CarMake/' + id);
+    return { error: false, message: 'Removed' };
+  } catch {
+    return { error: true, message: 'Operation failed' };
+  }
 }
 
-  
-  export default{
-    getCarMakesPFS,
-    getById,
-    add,
-    edit,
-    remove    
+export default {
+  getCarMakesPFS,
+  getById,
+  add,
+  edit,
+  remove
 }
-
-
-
-

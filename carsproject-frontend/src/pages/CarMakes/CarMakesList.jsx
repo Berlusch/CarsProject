@@ -15,31 +15,29 @@ const CarMakesList = observer(() => {
   const [currentPageSize, setCurrentPageSize] = useState(0);
 
   const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
-
+  
   const fetchCarMakes = async () => {
-  const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
+    const { currentPage, pageSize, searchTerm } = CarMakeStore.filters;
 
-  const response = await CarMakeService.getCarMakesPFS(
-    currentPage,
-    pageSize,
-    "name",
-    searchTerm
-  );
+    const pfs = {
+      paging: { pageNumber: currentPage, pageSize },
+      sorting: { orderBy: "name", descending: false },
+      filter: { propertyName: "name", filter: searchTerm || "" }
+    };
 
-  const data = Array.isArray(response)
-    ? response
-    : response?.data ?? [];
+    const response = await CarMakeService.getCarMakesPFS(pfs);
 
-  console.log("FINAL DATA:", data);
+    const data = Array.isArray(response)
+      ? response
+      : response?.data ?? [];
 
-  setCarMakes(data);
-  setCurrentPageSize(data.length);
-};
-
+    setCarMakes(data);
+    setCurrentPageSize(data.length);
+  };
 
   useEffect(() => {
-    fetchCarMakes();
-  }, [currentPage, pageSize, searchTerm]);
+  CarMakeStore.fetchCarMakes();
+}, [CarMakeStore.currentPage, CarMakeStore.pageSize, CarMakeStore.searchTerm]);
 
   const handleSearch = (term) => {
     CarMakeStore.setSearchTerm(term);
@@ -124,10 +122,10 @@ const CarMakesList = observer(() => {
       />
 
       <Pagination
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        hasNextPage={hasNextPage}
-      />
+  currentPage={CarMakeStore.currentPage}
+  onPageChange={(page) => CarMakeStore.setPage(page)}
+  hasNextPage={CarMakeStore.hasNextPage}
+/>
     </div>
   );
 });
