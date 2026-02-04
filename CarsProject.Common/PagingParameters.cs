@@ -1,20 +1,33 @@
-﻿public class PagingParameters
+﻿namespace CarsProject.Common
 {
-    public int PageNumber { get; set; } = 1;
-
-        private int _pageSize;
-        
-    public int PageSize
+    public class PagingParameters
     {
-        get => _pageSize == 0 ? 5 : _pageSize;
-        set => _pageSize = value;
-    }
+        private int _pageNumber = 1;
+        private int _pageSize = 5;
 
-    public int Skip => (PageNumber - 1) * PageSize;
-   
-    public static PagingParameters Lookup(int pageSize = 1000)
-    {
-        return new PagingParameters { PageNumber = 1, PageSize = pageSize };
+        public int PageNumber
+        {
+            get => _pageNumber;
+            set => _pageNumber = value < 1 ? 1 : value;
+        }
+
+        public int PageSize
+        {
+            get => _pageSize;
+            set => _pageSize = value < 1 ? 5 : value;
+        }
+
+        public int Skip => (PageNumber - 1) * PageSize;
+
+        public static PagingParameters Lookup(int pageSize = 1000)
+        {
+            return new PagingParameters
+            {
+                PageNumber = 1,
+                PageSize = pageSize
+            };
+        }
     }
 }
+
 
