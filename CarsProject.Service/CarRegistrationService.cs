@@ -1,34 +1,22 @@
 ﻿using CarsProject.Common;
+using CarsProject.Common.QueryableExtensions;
 using CarsProject.Model;
-using CarsProject.Model.Common;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Service
 {
-    public class CarRegistrationService : ICarRegistrationService
+    public class CarRegistrationService(
+        IGenericRepository<CarRegistration> _carRegistrationRepository,
+        IGenericRepository<CarOwner> _carOwnerRepository,
+        IGenericRepository<CarModel> _carModelRepository
+    ) : ICarRegistrationService
     {
-        private readonly IGenericRepository<CarRegistration> _carRegistrationRepository;
-        private readonly IGenericRepository<CarOwner> _carOwnerRepository;
-        private readonly IGenericRepository<CarModel> _carModelRepository;
-
-        public CarRegistrationService(
-            IGenericRepository<CarRegistration> carRegistrationRepository,
-            IGenericRepository<CarOwner> carOwnerRepository,
-            IGenericRepository<CarModel> carModelRepository)
-        {
-            _carRegistrationRepository = carRegistrationRepository;
-            _carOwnerRepository = carOwnerRepository;
-            _carModelRepository = carModelRepository;
-        }
-
         public async Task<IEnumerable<CarRegistration>> GetCarRegistrationsAsync(PFSParameters pfs)
         {
-            var query = _carRegistrationRepository.GetQuery(pfs);
-
-            query = query.Include(cm => cm.CarModel);
-            query = query.Include(cm => cm.CarOwner);
+            var query = _carRegistrationRepository.GetQuery(pfs)
+                                                  .IncludeFKs();
 
             if (pfs.Paging.PageSize > 0)
             {
@@ -39,61 +27,63 @@ namespace CarsProject.Service
             return await query.ToListAsync();
         }
 
-
         public async Task<CarRegistration> GetCarRegistrationByIdAsync(int id)
         {
-            var query = _carRegistrationRepository.GetQuery(new PFSParameters())
-                                           .Include(cm => cm.CarModel)
-                                           .Include(cm => cm.CarOwner);
+            var carRegistration = await _carRegistrationRepository.GetQuery(new PFSParameters())
+                                                                 .IncludeFKs()
+                                                                 .FirstOrDefaultAsync(cr => cr.Id == id)
+                               ?? throw new KeyNotFoundException($"CarRegistration with ID {id} not found.");
 
-            var carModel = await query.FirstOrDefaultAsync(cm => cm.Id == id);
-
-            if (carModel == null)
-                throw new KeyNotFoundException($"CarModel with ID {id} not found.");
-
-            return carModel;
+            return carRegistration;
         }
 
         public async Task<CarRegistration> AddCarRegistrationAsync(CarRegistration carRegistration)
-        {            
+        {
+            ArgumentNullException.ThrowIfNull(carRegistration);
+
             var existing = await _carRegistrationRepository.GetQuery(new PFSParameters())
                 .FirstOrDefaultAsync(c => c.RegistrationNumber.ToLower() == carRegistration.RegistrationNumber.ToLower());
 
             if (existing != null)
                 throw new Exception($"CarRegistration with number {carRegistration.RegistrationNumber} already exists.");
-            
+
             var added = await _carRegistrationRepository.AddAsync(carRegistration);
-            
+
             var result = await _carRegistrationRepository.GetQuery(new PFSParameters())
-                                                          .Include(cr => cr.CarModel)
-                                                          .Include(cr => cr.CarOwner)
-                                                          .FirstOrDefaultAsync(cr => cr.Id == added.Id);
+                                                          .IncludeFKs()
+                                                          .FirstOrDefaultAsync(cr => cr.Id == added.Id)
+                         ?? throw new KeyNotFoundException($"CarRegistration with ID {added.Id} not found after insert.");
 
-            return result!;
+            return result;
         }
-
 
         public async Task<CarRegistration> UpdateCarRegistrationAsync(int id, CarRegistration carRegistration)
         {
-            var existing = await _carRegistrationRepository.GetByIdAsync(id);
-            if (existing == null)
-                throw new KeyNotFoundException($"CarRegistration with ID {id} not found.");
-            
-            var carOwner = await _carOwnerRepository.GetByIdAsync(carRegistration.CarOwnerId);
-            if (carOwner == null)
-                throw new System.Exception($"CarOwner with ID {carRegistration.CarOwnerId} not found.");
-            
-            var carModel = await _carModelRepository.GetByIdAsync(carRegistration.CarModelId);
-            if (carModel == null)
-                throw new System.Exception($"CarModel with ID {carRegistration.CarModelId} not found.");
-            
+            ArgumentNullException.ThrowIfNull(carRegistration);
+
+            var existing = await _carRegistrationRepository.GetByIdAsync(id)
+                            ?? throw new KeyNotFoundException($"CarRegistration with ID {id} not found.");
+
+            var carOwner = await _carOwnerRepository.GetByIdAsync(carRegistration.CarOwnerId)
+                           ?? throw new Exception($"CarOwner with ID {carRegistration.CarOwnerId} not found.");
+
+            var carModel = await _carModelRepository.GetByIdAsync(carRegistration.CarModelId)
+                           ?? throw new Exception($"CarModel with ID {carRegistration.CarModelId} not found.");
+
             existing.RegistrationNumber = carRegistration.RegistrationNumber;
             existing.CarOwner = carOwner;
             existing.CarModel = carModel;
             existing.CarOwnerId = carRegistration.CarOwnerId;
             existing.CarModelId = carRegistration.CarModelId;
 
-            return await _carRegistrationRepository.UpdateAsync(existing);
+            await _carRegistrationRepository.UpdateAsync(existing);
+
+            var result = await _carRegistrationRepository.GetQuery(new PFSParameters())
+                                                          .IncludeFKs()
+                                                          .FirstOrDefaultAsync(cr => cr.Id == existing.Id)
+                         ?? throw new KeyNotFoundException($"CarRegistration with ID {existing.Id} not found after update.");
+
+            return result;
         }
 
         public async Task<bool> DeleteCarRegistrationAsync(int id)

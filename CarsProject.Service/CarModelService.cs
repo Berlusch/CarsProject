@@ -1,4 +1,5 @@
 ﻿using CarsProject.Common;
+using CarsProject.Common.QueryableExtensions;
 using CarsProject.Model;
 using CarsProject.Repository;
 using CarsProject.Repository.Common;
@@ -15,13 +16,11 @@ namespace CarsProject.Service
         {
             _carModelRepository = carModelRepository;
         }
-        
+
         public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PFSParameters pfs)
         {
-            var query = _carModelRepository.GetQuery(pfs);
-
-            query = query.Include(cm => cm.CarMake);
-            query = query.Include(cm => cm.CarEngineType);
+            var query = _carModelRepository.GetQuery(pfs)
+                                           .IncludeFKs();
 
             if (pfs.Paging.PageSize > 0)
             {
@@ -32,12 +31,10 @@ namespace CarsProject.Service
             return await query.ToListAsync();
         }
 
-      
         public async Task<CarModel> GetCarModelByIdAsync(int id)
         {
             var query = _carModelRepository.GetQuery(new PFSParameters())
-                                           .Include(cm => cm.CarMake)
-                                           .Include(cm => cm.CarEngineType);
+                                           .IncludeFKs();
 
             var carModel = await query.FirstOrDefaultAsync(cm => cm.Id == id);
 
@@ -59,31 +56,28 @@ namespace CarsProject.Service
 
             var added = await _carModelRepository.AddAsync(carModel);
 
-            
             var result = await _carModelRepository.GetQuery(new PFSParameters())
-                                                  .Include(cm => cm.CarMake)
-                                                  .Include(cm => cm.CarEngineType)
+                                                  .IncludeFKs()
                                                   .FirstOrDefaultAsync(cm => cm.Id == added.Id);
 
             return result!;
         }
 
         public async Task<CarModel> UpdateCarModelAsync(int id, CarModel carModel)
-        {            
+        {
             var existing = await _carModelRepository.GetByIdAsync(id);
             if (existing == null)
                 throw new KeyNotFoundException($"CarModel with ID {id} not found.");
-            
+
             existing.Name = carModel.Name;
             existing.Abrv = carModel.Abrv;
             existing.CarMakeId = carModel.CarMakeId;
             existing.CarEngineTypeId = carModel.CarEngineTypeId;
-            
+
             await _carModelRepository.UpdateAsync(existing);
-           
+
             var result = await _carModelRepository.GetQuery(new PFSParameters())
-                                                  .Include(cm => cm.CarMake)
-                                                  .Include(cm => cm.CarEngineType)
+                                                  .IncludeFKs()
                                                   .FirstOrDefaultAsync(cm => cm.Id == existing.Id);
 
             return result!;
