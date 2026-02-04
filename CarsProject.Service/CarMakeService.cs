@@ -5,19 +5,12 @@ using CarsProject.Common;
 
 namespace CarsProject.Service
 {
-    public class CarMakeService : ICarMakeService
+    public class CarMakeService(IGenericRepository<CarMake> _carMakeRepository) : ICarMakeService
     {
-        private readonly IGenericRepository<CarMake> _carMakeRepository;
-
-        public CarMakeService(IGenericRepository<CarMake> carMakeRepository)
-        {
-            _carMakeRepository = carMakeRepository;
-        }
-
         public async Task<IEnumerable<CarMake>> GetCarMakesAsync(PFSParameters pfs)
-        {            
+        {
             var query = _carMakeRepository.GetQuery(pfs);
-           
+
             if (pfs.Paging.PageSize > 0)
                 query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
                              .Take(pfs.Paging.PageSize);
@@ -27,11 +20,16 @@ namespace CarsProject.Service
 
         public async Task<CarMake> GetCarMakeByIdAsync(int id)
         {
-            return await _carMakeRepository.GetByIdAsync(id);
+            var carMake = await _carMakeRepository.GetByIdAsync(id)
+                           ?? throw new KeyNotFoundException($"CarMake with ID {id} not found.");
+
+            return carMake;
         }
 
         public async Task<CarMake> AddCarMakeAsync(CarMake carMake)
-        {           
+        {
+            ArgumentNullException.ThrowIfNull(carMake);
+
             var existing = _carMakeRepository.GetQuery(new PFSParameters
             {
                 Filter = new FilterParameters { PropertyName = "Name", Filter = carMake.Name }
@@ -45,10 +43,11 @@ namespace CarsProject.Service
 
         public async Task<CarMake> UpdateCarMakeAsync(int id, CarMake carMake)
         {
-            var existing = await _carMakeRepository.GetByIdAsync(id);
-            if (existing == null)
-                throw new KeyNotFoundException($"CarMake with ID {id} not found.");
-            
+            ArgumentNullException.ThrowIfNull(carMake);
+
+            var existing = await _carMakeRepository.GetByIdAsync(id)
+                           ?? throw new KeyNotFoundException($"CarMake with ID {id} not found.");
+
             existing.Name = carMake.Name;
             existing.Abrv = carMake.Abrv;
 
@@ -61,4 +60,3 @@ namespace CarsProject.Service
         }
     }
 }
-

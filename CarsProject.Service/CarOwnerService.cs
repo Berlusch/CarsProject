@@ -5,15 +5,8 @@ using CarsProject.Service.Common;
 
 namespace CarsProject.Service
 {
-    public class CarOwnerService : ICarOwnerService
+    public class CarOwnerService(IGenericRepository<CarOwner> _carOwnerRepository) : ICarOwnerService
     {
-        private readonly IGenericRepository<CarOwner> _carOwnerRepository;
-
-        public CarOwnerService(IGenericRepository<CarOwner> carOwnerRepository)
-        {
-            _carOwnerRepository = carOwnerRepository;
-        }
-
         public async Task<IEnumerable<CarOwner>> GetCarOwnersAsync(PFSParameters pfs)
         {
             var query = _carOwnerRepository.GetQuery(pfs);
@@ -27,11 +20,15 @@ namespace CarsProject.Service
 
         public async Task<CarOwner> GetCarOwnerByIdAsync(int id)
         {
-            return await _carOwnerRepository.GetByIdAsync(id);
+            var carOwner = await _carOwnerRepository.GetByIdAsync(id)
+                           ?? throw new KeyNotFoundException($"CarOwner with ID {id} not found.");
+            return carOwner;
         }
 
         public async Task<CarOwner> AddCarOwnerAsync(CarOwner carOwner)
-        {            
+        {
+            ArgumentNullException.ThrowIfNull(carOwner);
+
             var potentialMatches = _carOwnerRepository.GetQuery(new PFSParameters
             {
                 Filter = new FilterParameters { PropertyName = "LastName", Filter = carOwner.LastName }
@@ -51,10 +48,11 @@ namespace CarsProject.Service
 
         public async Task<CarOwner> UpdateCarOwnerAsync(int id, CarOwner carOwner)
         {
-            var existing = await _carOwnerRepository.GetByIdAsync(id);
-            if (existing == null)
-                throw new KeyNotFoundException($"CarOwner with ID {id} not found.");
-            
+            ArgumentNullException.ThrowIfNull(carOwner);
+
+            var existing = await _carOwnerRepository.GetByIdAsync(id)
+                           ?? throw new KeyNotFoundException($"CarOwner with ID {id} not found.");
+
             existing.FirstName = carOwner.FirstName;
             existing.LastName = carOwner.LastName;
             existing.DateOfBirth = carOwner.DateOfBirth;
