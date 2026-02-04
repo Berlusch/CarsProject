@@ -1,22 +1,14 @@
 ﻿using CarsProject.Common;
 using CarsProject.Common.QueryableExtensions;
 using CarsProject.Model;
-using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Service
 {
-    public class CarModelService : ICarModelService
+    public class CarModelService(IGenericRepository<CarModel> _carModelRepository) : ICarModelService
     {
-        private readonly IGenericRepository<CarModel> _carModelRepository;
-
-        public CarModelService(IGenericRepository<CarModel> carModelRepository)
-        {
-            _carModelRepository = carModelRepository;
-        }
-
         public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PFSParameters pfs)
         {
             var query = _carModelRepository.GetQuery(pfs)
@@ -33,19 +25,18 @@ namespace CarsProject.Service
 
         public async Task<CarModel> GetCarModelByIdAsync(int id)
         {
-            var query = _carModelRepository.GetQuery(new PFSParameters())
-                                           .IncludeFKs();
-
-            var carModel = await query.FirstOrDefaultAsync(cm => cm.Id == id);
-
-            if (carModel == null)
-                throw new KeyNotFoundException($"CarModel with ID {id} not found.");
+            var carModel = await _carModelRepository.GetQuery(new PFSParameters())
+                                                    .IncludeFKs()
+                                                    .FirstOrDefaultAsync(cm => cm.Id == id)
+                            ?? throw new KeyNotFoundException($"CarModel with ID {id} not found.");
 
             return carModel;
         }
 
         public async Task<CarModel> AddCarModelAsync(CarModel carModel)
         {
+            ArgumentNullException.ThrowIfNull(carModel);
+
             var existing = _carModelRepository.GetQuery(new PFSParameters
             {
                 Filter = new FilterParameters { PropertyName = "Name", Filter = carModel.Name }
@@ -58,16 +49,18 @@ namespace CarsProject.Service
 
             var result = await _carModelRepository.GetQuery(new PFSParameters())
                                                   .IncludeFKs()
-                                                  .FirstOrDefaultAsync(cm => cm.Id == added.Id);
+                                                  .FirstOrDefaultAsync(cm => cm.Id == added.Id)
+                         ?? throw new KeyNotFoundException($"CarModel with ID {added.Id} not found after insert.");
 
-            return result!;
+            return result;
         }
 
         public async Task<CarModel> UpdateCarModelAsync(int id, CarModel carModel)
         {
-            var existing = await _carModelRepository.GetByIdAsync(id);
-            if (existing == null)
-                throw new KeyNotFoundException($"CarModel with ID {id} not found.");
+            ArgumentNullException.ThrowIfNull(carModel);
+
+            var existing = await _carModelRepository.GetByIdAsync(id)
+                            ?? throw new KeyNotFoundException($"CarModel with ID {id} not found.");
 
             existing.Name = carModel.Name;
             existing.Abrv = carModel.Abrv;
@@ -78,9 +71,10 @@ namespace CarsProject.Service
 
             var result = await _carModelRepository.GetQuery(new PFSParameters())
                                                   .IncludeFKs()
-                                                  .FirstOrDefaultAsync(cm => cm.Id == existing.Id);
+                                                  .FirstOrDefaultAsync(cm => cm.Id == existing.Id)
+                         ?? throw new KeyNotFoundException($"CarModel with ID {existing.Id} not found after update.");
 
-            return result!;
+            return result;
         }
 
         public async Task<bool> DeleteCarModelAsync(int id)
