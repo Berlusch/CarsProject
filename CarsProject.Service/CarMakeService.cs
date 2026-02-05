@@ -7,15 +7,27 @@ namespace CarsProject.Service
 {
     public class CarMakeService(IGenericRepository<CarMake> _carMakeRepository) : ICarMakeService
     {
-        public async Task<IEnumerable<CarMake>> GetCarMakesAsync(PFSParameters pfs)
+        public async Task<PagedResult<CarMake>> GetCarMakesAsync(PFSParameters pfs)
         {
-            var query = _carMakeRepository.GetQuery(pfs);
-
+            var query = _carMakeRepository.GetQuery(pfs); 
+           
+            var totalCount = query.Count();
+            
             if (pfs.Paging.PageSize > 0)
-                query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
-                             .Take(pfs.Paging.PageSize);
+            {
+                query = query
+                    .Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                    .Take(pfs.Paging.PageSize);
+            }
 
-            return await Task.FromResult(query.ToList());
+            var items = query.ToList();
+
+            return new PagedResult<CarMake>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Paging = pfs.Paging
+            };
         }
 
         public async Task<CarMake> GetCarMakeByIdAsync(int id)

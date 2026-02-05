@@ -19,25 +19,27 @@ namespace CarsProject.WebApi.Controllers
             _carMakeService = carMakeService;
             _mapper = mapper;
         }
-        
+
         [HttpPost("pfs")]
         public async Task<ActionResult> GetPfs([FromBody] PFSParameters pfs)
         {
-            if (pfs.Paging.PageNumber <= 0)
-                pfs.Paging.PageNumber = 1;
+            var pagedResult = await _carMakeService.GetCarMakesAsync(pfs);
 
-            if (pfs.Paging.PageSize <= 0)
-                pfs.Paging.PageSize = 5;
-
-            var carMakes = await _carMakeService.GetCarMakesAsync(pfs);
-
-            if (!carMakes.Any())
+            if (!pagedResult.Items.Any())
                 return NotFound();
 
-            var dtos = _mapper.Map<IEnumerable<CarMakeReadDto>>(carMakes);
-            return Ok(dtos);
+            var dtos = _mapper.Map<IEnumerable<CarMakeReadDto>>(pagedResult.Items);
+
+            var response = new PFSResponseDto<CarMakeReadDto>
+            {
+                Items = dtos,
+                TotalCount = pagedResult.TotalCount,
+                HasNextPage = pagedResult.TotalPages > pagedResult.Paging.PageNumber
+            };
+
+            return Ok(response);
         }
-        
+
         [HttpGet("{id:int}")]
         public async Task<ActionResult> GetById(int id)
         {
