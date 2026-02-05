@@ -1,93 +1,129 @@
-import CarMakeService from "../common/Services/CarMakeService";
 import { makeAutoObservable, runInAction } from "mobx";
-
+import CarMakeService from "../common/Services/CarMakeService";
 
 class CarMakeStore {
-  searchTerm = '';  
-  currentPage = 1;  
-  pageSize = 5;     
-  hasNextPage = false; 
-  addStatus = { error: false, message: '' }; 
+ 
   carMakes = [];
-  addStatus = { error: false, message: '' };
-  selectedCarMake = null;
+  searchTerm = "";
+  currentPage = 1;
+  pageSize = 5;
+  hasNextPage = false;
+
+  loading = false;
   error = null;
-  
+
+  addStatus = {
+    error: false,
+    message: ""
+  };
 
   constructor() {
     makeAutoObservable(this);
   }
+
   
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1;    
+    this.currentPage = 1; 
+  }
+
+  setPage(page) {
+  this.currentPage = page;
+  this.fetchCarMakes(); 
   }
 
   
-  setPage(page) {
-    this.currentPage = page;
-  }
-      
-  get filters() {
-    return {
-      searchTerm: this.searchTerm,   
-      currentPage: this.currentPage, 
-      pageSize: this.pageSize,       
-      hasNextPage: this.hasNextPage   
-    };
-  }
+ async fetchCarMakes() {
+  this.loading = true;
+  this.error = null;
 
-  async fetchCarMakes() {
   try {
     const pfs = {
-      currentPage: this.currentPage,
-      pageSize: this.pageSize,
-      searchTerm: this.searchTerm
+      paging: {
+        pageNumber: this.currentPage,
+        pageSize: this.pageSize
+      },
+      sorting: {
+        orderBy: "name",
+        descending: false
+      },
+      filter: {
+        propertyName: "name",
+        filter: this.searchTerm || ""
+      }
     };
 
     const response = await CarMakeService.getCarMakesPFS(pfs);
 
     runInAction(() => {
-      this.carMakes = response.items;
-      this.hasNextPage = response.hasNextPage;
+      this.carMakes = response.items ?? [];
+      this.hasNextPage = response.hasNextPage ?? false;
+      this.loading = false;
     });
-
   } catch (error) {
     runInAction(() => {
-      this.error = "Error fetching car makes";
+      this.error = "Error fetching car makes.";
+      this.loading = false;
     });
     console.error(error);
   }
 }
+
+  
   async addCarMake(name, abrv) {
-    this.addStatus = { error: false, message: 'Adding car make...' }; 
-  
+    runInAction(() => {
+      this.addStatus = { error: false, message: "Adding car make..." };
+    });
+
     try {
-      const result = await CarMakeService.add({ name, abrv });        
-      if (result && result.error) {
-        this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };  
-      } else {
-        this.carMakes.push({ name, abrv });  
-        this.addStatus = { error: false, message: result.message || 'Car make added successfully!' };  
+      const result = await CarMakeService.add({ name, abrv });
+
+      if (result?.error) {
+        runInAction(() => {
+          this.addStatus = {
+            error: true,
+            message: result.message || "Error adding car make."
+          };
+        });
+        return;
       }
+
+      runInAction(() => {
+        this.addStatus = {
+          error: false,
+          message: result.message || "Car make added successfully."
+        };
+      });
+
+     
+      await this.fetchCarMakes();
     } catch (error) {
-      this.addStatus = { error: true, message: 'Problem adding car make' };  
-      console.error('Error adding car make:', error);
-    }
-  }
-  
-  async getCarMakeById(id) {
-    try {      
-      const result = await CarMakeService.getById(id);  
-        if (result.error) {
-        return { error: true, message: "Car Make not found." };
-      }
-      return result;
-    } catch (error) {
-      return { error: true, message: "Error fetching a car make." };
+      runInAction(() => {
+        this.addStatus = {
+          error: true,
+          message: "Problem adding car make."
+        };
+      });
+      console.error(error);
     }
   }
 
+
+  async getCarMakeById(id) {
+    try {
+      const result = await CarMakeService.getById(id);
+
+      if (result?.error) {
+        return { error: true, message: "Car Make not found." };
+      }
+
+      return result;
+    } catch (error) {
+      return { error: true, message: "Error fetching car make." };
+    }
+  }
+
+  
   async editCarMake(id, carMake) {
     try {
       await CarMakeService.edit(id, carMake);
@@ -96,10 +132,6 @@ class CarMakeStore {
       return { error: true, message: "Error updating Car Make." };
     }
   }
-  
-
-  
-  
 }
 
 export default new CarMakeStore();

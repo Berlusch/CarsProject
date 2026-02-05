@@ -1,15 +1,10 @@
 import { HttpService } from "./HttpService"; 
 
 async function getCarMakesPFS(pfs) {
-  try {    
-    const response = await HttpService.post('/CarMake/pfs', { pfs }, {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    return response.data; 
-  } catch (error) {
-    throw error;
-  }
+  const response = await HttpService.post('/CarMake/pfs', pfs, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  return response.data;
 }
 
 async function getById(id) {
