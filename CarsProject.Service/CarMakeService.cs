@@ -1,7 +1,8 @@
-﻿using CarsProject.Model;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
-using CarsProject.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Service
 {
@@ -9,10 +10,10 @@ namespace CarsProject.Service
     {
         public async Task<PagedResult<CarMake>> GetCarMakesAsync(PFSParameters pfs)
         {
-            var query = _carMakeRepository.GetQuery(pfs); 
-           
+            var query = _carMakeRepository.GetQuery(pfs);                      
+
             var totalCount = query.Count();
-            
+
             if (pfs.Paging.PageSize > 0)
             {
                 query = query
@@ -29,6 +30,8 @@ namespace CarsProject.Service
                 Paging = pfs.Paging
             };
         }
+
+
 
         public async Task<CarMake> GetCarMakeByIdAsync(int id)
         {

@@ -2,7 +2,6 @@ import { makeAutoObservable, runInAction } from "mobx";
 import CarMakeService from "../common/Services/CarMakeService";
 
 class CarMakeStore {
- 
   carMakes = [];
   searchTerm = "";
   currentPage = 1;
@@ -21,55 +20,42 @@ class CarMakeStore {
     makeAutoObservable(this);
   }
 
-  
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1; 
+    this.currentPage = 1;
+    this.fetchCarMakes();
   }
 
   setPage(page) {
-  this.currentPage = page;
-  this.fetchCarMakes(); 
+    this.currentPage = page;
+    this.fetchCarMakes();
   }
 
-  
- async fetchCarMakes() {
-  this.loading = true;
-  this.error = null;
+  async fetchCarMakes() {
+    this.loading = true;
+    try {
+      const pfs = {
+        paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
+        sorting: { orderBy: "Name", descending: false }, // veliko N, backend očekuje
+        filter: { propertyName: "Name", filter: this.searchTerm || "" }
+      };
 
-  try {
-    const pfs = {
-      paging: {
-        pageNumber: this.currentPage,
-        pageSize: this.pageSize
-      },
-      sorting: {
-        orderBy: "name",
-        descending: false
-      },
-      filter: {
-        propertyName: "name",
-        filter: this.searchTerm || ""
-      }
-    };
+      const response = await CarMakeService.getCarMakesPFS(pfs);
 
-    const response = await CarMakeService.getCarMakesPFS(pfs);
-
-    runInAction(() => {
-      this.carMakes = response.items ?? [];
-      this.hasNextPage = response.hasNextPage ?? false;
-      this.loading = false;
-    });
-  } catch (error) {
-    runInAction(() => {
-      this.error = "Error fetching car makes.";
-      this.loading = false;
-    });
-    console.error(error);
+      runInAction(() => {
+        this.carMakes = response.items ?? [];
+        this.hasNextPage = response.hasNextPage ?? false;
+        this.loading = false;
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.error = "Error fetching car makes.";
+        this.loading = false;
+      });
+      console.error(error);
+    }
   }
-}
 
-  
   async addCarMake(name, abrv) {
     runInAction(() => {
       this.addStatus = { error: false, message: "Adding car make..." };
@@ -95,7 +81,6 @@ class CarMakeStore {
         };
       });
 
-     
       await this.fetchCarMakes();
     } catch (error) {
       runInAction(() => {
@@ -107,7 +92,6 @@ class CarMakeStore {
       console.error(error);
     }
   }
-
 
   async getCarMakeById(id) {
     try {
@@ -123,7 +107,6 @@ class CarMakeStore {
     }
   }
 
-  
   async editCarMake(id, carMake) {
     try {
       await CarMakeService.edit(id, carMake);
