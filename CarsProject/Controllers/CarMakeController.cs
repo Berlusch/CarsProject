@@ -25,14 +25,11 @@ namespace CarsProject.WebApi.Controllers
         {
             var pagedResult = await _carMakeService.GetCarMakesAsync(pfs);
 
-            if (!pagedResult.Items.Any())
-                return NotFound();
-
             var dtos = _mapper.Map<IEnumerable<CarMakeReadDto>>(pagedResult.Items);
 
             var response = new PFSResponseDto<CarMakeReadDto>
             {
-                Items = dtos,
+                Items = dtos.ToList(),
                 TotalCount = pagedResult.TotalCount,
                 HasNextPage = pagedResult.TotalPages > pagedResult.Paging.PageNumber
             };
