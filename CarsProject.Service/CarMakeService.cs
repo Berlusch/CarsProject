@@ -2,7 +2,6 @@
 using CarsProject.Model;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
-using Microsoft.EntityFrameworkCore;
 
 namespace CarsProject.Service
 {
