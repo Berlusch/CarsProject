@@ -1,29 +1,33 @@
-﻿using CarsProject.Model;
+﻿using CarsProject.Common;
+using CarsProject.Model;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
-using CarsProject.Common;
 
 namespace CarsProject.Service
 {
     public class CarEngineTypeService(ICarEngineTypeRepository _carEngineTypeRepository) : ICarEngineTypeService
     {
-        public async Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PFSParameters pfs)
+        public async Task<PagedResult<CarEngineType>> GetCarEngineTypesAsync(PFSParameters pfs)
         {
-            pfs ??= new PFSParameters();
-            pfs.Paging ??= new PagingParameters();
-            pfs.Sorting ??= new SortingParameters();
-            pfs.Filter ??= new FilterParameters();
+            var query = _carEngineTypeRepository.GetQuery(pfs);
 
-            if (pfs.Paging.PageNumber <= 0)
-                pfs.Paging.PageNumber = 1;
+            var totalCount = query.Count();
 
-            if (pfs.Paging.PageSize <= 0)
-                pfs.Paging.PageSize = 1000;
+            if (pfs.Paging.PageSize > 0)
+            {
+                query = query
+                    .Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                    .Take(pfs.Paging.PageSize);
+            }
 
-            if (string.IsNullOrEmpty(pfs.Sorting.OrderBy))
-                pfs.Sorting.OrderBy = "Type";
+            var items = query.ToList();
 
-            return await _carEngineTypeRepository.GetAllCarEngineTypesAsync(pfs);
+            return new PagedResult<CarEngineType>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Paging = pfs.Paging
+            };
         }
 
         public async Task<CarEngineType> GetCarEngineTypeByIdAsync(int id)

@@ -1,21 +1,35 @@
 ﻿using CarsProject.Common;
 using CarsProject.Model;
+using CarsProject.Repository;
 using CarsProject.Repository.Common;
 using CarsProject.Service.Common;
+
 
 namespace CarsProject.Service
 {
     public class CarOwnerService(IGenericRepository<CarOwner> _carOwnerRepository) : ICarOwnerService
     {
-        public async Task<IEnumerable<CarOwner>> GetCarOwnersAsync(PFSParameters pfs)
+        public async Task<PagedResult<CarOwner>> GetCarOwnersAsync(PFSParameters pfs)
         {
             var query = _carOwnerRepository.GetQuery(pfs);
 
-            if (pfs.Paging.PageSize > 0)
-                query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
-                             .Take(pfs.Paging.PageSize);
+            var totalCount = query.Count();
 
-            return await Task.FromResult(query.ToList());
+            if (pfs.Paging.PageSize > 0)
+            {
+                query = query
+                    .Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                    .Take(pfs.Paging.PageSize);
+            }
+
+            var items = query.ToList();
+
+            return new PagedResult<CarOwner>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Paging = pfs.Paging
+            };
         }
 
         public async Task<CarOwner> GetCarOwnerByIdAsync(int id)

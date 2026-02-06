@@ -5,7 +5,7 @@ namespace CarsProject.Service.Common
 {
     public interface ICarEngineTypeService
     {
-        Task<IEnumerable<CarEngineType>> GetCarEngineTypesAsync(PFSParameters pfs);
+        Task<PagedResult<CarEngineType>> GetCarEngineTypesAsync(PFSParameters pfs);
         Task<CarEngineType> GetCarEngineTypeByIdAsync(int id);
     }
 }

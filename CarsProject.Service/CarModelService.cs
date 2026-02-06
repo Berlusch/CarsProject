@@ -9,18 +9,28 @@ namespace CarsProject.Service
 {
     public class CarModelService(IGenericRepository<CarModel> _carModelRepository) : ICarModelService
     {
-        public async Task<IEnumerable<CarModel>> GetCarModelsAsync(PFSParameters pfs)
+        public async Task<PagedResult<CarModel>> GetCarModelsAsync(PFSParameters pfs)
         {
             var query = _carModelRepository.GetQuery(pfs)
-                                           .IncludeFKs();
+                                            .IncludeFKs();
+
+            var totalCount = query.Count();
 
             if (pfs.Paging.PageSize > 0)
             {
-                query = query.Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
-                             .Take(pfs.Paging.PageSize);
+                query = query
+                    .Skip((pfs.Paging.PageNumber - 1) * pfs.Paging.PageSize)
+                    .Take(pfs.Paging.PageSize);
             }
 
-            return await query.ToListAsync();
+            var items = query.ToList();
+
+            return new PagedResult<CarModel>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Paging = pfs.Paging
+            };
         }
 
         public async Task<CarModel> GetCarModelByIdAsync(int id)

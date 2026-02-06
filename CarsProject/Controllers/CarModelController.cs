@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CarsProject.Common;
 using CarsProject.Model;
+using CarsProject.Service;
 using CarsProject.Service.Common;
 using CarsProject.WebApi.DTO;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +24,18 @@ namespace CarsProject.WebApi.Controllers
         [HttpPost("pfs")]
         public async Task<ActionResult> GetPfs([FromBody] PFSParameters pfs)
         {
-            var carModels = await _carModelService.GetCarModelsAsync(pfs);
+            var pagedResult = await _carModelService.GetCarModelsAsync(pfs);
 
-            if (!carModels.Any())
-                return NotFound();
+            var dtos = _mapper.Map<IEnumerable<CarModelReadDto>>(pagedResult.Items);
 
-            var dtos = _mapper.Map<IEnumerable<CarModelReadDto>>(carModels);
-            return Ok(dtos);
+            var response = new PFSResponseDto<CarModelReadDto>
+            {
+                Items = dtos.ToList(),
+                TotalCount = pagedResult.TotalCount,
+                HasNextPage = pagedResult.TotalPages > pagedResult.Paging.PageNumber
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]

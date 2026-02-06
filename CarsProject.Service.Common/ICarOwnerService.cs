@@ -5,7 +5,7 @@ namespace CarsProject.Service.Common
 {
     public interface ICarOwnerService
     {
-        Task<IEnumerable<CarOwner>> GetCarOwnersAsync(PFSParameters pfs);
+        Task<PagedResult<CarOwner>> GetCarOwnersAsync(PFSParameters pfs);
         Task<CarOwner> GetCarOwnerByIdAsync(int id);
         Task<CarOwner> AddCarOwnerAsync(CarOwner carOwner);
         Task<CarOwner> UpdateCarOwnerAsync(int id, CarOwner carOwner);
