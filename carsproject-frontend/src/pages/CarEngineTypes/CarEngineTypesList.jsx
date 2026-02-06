@@ -1,38 +1,43 @@
-import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
 import CarEngineTypeStore from "../../stores/CarEngineTypeStore";
-import TableLookup from "../../components/TableLookup";  
+import TableLookup from "../../components/TableLookup";
+import Pagination from "../../components/Pagination";
 
 const CarEngineTypeList = observer(() => {
   useEffect(() => {
     CarEngineTypeStore.fetchCarEngineTypes();
   }, []);
 
-  const { carEngineTypes, loading, error } = CarEngineTypeStore;
+  const handlePageChange = (page) => {
+    CarEngineTypeStore.setPage(page);
+  };
 
   const columns = [
-    { accessor: 'type', header: 'Type' },
-    { accessor: 'abrv', header: 'Abbreviation' }
+    { header: "Type", accessor: "type" },
+    { header: "Abbreviation", accessor: "abrv" }
   ];
- 
-  const data = carEngineTypes ? carEngineTypes.map((item) => ({
+
+  const data = CarEngineTypeStore.carEngineTypes.map((item) => ({
     type: item.type,
     abrv: item.abrv
-  })) : [];
+  }));
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (CarEngineTypeStore.loading) return <p>Loading...</p>;
+  if (CarEngineTypeStore.error) return <p>{CarEngineTypeStore.error}</p>;
 
   return (
     <div>
-      <header className="entityName">
-        Car Engine Types
-      </header> 
-      <br/><br/>
+      <header className="entityName">Car Engine Types</header>
+      <br/>
 
-    <TableLookup
-     columns={columns}
-     data={data} />
+      <TableLookup columns={columns} data={data} />
+
+      <Pagination
+        currentPage={CarEngineTypeStore.currentPage}
+        onPageChange={handlePageChange}
+        hasNextPage={CarEngineTypeStore.hasNextPage}
+      />
     </div>
   );
 });

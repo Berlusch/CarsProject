@@ -1,81 +1,65 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import CarRegistrationService from "../common/Services/CarRegistrationService";
 
-
 class CarRegistrationStore {
-  searchTerm = '';  
-  currentPage = 1;  
-  pageSize = 5;    
-  hasNextPage = false; 
-  addStatus = { error: false, message: '' }; 
   carRegistrations = [];
-  addStatus = { error: false, message: '' };
-  selectedCarRegistration = null;
+  searchTerm = "";
+  currentPage = 1;
+  pageSize = 5;
+  hasNextPage = false;
+
+  loading = false;
   error = null;
-  
+
+  addStatus = { error: false, message: "" };
 
   constructor() {
     makeAutoObservable(this);
   }
-  
+
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.currentPage = 1;  // Resetiranje stranice na 1 pri novoj pretrazi
-  }
-  
-  setPage(page) {
-    this.currentPage = page;
-  }
-      
-  get filters() {
-    return {
-      searchTerm: this.searchTerm,   
-      currentPage: this.currentPage, 
-      pageSize: this.pageSize,       
-      hasNextPage: this.hasNextPage   
-    };
-  }
-  async addCarRegistration(registrationNumber, carOwnerId, carModelId) {
-    this.addStatus = { error: false, message: 'Adding car registration...' };
-  
-    try {
-      const result = await CarRegistrationService.add({ registrationNumber, carOwnerId, carModelId });
-        
-      if (result && result.error) {
-        this.addStatus = { error: true, message: result.message || 'An error occurred while adding.' };
-      } else {
-        this.carRegistrations.push({ registrationNumber, carOwnerId, carModelId });
-        this.addStatus = { error: false, message: result.message || 'Car registration added successfully!' };
-      }
-    } catch (error) {
-      this.addStatus = { error: true, message: 'Problem adding car registration' };
-      console.error('Error adding car registration:', error);
-      
-    }  
-  }
-  
-  async getCarRegistrationById(id) {
-    try {      
-      const result = await CarRegistrationService.getById(id);  
-        if (result.error) {
-        return { error: true, message: "Car Registration not found." };
-      }
-      return result;
-    } catch (error) {
-      return { error: true, message: "Error fetching Car Registration." };
-    }
+    this.currentPage = 1;
+    this.fetchCarRegistrations();
   }
 
-  async editCarRegistration(id, carRegistration) {
+  setPage(page) {
+    this.currentPage = page;
+    this.fetchCarRegistrations();
+  }
+
+  async fetchCarRegistrations() {
+    this.loading = true;
+    this.error = null;
+
     try {
-      await CarRegistrationService.edit(id, carRegistration);
-      return { error: false, message: "Car Registration edited successfully." };
+      const pfs = {
+        paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
+        sorting: { orderBy: "RegistrationNumber", descending: false },
+        filter: { propertyName: "RegistrationNumber", filter: this.searchTerm || "" }
+      };
+
+      const response = await CarRegistrationService.getCarRegistrationsPFS(pfs);
+
+      
+      const filtered = response.items.filter(reg =>
+        reg.registrationNumber.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        reg.carOwnerFirstNameLastName.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+
+      runInAction(() => {
+        this.carRegistrations = filtered;
+        this.hasNextPage = response.hasNextPage ?? false;
+        this.loading = false;
+      });
     } catch (error) {
-      return { error: true, message: "Error updating Car Registration." };
+      runInAction(() => {
+        this.error = "Error fetching car registrations.";
+        this.loading = false;
+      });
+      console.error(error);
     }
   }
-    
-  
 }
 
 export default new CarRegistrationStore();

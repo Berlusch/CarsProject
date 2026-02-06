@@ -3,6 +3,9 @@ import CarEngineTypeService from "../common/Services/CarEngineTypeService";
 
 class CarEngineTypeStore {
   carEngineTypes = [];
+  currentPage = 1;
+  pageSize = 5;
+  hasNextPage = false;
   loading = false;
   error = null;
 
@@ -10,24 +13,33 @@ class CarEngineTypeStore {
     makeAutoObservable(this);
   }
 
+  setPage(page) {
+    this.currentPage = page;
+    this.fetchCarEngineTypes();
+  }
+
   async fetchCarEngineTypes() {
     this.loading = true;
     this.error = null;
-    try {
-      const items = await CarEngineTypeService.getCarEngineTypesListOnly();      
-  
-      if (items.length === 0) {
-        console.log("No data available.");
-      }
-  
+
+    try {      
+      const pfs = {
+        paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
+        sorting: { orderBy: "Type", descending: false },
+        filter: { propertyName: "Type", filter: "" } 
+      };
+
+      const response = await CarEngineTypeService.getCarEngineTypesPFS(pfs);
+
       runInAction(() => {
-        this.carEngineTypes = items;
-         
+        this.carEngineTypes = response.items ?? [];
+        this.hasNextPage = response.hasNextPage ?? false;
       });
     } catch (error) {
       runInAction(() => {
-        this.error = "Fetching error";
+        this.error = "Error fetching engine types.";
       });
+      console.error(error);
     } finally {
       runInAction(() => {
         this.loading = false;
@@ -35,6 +47,5 @@ class CarEngineTypeStore {
     }
   }
 }
-
 
 export default new CarEngineTypeStore();

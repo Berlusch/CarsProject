@@ -6,74 +6,77 @@ import CarOwnerService from "../../common/Services/CarOwnerService";
 import CarModelService from "../../common/Services/CarModelService";
 import { Form } from "react-bootstrap";
 
-const CarRegistrationsEdit = observer(() => {  
-  const navigate = useNavigate();  
-  
-  const [registrationNumber, setRegistrationNumber] = useState("");
-  
-  const [carOwners, setCarOwners] = useState("");
-  const [carOwnerId, setCarOwnerId] = useState("");  
-  
-  const [carModels, setCarModels] = useState("");
-  const [carModelId, setCarModelId] = useState("");
+const CarRegistrationsEdit = observer(() => {
+  const navigate = useNavigate();
+  const { id } = useParams();
 
+  const [registrationNumber, setRegistrationNumber] = useState("");
+  const [carOwners, setCarOwners] = useState([]);
+  const [carOwnerId, setCarOwnerId] = useState("");
+  const [carModels, setCarModels] = useState([]);
+  const [carModelId, setCarModelId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); 
 
+  // === FETCH DROPDOWN DATA ===
   async function fetchCarOwners() {
     try {
-      const response = await CarOwnerService.getCarOwnersPFS(1, 100, "last name", "");
-      if (Array.isArray(response) && response.length > 0) {
-        setCarOwners(response);            
-      } else {
-        console.error("Data not available");
-      }
+      const pfs = {
+        paging: { pageNumber: 1, pageSize: 100 },
+        sorting: { orderBy: "LastName", descending: false },
+        filter: { propertyName: "LastName", filter: "" }
+      };
+      const response = await CarOwnerService.getCarOwnersPFS(pfs);
+      if (Array.isArray(response.items)) setCarOwners(response.items);
     } catch (error) {
-      console.error("Fetching error:", error);
+      console.error("Error fetching car owners:", error);
     }
   }
-   
-async function fetchCarModels() {
+
+  async function fetchCarModels() {
     try {
-      const response = await CarModelService.getCarModelsPFS(1, 100, "name", "");
-      if (Array.isArray(response) && response.length > 0) {
-        setCarModels (response);            
-      } else {
-        console.error("Data not available");
-      }
+      const pfs = {
+        paging: { pageNumber: 1, pageSize: 100 },
+        sorting: { orderBy: "Name", descending: false },
+        filter: { propertyName: "Name", filter: "" }
+      };
+      const response = await CarModelService.getCarModelsPFS(pfs);
+      if (Array.isArray(response.items)) setCarModels(response.items);
     } catch (error) {
-      console.error("Fetching error:", error);
+      console.error("Error fetching car models:", error);
     }
-  }       
+  }
 
-  async function fetchCarRegistration() {              
-    const result = await CarRegistrationStore.getCarRegistrationById(id);       
+  // === FETCH REGISTRATION BY ID ===
+  async function fetchCarRegistration() {
+    try {
+      const reg = await CarRegistrationStore.getCarRegistrationById(id);
+      if (reg.error) {
+        setMessage("Car Registration not found.");
+        return;
+      }
 
-    if (result.error) {       
-      setMessage("Car Registration not found.");
-    } 
+      setRegistrationNumber(reg.registrationNumber);
+      setCarOwnerId(reg.carOwnerId);
+      setCarModelId(reg.carModelId);
+    } catch (error) {
+      console.error("Error fetching registration:", error);
+      setMessage("Error fetching registration.");
+    }
+  }
 
-    let p = result.message      
-      setRegistrationNumber(p.registrationNumber);
-      setCarOwnerId(p.carOwnerId);  
-      setCarModelId(p.carModelId);        
-    
-  };    
-  
+  // === INITIAL DATA ===
+  async function fetchInitialData() {
+    await fetchCarOwners();
+    await fetchCarModels();
+    await fetchCarRegistration();
+    setLoading(false);
+  }
 
-async function fetchInitialData() {
-  await fetchCarOwners();
-  await fetchCarModels();
-  await fetchCarRegistration();
-  setLoading(false);
-}
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
 
-useEffect(()=>{
-  fetchInitialData();        
-},[]);
-
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!carOwnerId) {
@@ -81,29 +84,29 @@ useEffect(()=>{
       return;
     }
     if (!carModelId) {
-      alert("Please select a car owner!");
+      alert("Please select a car model!");
       return;
     }
-    
-    const result = await CarRegistrationStore.editCarRegistration
-    (id, { registrationNumber, carOwnerId: parseInt(carOwnerId), carModelId: parseInt(carModelId)});
+
+    const result = await CarRegistrationStore.editCarRegistration(id, {
+      registrationNumber,
+      carOwnerId: parseInt(carOwnerId),
+      carModelId: parseInt(carModelId),
+    });
+
     setMessage(result.message);
     if (!result.error) {
       navigate("/car-registrations");
     }
   };
 
-  const handleCancel = () => {
-    navigate("/car-registrations");
-  };
+  const handleCancel = () => navigate("/car-registrations");
 
-  if (loading) return <p>Loading...</p>; 
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="form-container">
-      
-    <h2>Edit Car Registration</h2>
-
+      <h2>Edit Car Registration</h2>
       {message && <p className="form-message">{message}</p>}
 
       <div className="form-group">
@@ -113,30 +116,31 @@ useEffect(()=>{
           id="registrationNumber"
           value={registrationNumber}
           onChange={(e) => setRegistrationNumber(e.target.value)}
-          
         />
       </div>
 
-      <Form.Select 
+      <Form.Select
         value={carOwnerId}
-        onChange={(e) => {setCarOwnerId(e.target.value)}}        
-      > <option value="">Select a car owner</option> 
-        {carOwners && carOwners.map((s, index) => (
-          <option key={index} value={s.id}>
-          {s.firstName} {s.lastName}
-            </option>
+        onChange={(e) => setCarOwnerId(e.target.value)}
+      >
+        <option value="">Select a car owner</option>
+        {carOwners.map((owner) => (
+          <option key={owner.id} value={owner.id}>
+            {owner.firstName} {owner.lastName}
+          </option>
         ))}
       </Form.Select>
-      <br/>
+      <br />
 
-      <Form.Select 
+      <Form.Select
         value={carModelId}
-        onChange={(e) => setCarModelId(e.target.value)}        
-      > <option value="">Select a car model</option>
-        {carModels && carModels.map((s, index) => (
-          <option key={index} value={s.id}>
-          {s.name}
-            </option>
+        onChange={(e) => setCarModelId(e.target.value)}
+      >
+        <option value="">Select a car model</option>
+        {carModels.map((model) => (
+          <option key={model.id} value={model.id}>
+            {model.name}
+          </option>
         ))}
       </Form.Select>
 
