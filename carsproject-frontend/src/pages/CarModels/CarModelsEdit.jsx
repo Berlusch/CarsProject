@@ -140,15 +140,15 @@ const CarModelsEdit = observer(() => {
       </Form.Select>
       <br/>
 
-      <Form.Select
-        value={carEngineTypeId}
-        onChange={(e) => setCarEngineTypeId(e.target.value)}
-      >
+      <Form.Select value={carEngineTypeId} onChange={(e) => setCarEngineTypeId(e.target.value)}>
         <option value="">Select a car engine type</option>
-        {carEngineTypes.map((s) => (
-          <option key={s.id} value={s.id}>{s.type}</option>
-        ))}
-      </Form.Select>
+        {carEngineTypes && carEngineTypes.map((c,index)=>(
+              <option key={index} value={c.id}>
+                {c.type}
+              </option>
+            ))}
+            </Form.Select>
+      <br/>      
 
       <div className="form-button-container">
         <button className="cancel-button" onClick={handleCancel}>Cancel</button>
