@@ -10,8 +10,9 @@ class CarRegistrationStore {
 
   loading = false;
   error = null;
-
   addStatus = { error: false, message: "" };
+  
+  currentRegistration = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -41,7 +42,6 @@ class CarRegistrationStore {
 
       const response = await CarRegistrationService.getCarRegistrationsPFS(pfs);
 
-      
       const filtered = response.items.filter(reg =>
         reg.registrationNumber.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         reg.carOwnerFirstNameLastName.toLowerCase().includes(this.searchTerm.toLowerCase())
@@ -59,6 +59,48 @@ class CarRegistrationStore {
       });
       console.error(error);
     }
+  }
+
+  async getCarRegistrationById(id) {
+    this.loading = true;
+    this.error = null;
+
+    try {
+      const response = await CarRegistrationService.getById(id);
+      if (!response.error) {
+        runInAction(() => {
+          this.currentRegistration = response.message;
+          this.loading = false;
+        });
+      }
+      return response; 
+    } catch (error) {
+      runInAction(() => {
+        this.error = "Error fetching registration by ID.";
+        this.loading = false;
+      });
+      console.error(error);
+      return { error: true, message: "Error fetching registration by ID." };
+    }
+  }
+
+ 
+  async addCarRegistration(registration) {
+    const response = await CarRegistrationService.add(registration);
+    runInAction(() => {
+      this.addStatus = response;
+    });
+    return response;
+  }
+
+
+  async editCarRegistration(id, registration) {
+    return await CarRegistrationService.edit(id, registration);
+  }
+
+
+  async removeCarRegistration(id) {
+    return await CarRegistrationService.remove(id);
   }
 }
 
