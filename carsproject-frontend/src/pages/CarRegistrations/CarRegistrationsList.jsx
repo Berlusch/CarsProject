@@ -77,8 +77,15 @@ const CarRegistrationsList = observer(() => {
         onSearch={handleSearch}
         placeholder="Search by registration..."
       />
+     
 
-      <Table columns={columns} data={data} entityName="Car Registration" />
+      <Table
+        columns={columns}
+        data={data}
+        routeNames={RouteNames.CAR_REGISTRATION_ADD}
+        entityName="Car Registration"
+        page={CarRegistrationStore.currentPage}
+      />
 
       <Pagination currentPage={currentPage} onPageChange={handlePageChange} hasNextPage={hasNextPage} />
     </div>
