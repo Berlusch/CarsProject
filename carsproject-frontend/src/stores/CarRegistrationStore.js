@@ -11,7 +11,7 @@ class CarRegistrationStore {
   loading = false;
   error = null;
   addStatus = { error: false, message: "" };
-  
+
   currentRegistration = null;
 
   constructor() {
@@ -73,7 +73,7 @@ class CarRegistrationStore {
           this.loading = false;
         });
       }
-      return response; 
+      return response;
     } catch (error) {
       runInAction(() => {
         this.error = "Error fetching registration by ID.";
@@ -83,21 +83,25 @@ class CarRegistrationStore {
       return { error: true, message: "Error fetching registration by ID." };
     }
   }
-
- 
-  async addCarRegistration(registration) {
-    const response = await CarRegistrationService.add(registration);
+  
+  async addCarRegistration(payload) {
+  try {
+    const response = await CarRegistrationService.add(payload); 
     runInAction(() => {
       this.addStatus = response;
     });
     return response;
+  } catch (error) {
+    runInAction(() => {
+      this.addStatus = { error: true, message: 'Problem adding car registration.' };
+    });
+    return { error: true, message: 'Problem adding car registration.' };
   }
-
+}
 
   async editCarRegistration(id, registration) {
     return await CarRegistrationService.edit(id, registration);
   }
-
 
   async removeCarRegistration(id) {
     return await CarRegistrationService.remove(id);
