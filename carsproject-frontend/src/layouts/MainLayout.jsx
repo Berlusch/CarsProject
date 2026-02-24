@@ -13,7 +13,7 @@ const MainLayout = () => {
       <main className="main">
         <Outlet />
         <div style={{ textAlign: 'center', paddingTop: '30px', paddingRight: '30px', fontSize: '12px' }}>
-          &copy; Bernarda Lusch 2025
+          &copy; Bernarda Lusch 2025-2026
         </div>
       </main>
     </div>
