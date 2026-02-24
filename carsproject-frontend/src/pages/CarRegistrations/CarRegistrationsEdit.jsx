@@ -18,75 +18,73 @@ const CarRegistrationsEdit = observer(() => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // === FETCH DROPDOWN DATA ===
-  async function fetchCarOwners() {
+  
+  const [currentRegistration, setCurrentRegistration] = useState(null);
+
+
+  const fetchCarOwners = async () => {
     try {
-      const pfs = {
-        paging: { pageNumber: 1, pageSize: 100 },
-        sorting: { orderBy: "LastName", descending: false },
-        filter: { propertyName: "LastName", filter: "" }
-      };
+      const pfs = { paging: { pageNumber: 1, pageSize: 100 }, sorting: { orderBy: "LastName", descending: false }, filter: { propertyName: "LastName", filter: "" } };
       const response = await CarOwnerService.getCarOwnersPFS(pfs);
       if (Array.isArray(response.items)) setCarOwners(response.items);
     } catch (error) {
-      console.error("Error fetching car owners:", error);
+      console.error(error);
     }
-  }
+  };
 
-  async function fetchCarModels() {
+  const fetchCarModels = async () => {
     try {
-      const pfs = {
-        paging: { pageNumber: 1, pageSize: 100 },
-        sorting: { orderBy: "Name", descending: false },
-        filter: { propertyName: "Name", filter: "" }
-      };
+      const pfs = { paging: { pageNumber: 1, pageSize: 100 }, sorting: { orderBy: "Name", descending: false }, filter: { propertyName: "Name", filter: "" } };
       const response = await CarModelService.getCarModelsPFS(pfs);
       if (Array.isArray(response.items)) setCarModels(response.items);
     } catch (error) {
-      console.error("Error fetching car models:", error);
+      console.error(error);
     }
-  }
+  };
 
-  // === FETCH REGISTRATION BY ID ===
-  async function fetchCarRegistration() {
+
+  const fetchCarRegistration = async () => {
     try {
       const reg = await CarRegistrationStore.getCarRegistrationById(id);
       if (reg.error) {
         setMessage("Car Registration not found.");
         return;
       }
-
-      setRegistrationNumber(reg.registrationNumber);
-      setCarOwnerId(reg.carOwnerId);
-      setCarModelId(reg.carModelId);
+      setRegistrationNumber(reg.message.registrationNumber);
+      setCurrentRegistration(reg.message);
     } catch (error) {
-      console.error("Error fetching registration:", error);
+      console.error(error);
       setMessage("Error fetching registration.");
     }
-  }
+  };
 
-  // === INITIAL DATA ===
-  async function fetchInitialData() {
+  const fetchInitialData = async () => {
     await fetchCarOwners();
     await fetchCarModels();
     await fetchCarRegistration();
     setLoading(false);
-  }
+  };
 
   useEffect(() => {
     fetchInitialData();
   }, []);
 
+
+  useEffect(() => {
+    if (!loading && carOwners.length > 0 && carModels.length > 0 && currentRegistration) {
+      
+      const owner = carOwners.find(o => `${o.firstName} ${o.lastName}` === currentRegistration.carOwnerFirstNameLastName);
+      if (owner) setCarOwnerId(owner.id);
+
+      const model = carModels.find(m => m.name === currentRegistration.carModelName);
+      if (model) setCarModelId(model.id);
+    }
+  }, [loading, carOwners, carModels, currentRegistration]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!carOwnerId) {
-      alert("Please select a car owner!");
-      return;
-    }
-    if (!carModelId) {
-      alert("Please select a car model!");
-      return;
-    }
+    if (!carOwnerId) return alert("Please select a car owner!");
+    if (!carModelId) return alert("Please select a car model!");
 
     const result = await CarRegistrationStore.editCarRegistration(id, {
       registrationNumber,
@@ -95,9 +93,7 @@ const CarRegistrationsEdit = observer(() => {
     });
 
     setMessage(result.message);
-    if (!result.error) {
-      navigate("/car-registrations");
-    }
+    if (!result.error) navigate("/car-registrations");
   };
 
   const handleCancel = () => navigate("/car-registrations");
@@ -119,38 +115,35 @@ const CarRegistrationsEdit = observer(() => {
         />
       </div>
 
-      <Form.Select
-        value={carOwnerId}
-        onChange={(e) => setCarOwnerId(e.target.value)}
-      >
-        <option value="">Select a car owner</option>
-        {carOwners.map((owner) => (
-          <option key={owner.id} value={owner.id}>
-            {owner.firstName} {owner.lastName}
-          </option>
-        ))}
-      </Form.Select>
+      <Form.Group controlId="carOwner">
+        <Form.Label>Car Owner</Form.Label>
+        <Form.Select value={carOwnerId} onChange={(e) => setCarOwnerId(e.target.value)}>
+          <option value="">Select a car owner</option>
+          {carOwners.map((owner) => (
+            <option key={owner.id} value={owner.id}>
+              {owner.firstName} {owner.lastName}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
       <br />
 
-      <Form.Select
-        value={carModelId}
-        onChange={(e) => setCarModelId(e.target.value)}
-      >
-        <option value="">Select a car model</option>
-        {carModels.map((model) => (
-          <option key={model.id} value={model.id}>
-            {model.name}
-          </option>
-        ))}
-      </Form.Select>
+      <Form.Group controlId="carModel">
+        <Form.Label>Car Model</Form.Label>
+        <Form.Select value={carModelId} onChange={(e) => setCarModelId(e.target.value)}>
+          <option value="">Select a car model</option>
+          {carModels.map((model) => (
+            <option key={model.id} value={model.id}>
+              {model.name}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+      <br />
 
       <div className="form-button-container">
-        <button className="cancel-button" onClick={handleCancel}>
-          Cancel
-        </button>
-        <button className="add-button" onClick={handleSubmit}>
-          Submit
-        </button>
+        <button className="cancel-button" onClick={handleCancel}>Cancel</button>
+        <button className="add-button" onClick={handleSubmit}>Submit</button>
       </div>
     </div>
   );
