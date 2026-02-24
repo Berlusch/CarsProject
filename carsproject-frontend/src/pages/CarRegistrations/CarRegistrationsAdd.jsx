@@ -1,72 +1,68 @@
 import { observer } from 'mobx-react-lite';
-import CarRegistrationStore from '../../stores/CarRegistrationStore';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 import { RouteNames } from '../../common/constants';
-import CarOwnerService from '../../common/Services/CarOwnerService';
-import CarModelService from '../../common/Services/CarModelService'
+import CarRegistrationStore from '../../stores/CarRegistrationStore';
+import CarOwnerStore from '../../stores/CarOwnerStore';
+import CarModelStore from '../../stores/CarModelStore';
 
-
-const CarRegistrationsAdd = () => {  
+const CarRegistrationsAdd = () => {
   const [registrationNumber, setRegistrationNumber] = useState('');
-  const [carOwners, setCarOwners] = useState([]);    
+  const [carOwners, setCarOwners] = useState([]);
   const [carModels, setCarModels] = useState([]);
-  const [carOwnerId, setCarOwnerId] = useState('');    
-  const [carModelId, setCarModelId] = useState('');  
+  const [carOwnerId, setCarOwnerId] = useState('');
+  const [carModelId, setCarModelId] = useState('');
   const navigate = useNavigate();
-
-  async function fetchCarModels() {
-    try {
-      const response = await CarModelService.getCarModelsPFS(1, 100, "name", "");
-      if (Array.isArray(response) && response.length > 0) {
-        setCarModels(response);
-        setCarModelId(response.id); 
-      } else {
-        console.error("Data not available");
-      }
-    } catch (error) {
-      console.error("Fetching error:", error);
-    }
-  }
   
-
-    async function fetchCarOwners() {
-      try {
-        const response = await CarOwnerService.getCarOwnersPFS(1, 100, "last name", "");
-          if (Array.isArray(response) && response.length > 0) {
-          setCarOwners(response);
-          setCarOwnerId(response.id)
-        } else {
-          console.error("Data not available");
-        }
-      } catch (error) {
-        console.error("Fetching error:", error);
-      }
+  const fetchCarOwners = async () => {
+    try {
+      await CarOwnerStore.fetchCarOwners();
+      setCarOwners([...CarOwnerStore.carOwners]);
+    } catch (error) {
+      console.error('Fetching car owners failed:', error);
     }
+  };
+  
+  const fetchCarModels = async () => {
+    try {
+      await CarModelStore.fetchCarModels();
+      setCarModels([...CarModelStore.carModels]);
+    } catch (error) {
+      console.error('Fetching car models failed:', error);
+    }
+  };
 
-    useEffect(()=>{
-      fetchCarOwners();  
-      fetchCarModels();     
-     
-    },[]);
+  useEffect(() => {
+    fetchCarOwners();
+    fetchCarModels();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!carOwnerId || !carModelId || !registrationNumber.trim()) {
+      alert('Please fill all fields and select both car owner and car model.');
+      return;
+    }
    
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();   
-                    
-      await CarRegistrationStore.addCarRegistration(registrationNumber, (parseInt(carOwnerId)), (parseInt(carModelId)));
-    
-      if (CarRegistrationStore.addStatus.error) {
-        alert('Adding item failed.');
-      } else {
-        CarRegistrationStore.currentPage = 1;
-        navigate(RouteNames.CAR_REGISTRATION_LIST);
-      }
+    const payload = {
+      RegistrationNumber: registrationNumber.trim(),
+      CarOwnerId: Number(carOwnerId),
+      CarModelId: Number(carModelId)
     };
-    
 
-  const handleCancel = () => {    
+    const result = await CarRegistrationStore.addCarRegistration(payload);
+
+    if (result?.error) {
+      alert(`Adding car registration failed: ${result.message}`);
+    } else {
+      CarRegistrationStore.currentPage = 1;
+      navigate(RouteNames.CAR_REGISTRATION_LIST);
+    }
+  };
+
+  const handleCancel = () => {
     setRegistrationNumber('');
     setCarOwnerId('');
     setCarModelId('');
@@ -77,7 +73,7 @@ const CarRegistrationsAdd = () => {
   return (
     <div className="form-container">
       <h2>Add Car Registration</h2>
-      
+
       <div className="form-group">
         <label htmlFor="registrationNumber">Registration Number</label>
         <input
@@ -89,38 +85,43 @@ const CarRegistrationsAdd = () => {
         />
       </div>
 
-      
       <div className="form-group">
         <label htmlFor="carOwnerId">Car Owner</label>
-        <Form.Select 
-            onChange={(e)=>{setCarOwnerId(e.target.value)}}
-            >
-            <option value="">Select a car owner</option>
-            {carOwners && carOwners.map((s,index)=>(
-              <option key={index} value={s.id}>
-                {s.firstName} {s.lastName}
-              </option>
-            ))}
-            </Form.Select>
+        <Form.Select
+          value={carOwnerId || ''}
+          onChange={(e) => setCarOwnerId(Number(e.target.value))}
+        >
+          <option value="">Select a car owner</option>
+          {carOwners.map((owner) => (
+            <option key={owner.id} value={owner.id}>
+              {owner.firstName} {owner.lastName}
+            </option>
+          ))}
+        </Form.Select>
       </div>
 
       <div className="form-group">
         <label htmlFor="carModelId">Car Model</label>
-        <Form.Select 
-            onChange={(e)=>{setCarModelId(e.target.value)}}
-            >
-            <option value="">Select a car model</option>
-            {carModels && carModels.map((s,index)=>(
-              <option key={index} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-            </Form.Select>
+        <Form.Select
+          value={carModelId || ''}
+          onChange={(e) => setCarModelId(Number(e.target.value))}
+        >
+          <option value="">Select a car model</option>
+          {carModels.map((model) => (
+            <option key={model.id} value={model.id}>
+              {model.name}
+            </option>
+          ))}
+        </Form.Select>
       </div>
 
       <div className="form-button-container">
-        <button className="cancel-button" onClick={handleCancel}>Cancel</button>
-        <button className="add-button" onClick={handleSubmit}>Submit</button>
+        <button className="cancel-button" onClick={handleCancel}>
+          Cancel
+        </button>
+        <button className="add-button" onClick={handleSubmit}>
+          Submit
+        </button>
       </div>
     </div>
   );
