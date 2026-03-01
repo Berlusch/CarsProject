@@ -1,6 +1,6 @@
 ﻿namespace CarsProject.WebApi.Extensions
 {
-    public static class CarsProjectExtensions
+    public static class ServiceCollectionCorsExtensions
     {
         public static void AddCarsProjectCORS(this IServiceCollection services)
         {
