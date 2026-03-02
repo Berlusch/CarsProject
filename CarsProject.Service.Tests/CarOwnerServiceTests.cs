@@ -14,7 +14,7 @@ namespace CarsProject.Service.Tests
         public CarOwnerServiceTests()
         {
             _mockRepo = new Mock<IGenericRepository<CarOwner>>();
-            _service = new CarOwnerService(_mockRepo.Object); 
+            _service = new CarOwnerService(_mockRepo.Object);
         }
 
         [Fact]
@@ -29,8 +29,9 @@ namespace CarsProject.Service.Tests
                      .Returns(new List<CarOwner>().AsQueryable());
 
             var result = await _service.GetCarOwnersAsync(pfs);
-
-            result.Should().BeEmpty();
+           
+            result.Items.Should().BeEmpty();
+            result.TotalCount.Should().Be(0);
         }
 
         [Fact]
@@ -72,9 +73,11 @@ namespace CarsProject.Service.Tests
 
             var result = await _service.GetCarOwnersAsync(pfs);
 
-            result.Should().HaveCount(2);
-            result.Should().Contain(x => x.FirstName == "FirstName1");
-            result.Should().Contain(x => x.FirstName == "FirstName2");
+            result.Items.Should().HaveCount(2);
+                        
+            result.Items.Select(x => x.FirstName).Should().Contain(new[] { "FirstName1", "FirstName2" });
+
+            result.TotalCount.Should().Be(2);
         }
 
         [Fact]
@@ -90,7 +93,7 @@ namespace CarsProject.Service.Tests
             _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(new List<CarOwner>().AsQueryable());
             _mockRepo.Setup(r => r.AddAsync(It.IsAny<CarOwner>())).ReturnsAsync((CarOwner c) =>
             {
-                c.Id = 1; 
+                c.Id = 1;
                 return c;
             });
 
