@@ -1,177 +1,127 @@
-﻿using AutoMapper;
-using CarsProject.Common;
+﻿using CarsProject.Common;
 using CarsProject.Model;
 using CarsProject.Repository.Common;
-using CarsProject.WebApi.DTO;
-using FluentAssertions;
+using Microsoft.EntityFrameworkCore.Query;
 using Moq;
+using System.Linq.Expressions;
 
-namespace CarsProject.Service.Tests
+
+namespace CarsProject.Service.Tests;
+
+public class CarModelServiceTests
 {
-    public class CarModelServiceTests
+    private readonly Mock<IGenericRepository<CarModel>> _repoMock;
+    private readonly CarModelService _service;
+
+    public CarModelServiceTests()
     {
-        private readonly Mock<IGenericRepository<CarModel>> _mockRepo;
-        private readonly Mock<IMapper> _mockMapper;
-        private readonly CarModelService _service;
+        _repoMock = new Mock<IGenericRepository<CarModel>>();
+        _service = new CarModelService(_repoMock.Object);
+    }
+   
 
-        public CarModelServiceTests()
-        {
-            _mockRepo = new Mock<IGenericRepository<CarModel>>();
-            _mockMapper = new Mock<IMapper>();
-            _service = new CarModelService(_mockRepo.Object);
-        }
+    private IQueryable<CarModel> BuildQueryable(params CarModel[] items)
+        => new TestAsyncEnumerable<CarModel>(items);
 
-        [Fact]
-        public async Task GetCarModelByIdAsync_ReturnsCorrectCarModelDTO()
-        {
-            var id = 1;
-            var carModel = new CarModel
-            {
-                Id = id,
-                Name = "Model A",
-                Abrv = "MA",
-                CarMake = new CarMake { Id = 1, Name = "Make A", Abrv = "MK" },
-                CarEngineType = new CarEngineType { Id = 1, Type = "Gasoline", Abrv = "GAS" }
-            };
-            var expectedDto = new CarModelReadDto(id, "Model A", "MA", "Make A", "Gasoline");
+    
 
-            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(carModel);
-            _mockMapper.Setup(m => m.Map<CarModelReadDto>(carModel)).Returns(expectedDto);
-
-            var result = await _service.GetCarModelByIdAsync(id);
-
-            result.Should().BeEquivalentTo(expectedDto);
-        }
-
-        [Fact]
-        public async Task GetCarModelsPagedAsync_ReturnsPagedFilteredSortedCarModels()
-        {            
-            var pfs = new PFSParameters
-            {
-                Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
-                Sorting = new SortingParameters { OrderBy = "name", Descending = true },
-                Filter = new FilterParameters { PropertyName = "Id", Filter = "1" }
-            };
-
-            // mock podaci
-            var carModels = new List<CarModel>
+    private CarModel CreateModel(
+        int id,
+        string name = "TestModel",
+        string abrv = "TM",
+        int makeId = 1,
+        int engineId = 1)
     {
-        new CarModel
+        return new CarModel
         {
-            Id = 1,
-            Name = "Model A",
-            Abrv = "MA",
-            CarMake = new CarMake { Id = 1, Name = "Make A", Abrv = "MK" },
-            CarEngineType = new CarEngineType { Id = 1, Type = "Gasoline", Abrv = "GAS" }
-        },
-        new CarModel
-        {
-            Id = 2,
-            Name = "Model B",
-            Abrv = "MB",
-            CarMake = new CarMake { Id = 2, Name = "Make B", Abrv = "MB" },
-            CarEngineType = new CarEngineType { Id = 2, Type = "Diesel", Abrv = "DIE" }
-        }
-    };
-           
-            var expectedDTOs = new List<CarModelReadDto>
+            Id = id,
+            Name = name,
+            Abrv = abrv,
+            CarMakeId = makeId,
+            CarEngineTypeId = engineId,
+
+            CarMake = new CarMake { Id = makeId, Name = "VW", Abrv = "VW" },
+            CarEngineType = new CarEngineType { Id = engineId, Type = "Diesel" }
+        };
+    }
+       
+
+    [Fact]
+    public async Task GetCarModelsAsync_ReturnsPagedResult()
     {
-        new CarModelReadDto(1, "Model A", "MA", "Make A", "Gasoline"),
-        new CarModelReadDto(2, "Model B", "MB", "Make B", "Diesel")
-    };
-                       
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(carModels.AsQueryable());
-                        
-            _mockMapper.Setup(m => m.Map<IEnumerable<CarModelReadDto>>(It.IsAny<IEnumerable<CarModel>>()))
-                       .Returns(expectedDTOs);
-                        
-            var result = await _service.GetCarModelsAsync(pfs);
-                        
-            result.Should().BeEquivalentTo(expectedDTOs);
-        }
+        var data = BuildQueryable(
+            CreateModel(1, "A"),
+            CreateModel(2, "B"),
+            CreateModel(3, "C")
+        );
 
+        _repoMock.Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
+                 .Returns(data);
 
-        [Fact]
-        public async Task AddCarModelAsync_ReturnsAddedCarModelDTO()
+        var pfs = new PFSParameters
         {
-            var carModelDto = new CarModelInsertUpdateDto("Model A", "MA", 1, 2);
-            var carMake = new CarMake { Id = 1, Name = "Make A", Abrv = "MK" };
-            var carEngineType = new CarEngineType { Id = 2, Type = "Gasoline", Abrv = "GAS" };
+            Paging = new PagingParameters { PageNumber = 1, PageSize = 2 }
+        };
 
-            var carModel = new CarModel
-            {
-                Id = 1,
-                Name = "Model A",
-                Abrv = "MA",
-                CarMake = carMake,
-                CarEngineType = carEngineType
-            };
+        var result = await _service.GetCarModelsAsync(pfs);
 
-            var expectedDto = new CarModelReadDto(1, "Model A", "MA", "Make A", "Gasoline");
+        Assert.Equal(3, result.TotalCount);
+        Assert.Equal(2, result.Items.Count);
+        Assert.Equal("A", result.Items[0].Name);
+        Assert.Equal("B", result.Items[1].Name);
+    }          
+       
+    
 
-            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
-                     .Returns(new List<CarModel>().AsQueryable());
-            _mockRepo.Setup(r => r.AddAsync(It.IsAny<CarModel>())).ReturnsAsync(carModel);
-            _mockMapper.Setup(m => m.Map<CarModelReadDto>(carModel)).Returns(expectedDto);
+    [Fact]
+    public async Task AddCarModelAsync_Throws_WhenNameExists()
+    {
+        var existing = CreateModel(1, "Golf");
 
-            var result = await _service.AddCarModelAsync(carModel);
+        _repoMock.Setup(r => r.GetQuery(It.Is<PFSParameters>(p =>
+            p.Filter.PropertyName == "Name")))
+            .Returns(BuildQueryable(existing));
 
-            result.Should().BeEquivalentTo(expectedDto);
-        }
+        await Assert.ThrowsAsync<Exception>(() =>
+            _service.AddCarModelAsync(CreateModel(0, "Golf")));
+    }
+        
+    
 
-        [Fact]
-        public async Task UpdateCarModelAsync_ValidInput_UpdatesAndReturnsDTO()
-        {
-            var id = 1;
-            var carModelDto = new CarModelInsertUpdateDto("Corolla", "COR", 1, 2);
+    [Fact]
+    public async Task UpdateCarModelAsync_Throws_WhenNotFound()
+    {
+        _repoMock.Setup(r => r.GetByIdAsync(999))
+                 .ThrowsAsync(new KeyNotFoundException("Not found"));
 
-            var existingCarModel = new CarModel
-            {
-                Id = id,
-                CarMake = new CarMake { Id = 0, Name = "Dummy", Abrv = "DUM" },
-                CarEngineType = new CarEngineType { Id = 0, Type = "DummyEngine", Abrv = "DME" }
-            };
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            _service.UpdateCarModelAsync(999, CreateModel(0)));
+    }
+    
+    [Fact]
+    public async Task DeleteCarModelAsync_ReturnsTrue()
+    {
+        _repoMock.Setup(r => r.DeleteAsync(1))
+                 .ReturnsAsync(true);
 
-            var updatedCarModel = new CarModel
-            {
-                Id = id,
-                Name = "Corolla",
-                Abrv = "COR",
-                CarMake = new CarMake { Id = 1, Name = "Toyota", Abrv = "TOY" },
-                CarEngineType = new CarEngineType { Id = 2, Type = "Diesel", Abrv = "DIE" }
-            };
+        var result = await _service.DeleteCarModelAsync(1);
 
-            var expectedDto = new CarModelReadDto(id, "Corolla", "COR", "Toyota", "Diesel");
+        Assert.True(result);
+    }
 
-            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(existingCarModel);
-            _mockRepo.Setup(r => r.UpdateAsync(existingCarModel)).ReturnsAsync(updatedCarModel);
-            _mockMapper.Setup(m => m.Map<CarModelReadDto>(updatedCarModel)).Returns(expectedDto);
+    [Fact]
+    public async Task DeleteCarModelAsync_ReturnsFalse()
+    {
+        _repoMock.Setup(r => r.DeleteAsync(1))
+                 .ReturnsAsync(false);
 
-            var result = await _service.UpdateCarModelAsync(id, updatedCarModel);
+        var result = await _service.DeleteCarModelAsync(1);
 
-            result.Should().BeEquivalentTo(expectedDto);
-        }
-
-        [Fact]
-        public async Task DeleteCarModelAsync_ReturnsTrue_WhenCarModelIsDeleted()
-        {
-            var id = 1;
-            var carModel = new CarModel
-            {
-                Id = id,
-                Name = "Corolla",
-                Abrv = "COR",
-                CarMake = new CarMake { Id = 1, Name = "Make X", Abrv = "MX" },
-                CarEngineType = new CarEngineType { Id = 2, Type = "Gasoline", Abrv = "GAS" }
-            };
-
-            _mockRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(carModel);
-            _mockRepo.Setup(r => r.DeleteAsync(id)).ReturnsAsync(true);
-
-            var result = await _service.DeleteCarModelAsync(id);
-
-            result.Should().BeTrue();
-            _mockRepo.Verify(r => r.DeleteAsync(id), Times.Once);
-        }
+        Assert.False(result);
     }
 }
+
+
+public class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider { private readonly IQueryProvider _inner; public TestAsyncQueryProvider(IQueryProvider inner) { _inner = inner; } public IQueryable CreateQuery(Expression expression) => new TestAsyncEnumerable<TEntity>(expression); public IQueryable<TElement> CreateQuery<TElement>(Expression expression) => new TestAsyncEnumerable<TElement>(expression); public object Execute(Expression expression) => _inner.Execute(expression); public TResult Execute<TResult>(Expression expression) => _inner.Execute<TResult>(expression); public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default) => _inner.Execute<TResult>(expression); }
+public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T> { public TestAsyncEnumerable(IEnumerable<T> enumerable) : base(enumerable) { } public TestAsyncEnumerable(Expression expression) : base(expression) { } public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) => new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator()); IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this); }
+public class TestAsyncEnumerator<T> : IAsyncEnumerator<T> { private readonly IEnumerator<T> _inner; public TestAsyncEnumerator(IEnumerator<T> inner) { _inner = inner; } public T Current => _inner.Current; public ValueTask DisposeAsync() { _inner.Dispose(); return ValueTask.CompletedTask; } public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(_inner.MoveNext()); }
