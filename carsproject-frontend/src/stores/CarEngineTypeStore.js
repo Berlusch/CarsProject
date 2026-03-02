@@ -22,11 +22,11 @@ class CarEngineTypeStore {
     this.loading = true;
     this.error = null;
 
-    try {      
+    try {
       const pfs = {
         paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
         sorting: { orderBy: "Type", descending: false },
-        filter: { propertyName: "Type", filter: "" } 
+        filter: { propertyName: "Type", filter: "" }
       };
 
       const response = await CarEngineTypeService.getCarEngineTypesPFS(pfs);

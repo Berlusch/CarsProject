@@ -5,8 +5,8 @@ import Pagination from "../../components/Pagination";
 
 const CarEngineTypeList = observer(() => {
   const [sortConfig, setSortConfig] = useState({
-    key: "type",       
-    direction: "desc", 
+    key: "type",
+    direction: "asc",
   });
 
   useEffect(() => {
@@ -30,16 +30,10 @@ const CarEngineTypeList = observer(() => {
     { header: "Abbreviation", accessor: "abrv" }
   ];
 
-  let data = CarEngineTypeStore.carEngineTypes.map((item) => ({
-    type: item.type,
-    abrv: item.abrv
-  }));
-
-  
-  data = [...data].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
-    if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-    return 0;
+  const data = [...CarEngineTypeStore.carEngineTypes].sort((a, b) => {
+    const valA = a[sortConfig.key]?.toLowerCase() ?? "";
+    const valB = b[sortConfig.key]?.toLowerCase() ?? "";
+    return sortConfig.direction === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
   });
 
   if (CarEngineTypeStore.loading) return <p>Loading...</p>;
@@ -48,7 +42,7 @@ const CarEngineTypeList = observer(() => {
   return (
     <div>
       <header className="entityName">Car Engine Types</header>
-      <br/>
+      <br />
 
       <div className="table-container">
         <table className="custom-table">
