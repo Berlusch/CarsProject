@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using CarsProject.Common;
 using CarsProject.Model;
 using CarsProject.Repository.Common;
-using CarsProject.WebApi.DTO;
 using FluentAssertions;
 using Moq;
 
