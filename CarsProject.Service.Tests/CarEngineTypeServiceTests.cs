@@ -1,6 +1,7 @@
 ﻿using CarsProject.Common;
 using CarsProject.Model;
 using CarsProject.Repository.Common;
+using FluentAssertions;
 using Moq;
 
 namespace CarsProject.Service.Tests
@@ -9,12 +10,19 @@ namespace CarsProject.Service.Tests
     {
         private readonly Mock<ICarEngineTypeRepository> _mockRepo;
         private readonly CarEngineTypeService _service;
+       
+        private static readonly CarEngineType[] TestEngineTypes = new[]
+        {
+            new CarEngineType { Id = 1, Type = "FirstType", Abrv = "FT" },
+            new CarEngineType { Id = 2, Type = "SecondType", Abrv = "ST" }
+        };
+
+        private static readonly string[] TestEngineTypeNames = new[] { "FirstType", "SecondType" };
 
         public CarEngineTypeServiceTests()
         {
             _mockRepo = new Mock<ICarEngineTypeRepository>();
-
-            _service = new CarEngineTypeService(_mockRepo.Object); // SAMO JEDAN ARGUMENT
+            _service = new CarEngineTypeService(_mockRepo.Object);
         }
 
         [Fact]
@@ -27,21 +35,13 @@ namespace CarsProject.Service.Tests
                 Filter = new FilterParameters { PropertyName = "Type", Filter = "F" }
             };
 
-            var carEngineTypes = new List<CarEngineType>
-        {
-            new CarEngineType { Id = 1, Type = "FirstType", Abrv = "FT" },
-            new CarEngineType { Id = 2, Type = "SecondType", Abrv = "ST" }
-        };
-
-            _mockRepo.Setup(r => r.GetAllCarEngineTypesAsync(pfs))
-                     .ReturnsAsync(carEngineTypes);
+            _mockRepo.Setup(r => r.GetQuery(pfs)).Returns(TestEngineTypes.AsQueryable());
 
             var result = await _service.GetCarEngineTypesAsync(pfs);
 
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
-            Assert.Contains(result, x => x.Type == "FirstType");
-            Assert.Contains(result, x => x.Type == "SecondType");
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Type).Should().Contain(TestEngineTypeNames);
+            result.TotalCount.Should().Be(2);
         }
 
         [Fact]
@@ -54,9 +54,10 @@ namespace CarsProject.Service.Tests
 
             var result = await _service.GetCarEngineTypeByIdAsync(id);
 
-            Assert.Equal(carEngineType.Id, result.Id);
-            Assert.Equal(carEngineType.Type, result.Type);
-            Assert.Equal(carEngineType.Abrv, result.Abrv);
+            result.Should().NotBeNull();
+            result.Id.Should().Be(carEngineType.Id);
+            result.Type.Should().Be(carEngineType.Type);
+            result.Abrv.Should().Be(carEngineType.Abrv);
         }
     }
 }
