@@ -7,12 +7,11 @@ class CarRegistrationStore {
   currentPage = 1;
   pageSize = 5;
   hasNextPage = false;
-
   loading = false;
   error = null;
   addStatus = { error: false, message: "" };
-
   currentRegistration = null;
+  sorting = { orderBy: "registrationNumber", descending: false };
 
   constructor() {
     makeAutoObservable(this);
@@ -29,26 +28,33 @@ class CarRegistrationStore {
     this.fetchCarRegistrations();
   }
 
+  setSorting(columnKey) {
+    if (this.sorting.orderBy === columnKey) {
+      this.sorting.descending = !this.sorting.descending;
+    } else {
+      this.sorting.orderBy = columnKey;
+      this.sorting.descending = false;
+    }
+    this.fetchCarRegistrations();
+  }
+
   async fetchCarRegistrations() {
     this.loading = true;
     this.error = null;
 
     try {
+      const search = this.searchTerm?.toLowerCase() || "";
+
       const pfs = {
         paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
-        sorting: { orderBy: "RegistrationNumber", descending: false },
-        filter: { propertyName: "RegistrationNumber", filter: this.searchTerm || "" }
+        sorting: { orderBy: this.sorting.orderBy, descending: this.sorting.descending },
+        filter: { propertyName: "registrationNumber", filter: search }
       };
 
       const response = await CarRegistrationService.getCarRegistrationsPFS(pfs);
 
-      const filtered = response.items.filter(reg =>
-        reg.registrationNumber.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        reg.carOwnerFirstNameLastName.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-
       runInAction(() => {
-        this.carRegistrations = filtered;
+        this.carRegistrations = response.items ?? [];
         this.hasNextPage = response.hasNextPage ?? false;
         this.loading = false;
       });
@@ -64,7 +70,6 @@ class CarRegistrationStore {
   async getCarRegistrationById(id) {
     this.loading = true;
     this.error = null;
-
     try {
       const response = await CarRegistrationService.getById(id);
       if (!response.error) {
@@ -83,21 +88,22 @@ class CarRegistrationStore {
       return { error: true, message: "Error fetching registration by ID." };
     }
   }
-  
+
   async addCarRegistration(payload) {
-  try {
-    const response = await CarRegistrationService.add(payload); 
-    runInAction(() => {
-      this.addStatus = response;
-    });
-    return response;
-  } catch (error) {
-    runInAction(() => {
-      this.addStatus = { error: true, message: 'Problem adding car registration.' };
-    });
-    return { error: true, message: 'Problem adding car registration.' };
+    try {
+      const response = await CarRegistrationService.add(payload);
+      runInAction(() => {
+        this.addStatus = response;
+      });
+      this.fetchCarRegistrations();
+      return response;
+    } catch (error) {
+      runInAction(() => {
+        this.addStatus = { error: true, message: 'Problem adding car registration.' };
+      });
+      return { error: true, message: 'Problem adding car registration.' };
+    }
   }
-}
 
   async editCarRegistration(id, registration) {
     return await CarRegistrationService.edit(id, registration);

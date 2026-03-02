@@ -44,37 +44,33 @@ const CarOwnersList = observer(() => {
   };
 
   const columns = [
-    { header: 'Last Name', accessor: 'lastName' },
-    { header: 'First Name', accessor: 'firstName' },
-    { header: 'Date of Birth', accessor: 'dateOfBirth' },
+    { header: 'Last Name', accessor: 'lastName', sortable: true },
+    { header: 'First Name', accessor: 'firstName', sortable: true },
+    { header: 'Date of Birth', accessor: 'dateOfBirth', sortable: true },
     { header: 'Edit', accessor: 'edit' },
     { header: 'Remove', accessor: 'remove' }
   ];
   
-  const data = CarOwnerStore.carOwners
-    .filter(owner => {
-      const term = CarOwnerStore.searchTerm.toLowerCase();
-      return (
-        owner.firstName.toLowerCase().includes(term) ||
-        owner.lastName.toLowerCase().includes(term)
-      );
-    })
-    .map(owner => ({
-      id: owner.id,
-      lastName: owner.lastName,
-      firstName: owner.firstName,
-      dateOfBirth: owner.dateOfBirth,
-      edit: (
-        <button className="edit-button" onClick={() => handleEdit(owner.id)}>
-          <i className="fas fa-edit"></i>
-        </button>
-      ),
-      remove: (
-        <button className="delete-button" onClick={() => handleRemove(owner.id)}>
-          <i className="fas fa-trash"></i>
-        </button>
-      )
-    }));
+  const data = CarOwnerStore.carOwners.map(owner => ({
+    id: owner.id,
+    lastName: owner.lastName,
+    firstName: owner.firstName,
+    dateOfBirth: owner.dateOfBirth,
+    edit: (
+      <button className="edit-button" onClick={() => handleEdit(owner.id)}>
+        <i className="fas fa-edit"></i>
+      </button>
+    ),
+    remove: (
+      <button className="delete-button" onClick={() => handleRemove(owner.id)}>
+        <i className="fas fa-trash"></i>
+      </button>
+    )
+  }));
+
+  const handleSort = (columnKey) => {
+    CarOwnerStore.setSorting(columnKey);
+  };
 
   return (
     <div>
@@ -87,13 +83,35 @@ const CarOwnersList = observer(() => {
         placeholder="Search by first or last name..."
       />
 
-      <Table
-        columns={columns}
-        data={data}
-        routeNames={RouteNames.CAR_OWNER_ADD}
-        entityName="Car Owner"
-        page={CarOwnerStore.currentPage}
-      />
+      <div className="table-container">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              {columns.map(col => (
+                <th
+                  key={col.accessor}
+                  onClick={col.sortable ? () => handleSort(col.accessor) : undefined}
+                  style={{ cursor: col.sortable ? 'pointer' : 'default' }}
+                >
+                  {col.header}{' '}
+                  {col.sortable && CarOwnerStore.sorting.orderBy === col.accessor && (
+                    <span>{CarOwnerStore.sorting.descending ? '↓' : '↑'}</span>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={item.id} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
+                {columns.map(col => (
+                  <td key={col.accessor}>{item[col.accessor]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <Pagination
         currentPage={CarOwnerStore.currentPage}

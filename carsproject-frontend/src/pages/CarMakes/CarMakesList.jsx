@@ -17,12 +17,11 @@ const CarMakesList = observer(() => {
 
   const handleSearch = (term) => {
     CarMakeStore.setSearchTerm(term);
-    CarMakeStore.fetchCarMakes(); 
   };
 
   const handlePageChange = (page) => {
-  CarMakeStore.setPage(page); 
-};
+    CarMakeStore.setPage(page); 
+  };
 
   const handleEdit = (id) => {
     navigate(RouteNames.CAR_MAKE_EDIT.replace(':id', id));
@@ -46,9 +45,10 @@ const CarMakesList = observer(() => {
     CarMakeStore.fetchCarMakes(); 
   };
 
+  // ---------- DEFINICIJA KOLONA SA SORTIRANJEM ----------
   const columns = [
-    { header: 'Name', accessor: 'name' },
-    { header: 'Abrv', accessor: 'abrv' },
+    { header: 'Name', accessor: 'name', sortable: true },
+    { header: 'Abrv', accessor: 'abrv', sortable: true },
     { header: 'Edit', accessor: 'edit' },
     { header: 'Remove', accessor: 'remove' }
   ];
@@ -69,6 +69,11 @@ const CarMakesList = observer(() => {
     )
   }));
 
+  // ---------- FUNKCIJA ZA KLIK NA HEADER (SERVER-SIDE SORT) ----------
+  const handleSort = (columnKey) => {
+    CarMakeStore.setSorting(columnKey);
+  };
+
   return (
     <div>
       <header className="entityName">Car Makes</header>
@@ -80,13 +85,35 @@ const CarMakesList = observer(() => {
         placeholder="Search by car make..."
       />
 
-      <Table
-        columns={columns}
-        data={data}
-        routeNames={RouteNames.CAR_MAKE_ADD}
-        entityName="Car Make"
-        page={CarMakeStore.currentPage}
-      />
+      <div className="table-container">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              {columns.map(col => (
+                <th
+                  key={col.accessor}
+                  onClick={col.sortable ? () => handleSort(col.accessor) : undefined}
+                  style={{ cursor: col.sortable ? 'pointer' : 'default' }}
+                >
+                  {col.header}{' '}
+                  {col.sortable && CarMakeStore.sorting.orderBy === col.accessor && (
+                    <span>{CarMakeStore.sorting.descending ? '↓' : '↑'}</span>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={item.id} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
+                {columns.map(col => (
+                  <td key={col.accessor}>{item[col.accessor]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <Pagination
         currentPage={CarMakeStore.currentPage}

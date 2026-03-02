@@ -7,14 +7,10 @@ class CarModelStore {
   currentPage = 1;
   pageSize = 5;
   hasNextPage = false;
-
   loading = false;
   error = null;
-
-  addStatus = {
-    error: false,
-    message: ""
-  };
+  addStatus = { error: false, message: "" };
+  sorting = { orderBy: "name", descending: false };
 
   constructor() {
     makeAutoObservable(this);
@@ -31,19 +27,26 @@ class CarModelStore {
     this.fetchCarModels();
   }
 
+  setSorting(columnKey) {
+    if (this.sorting.orderBy === columnKey) {
+      this.sorting.descending = !this.sorting.descending;
+    } else {
+      this.sorting.orderBy = columnKey;
+      this.sorting.descending = false;
+    }
+    this.fetchCarModels();
+  }
+
   async fetchCarModels() {
     this.loading = true;
     this.error = null;
-
     try {
       const pfs = {
         paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
-        sorting: { orderBy: "Name", descending: false }, 
-        filter: { propertyName: "Name", filter: this.searchTerm || "" }
+        sorting: { orderBy: this.sorting.orderBy, descending: this.sorting.descending },
+        filter: { propertyName: "name", filter: this.searchTerm || "" }
       };
-
       const response = await CarModelService.getCarModelsPFS(pfs);
-
       runInAction(() => {
         this.carModels = response.items ?? [];
         this.hasNextPage = response.hasNextPage ?? false;
@@ -59,43 +62,17 @@ class CarModelStore {
   }
 
   async addCarModel(name, abrv, carMakeId, carEngineTypeId) {
-    runInAction(() => {
-      this.addStatus = { error: false, message: "Adding car model..." };
-    });
-
+    runInAction(() => { this.addStatus = { error: false, message: "Adding car model..." }; });
     try {
-      const result = await CarModelService.add({
-        name,
-        abrv,
-        carMakeId,
-        carEngineTypeId
-      });
-
+      const result = await CarModelService.add({ name, abrv, carMakeId, carEngineTypeId });
       if (result?.error) {
-        runInAction(() => {
-          this.addStatus = {
-            error: true,
-            message: result.message || "Error adding car model."
-          };
-        });
+        runInAction(() => { this.addStatus = { error: true, message: result.message || "Error adding car model." }; });
         return;
       }
-
-      runInAction(() => {
-        this.addStatus = {
-          error: false,
-          message: result.message || "Car model added successfully."
-        };
-      });
-
+      runInAction(() => { this.addStatus = { error: false, message: result.message || "Car model added successfully." }; });
       await this.fetchCarModels();
     } catch (error) {
-      runInAction(() => {
-        this.addStatus = {
-          error: true,
-          message: "Problem adding car model."
-        };
-      });
+      runInAction(() => { this.addStatus = { error: true, message: "Problem adding car model." }; });
       console.error(error);
     }
   }
@@ -103,11 +80,7 @@ class CarModelStore {
   async getCarModelById(id) {
     try {
       const result = await CarModelService.getById(id);
-
-      if (result?.error) {
-        return { error: true, message: "Car Model not found." };
-      }
-
+      if (result?.error) return { error: true, message: "Car Model not found." };
       return result;
     } catch (error) {
       return { error: true, message: "Error fetching car model." };

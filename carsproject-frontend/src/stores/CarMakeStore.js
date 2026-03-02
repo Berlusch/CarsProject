@@ -15,6 +15,7 @@ class CarMakeStore {
     error: false,
     message: ""
   };
+  sorting = { orderBy: "name", descending: false }; 
 
   constructor() {
     makeAutoObservable(this);
@@ -30,13 +31,28 @@ class CarMakeStore {
     this.currentPage = page;
     this.fetchCarMakes();
   }
+  
+  setSorting(columnKey) {
+  
+    if (this.sorting.orderBy === columnKey) {
+      this.sorting.descending = !this.sorting.descending;
+    } else {
+      this.sorting.orderBy = columnKey;
+      this.sorting.descending = false;
+    }
+   
+    this.fetchCarMakes();
+  }
 
   async fetchCarMakes() {
     this.loading = true;
     try {
       const pfs = {
         paging: { pageNumber: this.currentPage, pageSize: this.pageSize },
-        sorting: { orderBy: "Name", descending: false }, // veliko N, backend očekuje
+        sorting: { 
+          orderBy: this.sorting.orderBy, 
+          descending: this.sorting.descending 
+        },
         filter: { propertyName: "Name", filter: this.searchTerm || "" }
       };
 

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
 import CarRegistrationStore from '../../stores/CarRegistrationStore';
-import Table from '../../components/Table';
 import Pagination from '../../components/Pagination';
 import SearchBox from '../../components/SearchBox';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +8,7 @@ import { RouteNames } from '../../common/constants';
 
 const CarRegistrationsList = observer(() => {
   const navigate = useNavigate();
-  const { currentPage, pageSize, searchTerm, carRegistrations, hasNextPage } = CarRegistrationStore;
+  const { currentPage, carRegistrations, hasNextPage, searchTerm, sorting } = CarRegistrationStore;
 
   useEffect(() => {
     CarRegistrationStore.fetchCarRegistrations();
@@ -21,6 +20,10 @@ const CarRegistrationsList = observer(() => {
 
   const handlePageChange = (page) => {
     CarRegistrationStore.setPage(page);
+  };
+
+  const handleSort = (columnKey) => {
+    CarRegistrationStore.setSorting(columnKey);
   };
 
   const handleEdit = (id) => {
@@ -43,28 +46,28 @@ const CarRegistrationsList = observer(() => {
   };
 
   const columns = [
-    { header: 'Registration', accessor: 'registrationNumber' },
-    { header: 'Car Owner', accessor: 'carOwnerFirstNameLastName' },
-    { header: 'Car Model', accessor: 'carModelName' },
+    { header: 'Registration', accessor: 'registrationNumber', sortable: true },
+    { header: 'Car Owner', accessor: 'carOwnerFirstNameLastName', sortable: true },
+    { header: 'Car Model', accessor: 'carModelName', sortable: true },
     { header: 'Edit', accessor: 'edit' },
     { header: 'Remove', accessor: 'remove' }
   ];
 
-  const data = carRegistrations.map(carRegistration => ({
-    id: carRegistration.id,
-    registrationNumber: carRegistration.registrationNumber,
-    carOwnerFirstNameLastName: carRegistration.carOwnerFirstNameLastName,
-    carModelName: carRegistration.carModelName,
+  const data = carRegistrations.map(reg => ({
+    id: reg.id,
+    registrationNumber: reg.registrationNumber,
+    carOwnerFirstNameLastName: reg.carOwnerFirstNameLastName,
+    carModelName: reg.carModelName,
     edit: (
-        <button className="edit-button" onClick={() => handleEdit(carRegistration.id)}>
-          <i className="fas fa-edit"></i>
-        </button>
-      ),
-      remove: (
-        <button className="delete-button" onClick={() => handleRemove(carRegistration.id)}>
-          <i className="fas fa-trash"></i>
-        </button>
-      )
+      <button className="edit-button" onClick={() => handleEdit(reg.id)}>
+        <i className="fas fa-edit"></i>
+      </button>
+    ),
+    remove: (
+      <button className="delete-button" onClick={() => handleRemove(reg.id)}>
+        <i className="fas fa-trash"></i>
+      </button>
+    )
   }));
 
   return (
@@ -77,17 +80,42 @@ const CarRegistrationsList = observer(() => {
         onSearch={handleSearch}
         placeholder="Search by registration..."
       />
-     
 
-      <Table
-        columns={columns}
-        data={data}
-        routeNames={RouteNames.CAR_REGISTRATION_ADD}
-        entityName="Car Registration"
-        page={CarRegistrationStore.currentPage}
+      <div className="table-container">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              {columns.map(col => (
+                <th
+                  key={col.accessor}
+                  onClick={col.sortable ? () => handleSort(col.accessor) : undefined}
+                  style={{ cursor: col.sortable ? 'pointer' : 'default' }}
+                >
+                  {col.header}{' '}
+                  {col.sortable && sorting.orderBy === col.accessor && (
+                    <span>{sorting.descending ? '↓' : '↑'}</span>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={item.id} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
+                {columns.map(col => (
+                  <td key={col.accessor}>{item[col.accessor]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+        hasNextPage={hasNextPage}
       />
-
-      <Pagination currentPage={currentPage} onPageChange={handlePageChange} hasNextPage={hasNextPage} />
     </div>
   );
 });

@@ -3,13 +3,13 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CarModelStore from '../../stores/CarModelStore';
 import CarModelService from '../../common/Services/CarModelService';
-import Table from '../../components/Table';
-import SearchBox from '../../components/SearchBox';
 import Pagination from '../../components/Pagination';
+import SearchBox from '../../components/SearchBox';
 import { RouteNames } from '../../common/constants';
 
 const CarModelsList = observer(() => {
   const navigate = useNavigate();
+  const { carModels, currentPage, hasNextPage, searchTerm, sorting } = CarModelStore;
 
   useEffect(() => {
     CarModelStore.fetchCarModels();
@@ -23,18 +23,21 @@ const CarModelsList = observer(() => {
     CarModelStore.setPage(page);
   };
 
+  const handleSort = (columnKey) => {
+    CarModelStore.setSorting(columnKey);
+  };
+
   const handleEdit = (id) => {
     navigate(RouteNames.CAR_MODEL_EDIT.replace(':id', id));
   };
 
   const handleRemove = async (id) => {
-    const carModel = CarModelStore.carModels.find(c => c.id === id);
+    const carModel = carModels.find(c => c.id === id);
     if (!carModel) return;
 
     if (!confirm(`Are you sure you want to remove ${carModel.name}?`)) return;
 
     const response = await CarModelService.remove(id);
-
     if (response?.error) {
       alert(response.message);
       return;
@@ -44,27 +47,27 @@ const CarModelsList = observer(() => {
   };
 
   const columns = [
-    { header: 'Model Name', accessor: 'name' },
-    { header: 'Model Abrv', accessor: 'abrv' },
-    { header: 'Car Make', accessor: 'carMake' },
-    { header: 'Car Engine Type', accessor: 'carEngineType' },
+    { header: 'Model Name', accessor: 'name', sortable: true },
+    { header: 'Model Abrv', accessor: 'abrv', sortable: true },
+    { header: 'Car Make', accessor: 'carMake', sortable: true },
+    { header: 'Car Engine Type', accessor: 'carEngineType', sortable: true },
     { header: 'Edit', accessor: 'edit' },
     { header: 'Remove', accessor: 'remove' }
   ];
 
-  const data = CarModelStore.carModels.map(carModel => ({
-    id: carModel.id,
-    name: carModel.name,
-    abrv: carModel.abrv,
-    carMake: carModel.carMakeName,
-    carEngineType: carModel.carEngineTypeType,
+  const data = carModels.map(model => ({
+    id: model.id,
+    name: model.name,
+    abrv: model.abrv,
+    carMake: model.carMakeName,
+    carEngineType: model.carEngineTypeType,
     edit: (
-      <button className="edit-button" onClick={() => handleEdit(carModel.id)}>
+      <button className="edit-button" onClick={() => handleEdit(model.id)}>
         <i className="fas fa-edit"></i>
       </button>
     ),
     remove: (
-      <button className="delete-button" onClick={() => handleRemove(carModel.id)}>
+      <button className="delete-button" onClick={() => handleRemove(model.id)}>
         <i className="fas fa-trash"></i>
       </button>
     )
@@ -75,24 +78,46 @@ const CarModelsList = observer(() => {
       <header className="entityName">Car Models</header>
 
       <SearchBox
-        value={CarModelStore.searchTerm}
+        value={searchTerm}
         onChange={handleSearch}
         onSearch={handleSearch}
         placeholder="Search by car model..."
       />
 
-      <Table
-        columns={columns}
-        data={data}
-        routeNames={RouteNames.CAR_MODEL_ADD}
-        entityName="Car Model"
-        page={CarModelStore.currentPage}
-      />
+      <div className="table-container">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              {columns.map(col => (
+                <th
+                  key={col.accessor}
+                  onClick={col.sortable ? () => handleSort(col.accessor) : undefined}
+                  style={{ cursor: col.sortable ? 'pointer' : 'default' }}
+                >
+                  {col.header}{' '}
+                  {col.sortable && sorting.orderBy === col.accessor && (
+                    <span>{sorting.descending ? '↓' : '↑'}</span>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={item.id} className={index % 2 === 0 ? 'row-light' : 'row-white'}>
+                {columns.map(col => (
+                  <td key={col.accessor}>{item[col.accessor]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <Pagination
-        currentPage={CarModelStore.currentPage}
+        currentPage={currentPage}
         onPageChange={handlePageChange}
-        hasNextPage={CarModelStore.hasNextPage}
+        hasNextPage={hasNextPage}
       />
     </div>
   );
