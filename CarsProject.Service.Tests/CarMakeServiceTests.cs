@@ -22,20 +22,9 @@ namespace CarsProject.Service.Tests
         {
             var pfs = new PFSParameters
             {
-                Paging = new PagingParameters
-                {
-                    PageNumber = 1,
-                    PageSize = 2
-                },
-                Sorting = new SortingParameters
-                {
-                    OrderBy = "name"
-                },
-                Filter = new FilterParameters
-                {
-                    PropertyName = "", 
-                    Filter = ""        
-                }
+                Paging = new PagingParameters { PageNumber = 1, PageSize = 2 },
+                Sorting = new SortingParameters { OrderBy = "name" },
+                Filter = new FilterParameters { PropertyName = "", Filter = "" }
             };
 
             var carMakes = new List<CarMake>
@@ -44,13 +33,13 @@ namespace CarsProject.Service.Tests
                 new CarMake { Id = 2, Name = "Toyota", Abrv = "TOY" }
             };
 
-            _mockRepo.Setup(r => r.GetQuery(pfs)).Returns(carMakes.AsQueryable());
+            _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(carMakes.AsQueryable());
 
             var result = await _service.GetCarMakesAsync(pfs);
 
-            result.Should().HaveCount(2);
-            result.Should().Contain(c => c.Name == "Ford");
-            result.Should().Contain(c => c.Name == "Toyota");
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(c => c.Name).Should().Contain(new[] { "Ford", "Toyota" });
+            result.TotalCount.Should().Be(2);
         }
 
         [Fact]
@@ -76,7 +65,7 @@ namespace CarsProject.Service.Tests
             _mockRepo.Setup(r => r.GetQuery(It.IsAny<PFSParameters>())).Returns(new List<CarMake>().AsQueryable());
             _mockRepo.Setup(r => r.AddAsync(carMake)).ReturnsAsync(() =>
             {
-                carMake.Id = 1; 
+                carMake.Id = 1;
                 return carMake;
             });
 
