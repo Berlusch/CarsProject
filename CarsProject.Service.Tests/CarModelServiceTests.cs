@@ -1,127 +1,328 @@
 ﻿using CarsProject.Common;
 using CarsProject.Model;
 using CarsProject.Repository.Common;
-using Microsoft.EntityFrameworkCore.Query;
+using CarsProject.Service;
+using MockQueryable;
 using Moq;
-using System.Linq.Expressions;
+using Xunit;
 
-
-namespace CarsProject.Service.Tests;
-
-public class CarModelServiceTests
+namespace CarsProject.Tests.Service
 {
-    private readonly Mock<IGenericRepository<CarModel>> _repoMock;
-    private readonly CarModelService _service;
-
-    public CarModelServiceTests()
+    public class CarModelServiceTests
     {
-        _repoMock = new Mock<IGenericRepository<CarModel>>();
-        _service = new CarModelService(_repoMock.Object);
-    }
-   
+        private readonly Mock<IGenericRepository<CarModel>> _carModelRepoMock;
+        private readonly CarModelService _sut;
 
-    private IQueryable<CarModel> BuildQueryable(params CarModel[] items)
-        => new TestAsyncEnumerable<CarModel>(items);
+        public CarModelServiceTests()
+        {
+            _carModelRepoMock = new Mock<IGenericRepository<CarModel>>();
+            _sut = new CarModelService(_carModelRepoMock.Object);
+        }
 
-    
+        // ─────────────────────────────────────────────────────────
+        // Helper
+        // ─────────────────────────────────────────────────────────
 
-    private CarModel CreateModel(
-        int id,
-        string name = "TestModel",
-        string abrv = "TM",
-        int makeId = 1,
-        int engineId = 1)
-    {
-        return new CarModel
+        private static IQueryable<CarModel> BuildQueryable(IEnumerable<CarModel> data)
+        {
+            var list = data.ToList();
+            return list.BuildMock<CarModel>();
+        }
+
+        private static CarModel CreateCarModel(int id = 1) => new()
         {
             Id = id,
-            Name = name,
-            Abrv = abrv,
-            CarMakeId = makeId,
-            CarEngineTypeId = engineId,
-
-            CarMake = new CarMake { Id = makeId, Name = "VW", Abrv = "VW" },
-            CarEngineType = new CarEngineType { Id = engineId, Type = "Diesel" }
+            Name = $"Model {id}",
+            Abrv = $"M{id}",
+            CarMakeId = 10,
+            CarMake = new CarMake { Id = 10, Name = "Test Make" },
+            CarEngineTypeId = 20,
+            CarEngineType = new CarEngineType { Id = 20, Type = "Test Engine" }
         };
-    }
-       
 
-    [Fact]
-    public async Task GetCarModelsAsync_ReturnsPagedResult()
-    {
-        var data = BuildQueryable(
-            CreateModel(1, "A"),
-            CreateModel(2, "B"),
-            CreateModel(3, "C")
-        );
+        // ─────────────────────────────────────────────────────────
+        // GetCarModelsAsync
+        // ─────────────────────────────────────────────────────────
 
-        _repoMock.Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
-                 .Returns(data);
-
-        var pfs = new PFSParameters
+        [Fact]
+        public async Task GetCarModelsAsync_ReturnsPagedResult_WithCorrectTotalCount()
         {
-            Paging = new PagingParameters { PageNumber = 1, PageSize = 2 }
-        };
+            // Arrange
+            var models = new List<CarModel>
+            {
+                CreateCarModel(1),
+                CreateCarModel(2),
+                CreateCarModel(3)
+            };
 
-        var result = await _service.GetCarModelsAsync(pfs);
+            var pfs = new PFSParameters { Paging = new PagingParameters { PageNumber = 1, PageSize = 2 } };
 
-        Assert.Equal(3, result.TotalCount);
-        Assert.Equal(2, result.Items.Count);
-        Assert.Equal("A", result.Items[0].Name);
-        Assert.Equal("B", result.Items[1].Name);
-    }          
-       
-    
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(pfs))
+                .Returns(BuildQueryable(models));
 
-    [Fact]
-    public async Task AddCarModelAsync_Throws_WhenNameExists()
-    {
-        var existing = CreateModel(1, "Golf");
+            // Act
+            var result = await _sut.GetCarModelsAsync(pfs);
 
-        _repoMock.Setup(r => r.GetQuery(It.Is<PFSParameters>(p =>
-            p.Filter.PropertyName == "Name")))
-            .Returns(BuildQueryable(existing));
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(3, result.TotalCount);
+            Assert.Equal(2, result.Items.Count);
+        }
 
-        await Assert.ThrowsAsync<Exception>(() =>
-            _service.AddCarModelAsync(CreateModel(0, "Golf")));
-    }
-        
-    
+        [Fact]
+        public async Task GetCarModelsAsync_NoPaging_ReturnsAllItems()
+        {
+            // Arrange
+            var models = Enumerable.Range(1, 5).Select(i => CreateCarModel(i)).ToList();
+            var pfs = new PFSParameters { Paging = new PagingParameters { PageSize = 0 } };
 
-    [Fact]
-    public async Task UpdateCarModelAsync_Throws_WhenNotFound()
-    {
-        _repoMock.Setup(r => r.GetByIdAsync(999))
-                 .ThrowsAsync(new KeyNotFoundException("Not found"));
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(pfs))
+                .Returns(BuildQueryable(models));
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            _service.UpdateCarModelAsync(999, CreateModel(0)));
-    }
-    
-    [Fact]
-    public async Task DeleteCarModelAsync_ReturnsTrue()
-    {
-        _repoMock.Setup(r => r.DeleteAsync(1))
-                 .ReturnsAsync(true);
+            // Act
+            var result = await _sut.GetCarModelsAsync(pfs);
 
-        var result = await _service.DeleteCarModelAsync(1);
+            // Assert
+            Assert.Equal(5, result.Items.Count);
+            Assert.Equal(5, result.TotalCount);
+        }
 
-        Assert.True(result);
-    }
+        [Fact]
+        public async Task GetCarModelsAsync_EmptyRepository_ReturnsEmptyPagedResult()
+        {
+            // Arrange
+            var pfs = new PFSParameters { Paging = new PagingParameters { PageNumber = 1, PageSize = 10 } };
 
-    [Fact]
-    public async Task DeleteCarModelAsync_ReturnsFalse()
-    {
-        _repoMock.Setup(r => r.DeleteAsync(1))
-                 .ReturnsAsync(false);
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(pfs))
+                .Returns(BuildQueryable(new List<CarModel>()));
 
-        var result = await _service.DeleteCarModelAsync(1);
+            // Act
+            var result = await _sut.GetCarModelsAsync(pfs);
 
-        Assert.False(result);
+            // Assert
+            Assert.Empty(result.Items);
+            Assert.Equal(0, result.TotalCount);
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // GetCarModelByIdAsync
+        // ─────────────────────────────────────────────────────────
+
+        [Fact]
+        public async Task GetCarModelByIdAsync_ExistingId_ReturnsCarModel()
+        {
+            // Arrange
+            var model = CreateCarModel(1);
+
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
+                .Returns(BuildQueryable(new List<CarModel> { model }));
+
+            // Act
+            var result = await _sut.GetCarModelByIdAsync(1);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(1, result.Id);
+            Assert.Equal(model.Name, result.Name);
+        }
+
+        [Fact]
+        public async Task GetCarModelByIdAsync_NonExistingId_ThrowsKeyNotFoundException()
+        {
+            // Arrange
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
+                .Returns(BuildQueryable(new List<CarModel>()));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(
+                () => _sut.GetCarModelByIdAsync(999));
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // AddCarModelAsync
+        // ─────────────────────────────────────────────────────────
+
+        [Fact]
+        public async Task AddCarModelAsync_NewModel_ReturnsAddedWithFKs()
+        {
+            // Arrange
+            var newModel = new CarModel
+            {
+                Name = "New Model",
+                Abrv = "NM",
+                CarMakeId = 10,
+                CarMake = new CarMake { Id = 10, Name = "Test Make" },
+                CarEngineTypeId = 20,
+                CarEngineType = new CarEngineType { Id = 20, Type = "Test Engine" }
+            };
+
+            var savedModel = CreateCarModel(5);
+            savedModel.Name = "New Model";
+
+            _carModelRepoMock
+                .SetupSequence(r => r.GetQuery(It.IsAny<PFSParameters>()))
+                .Returns(BuildQueryable(new List<CarModel>()))           // duplicate check
+                .Returns(BuildQueryable(new List<CarModel> { savedModel })); // re-fetch after insert
+
+            _carModelRepoMock
+                .Setup(r => r.AddAsync(newModel))
+                .ReturnsAsync(savedModel);
+
+            // Act
+            var result = await _sut.AddCarModelAsync(newModel);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("New Model", result.Name);
+            Assert.NotNull(result.CarMake);
+            Assert.NotNull(result.CarEngineType);
+
+            _carModelRepoMock.Verify(r => r.AddAsync(newModel), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddCarModelAsync_DuplicateName_ThrowsException()
+        {
+            // Arrange
+            var existing = CreateCarModel(1);
+            var duplicate = new CarModel
+            {
+                Name = existing.Name,
+                CarMake = new CarMake { Id = 10, Name = "Test Make" },
+                CarEngineType = new CarEngineType { Id = 20, Type = "Test Engine" }
+            };
+
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
+                .Returns(BuildQueryable(new List<CarModel> { existing }));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(
+                () => _sut.AddCarModelAsync(duplicate));
+
+            _carModelRepoMock.Verify(r => r.AddAsync(It.IsAny<CarModel>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task AddCarModelAsync_NullArgument_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentNullException>(
+                () => _sut.AddCarModelAsync(null!));
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // UpdateCarModelAsync
+        // ─────────────────────────────────────────────────────────
+
+        [Fact]
+        public async Task UpdateCarModelAsync_ValidData_ReturnsUpdatedModel()
+        {
+            // Arrange
+            var existing = CreateCarModel(1);
+            var updateData = new CarModel
+            {
+                Name = "X",
+                Abrv = "X",
+                CarMakeId = 1,
+                CarEngineTypeId = 1,
+                CarMake = new CarMake { Id = 1, Name = "Test Make" },
+                CarEngineType = new CarEngineType { Id = 1, Type = "Test Engine" }
+            };
+            var updatedResult = CreateCarModel(1);
+            updatedResult.Name = "Updated Model";
+
+            _carModelRepoMock
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(existing);
+
+            _carModelRepoMock
+                .Setup(r => r.UpdateAsync(It.IsAny<CarModel>()))
+                .Returns(Task.FromResult(existing));
+
+            _carModelRepoMock
+                .Setup(r => r.GetQuery(It.IsAny<PFSParameters>()))
+                .Returns(BuildQueryable(new List<CarModel> { updatedResult }));
+
+            // Act
+            var result = await _sut.UpdateCarModelAsync(1, updateData);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Updated Model", result.Name);
+
+            _carModelRepoMock.Verify(r => r.UpdateAsync(It.IsAny<CarModel>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateCarModelAsync_NonExistingId_ThrowsKeyNotFoundException()
+        {
+            // Arrange
+            _carModelRepoMock
+                .Setup(r => r.GetByIdAsync(999))
+                .Returns(Task.FromResult<CarModel>(null!));
+
+            var updateData = new CarModel
+            {
+                Name = "X",
+                Abrv = "X",
+                CarMakeId = 1,
+                CarEngineTypeId = 1,
+                CarMake = new CarMake { Id = 1, Name = "Make" },
+                CarEngineType = new CarEngineType { Id = 1, Type = "Engine" }
+            };
+
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(
+                () => _sut.UpdateCarModelAsync(999, updateData));
+        }
+
+        [Fact]
+        public async Task UpdateCarModelAsync_NullArgument_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentNullException>(
+                () => _sut.UpdateCarModelAsync(1, null!));
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // DeleteCarModelAsync
+        // ─────────────────────────────────────────────────────────
+
+        [Fact]
+        public async Task DeleteCarModelAsync_ExistingId_ReturnsTrue()
+        {
+            // Arrange
+            _carModelRepoMock
+                .Setup(r => r.DeleteAsync(1))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await _sut.DeleteCarModelAsync(1);
+
+            // Assert
+            Assert.True(result);
+            _carModelRepoMock.Verify(r => r.DeleteAsync(1), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteCarModelAsync_NonExistingId_ReturnsFalse()
+        {
+            // Arrange
+            _carModelRepoMock
+                .Setup(r => r.DeleteAsync(999))
+                .ReturnsAsync(false);
+
+            // Act
+            var result = await _sut.DeleteCarModelAsync(999);
+
+            // Assert
+            Assert.False(result);
+        }
     }
 }
-
-
-public class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider { private readonly IQueryProvider _inner; public TestAsyncQueryProvider(IQueryProvider inner) { _inner = inner; } public IQueryable CreateQuery(Expression expression) => new TestAsyncEnumerable<TEntity>(expression); public IQueryable<TElement> CreateQuery<TElement>(Expression expression) => new TestAsyncEnumerable<TElement>(expression); public object Execute(Expression expression) => _inner.Execute(expression); public TResult Execute<TResult>(Expression expression) => _inner.Execute<TResult>(expression); public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default) => _inner.Execute<TResult>(expression); }
-public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T> { public TestAsyncEnumerable(IEnumerable<T> enumerable) : base(enumerable) { } public TestAsyncEnumerable(Expression expression) : base(expression) { } public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) => new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator()); IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this); }
-public class TestAsyncEnumerator<T> : IAsyncEnumerator<T> { private readonly IEnumerator<T> _inner; public TestAsyncEnumerator(IEnumerator<T> inner) { _inner = inner; } public T Current => _inner.Current; public ValueTask DisposeAsync() { _inner.Dispose(); return ValueTask.CompletedTask; } public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(_inner.MoveNext()); }
