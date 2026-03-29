@@ -28,7 +28,7 @@ builder.Services.AddScoped<ICarEngineTypeRepository, CarEngineTypeRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddAutoMapper(typeof(CarsProjectMappingProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CarsProjectMappingProfile).Assembly));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
